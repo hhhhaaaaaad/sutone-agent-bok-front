@@ -25,40 +25,73 @@ export default function ArticlesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen theme-bg-gradient">
-      <header className="h-16 px-6 flex items-center border-b border-slate-200/60 bg-white/60 backdrop-blur-sm">
-        <button onClick={() => router.push('/')} className="text-slate-500 hover:text-slate-800 text-sm">&larr; 首页</button>
-        <h1 className="ml-4 text-lg font-bold text-slate-800">文章广场</h1>
-      </header>
+    <div className="min-h-screen theme-bg-gradient p-5">
+      <div className="workspace-shell mx-auto grid min-h-[calc(100vh-40px)] max-w-[1180px] grid-cols-1 overflow-hidden xl:grid-cols-[248px_1fr]">
+        <aside className="workspace-sidebar flex flex-col gap-5 px-5 py-6">
+          <div>
+            <h1 className="text-[30px] font-semibold tracking-tight text-[#22252a]">文章广场</h1>
+            <p className="workspace-mono mt-1 text-[11px] tracking-[0.16em] text-[#858c96]">
+              内容发布区
+            </p>
+          </div>
+          <div className="space-y-2">
+            {[
+              { label: '返回首页', path: '/' },
+              { label: '草稿列表', path: '/drafts' },
+              { label: '文章广场', path: '/articles' },
+            ].map((item, index) => (
+              <button
+                key={item.path}
+                onClick={() => router.push(item.path)}
+                className={`flex h-[42px] w-full items-center rounded-[8px] px-4 text-left text-sm ${
+                  index === 2 ? 'border border-[#e6e2db] bg-white text-[#22252a]' : 'text-[#5d636c] hover:bg-white/60'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+          <div className="workspace-panel rounded-[12px] p-4 text-sm leading-7 text-[#5d636c]">
+            这里展示已发布的文章内容，可快速进入详情查看摘要、标签和正文。
+          </div>
+        </aside>
 
-      <main className="max-w-3xl mx-auto px-6 py-8">
-        {loading && <p className="text-slate-500 text-center mt-20">加载中...</p>}
-        {error && <p className="text-red-500 text-center mt-20">{error}</p>}
+        <main className="flex min-h-0 flex-col bg-[#fcfbf8]">
+          <header className="border-b border-[#e6e2db] px-5 py-4 md:px-7">
+            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / 文章广场</p>
+            <h2 className="mt-1 text-[34px] font-semibold tracking-tight text-[#22252a]">浏览已经完成发布的文章</h2>
+          </header>
 
-        {!loading && !error && articles.length === 0 && (
-          <p className="text-slate-400 text-center mt-24">暂无文章</p>
-        )}
+          <div className="flex-1 overflow-y-auto p-5 md:p-6">
+            {loading && <p className="py-12 text-center text-sm text-[#858c96]">文章加载中...</p>}
+            {error && <p className="py-12 text-center text-sm text-red-500">{error}</p>}
 
-        <div className="grid gap-5">
-          {articles.map(article => (
-            <div
-              key={article.articleId}
-              onClick={() => router.push(`/articles/${article.articleId}`)}
-              className="cursor-pointer bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-slate-200/60 hover:border-emerald-300 hover:shadow-md transition-all"
-            >
-              <h2 className="text-lg font-bold text-slate-800">{article.title}</h2>
-              <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">{article.summary || '暂无摘要'}</p>
-              <div className="flex items-center gap-3 mt-3 flex-wrap">
-                {article.tags?.map(tag => (
-                  <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">{tag}</span>
-                ))}
-                <span className="text-xs text-slate-400">{article.publishTime}</span>
-                <span className="text-xs text-slate-400">{article.viewCount} 阅读</span>
-              </div>
+            {!loading && !error && articles.length === 0 && (
+              <div className="workspace-panel rounded-[16px] p-8 text-center text-sm text-[#858c96]">当前还没有发布文章。</div>
+            )}
+
+            <div className="grid gap-4">
+              {articles.map(article => (
+                <button
+                  key={article.articleId}
+                  onClick={() => router.push(`/articles/${article.articleId}`)}
+                  className="workspace-panel w-full rounded-[16px] p-5 text-left transition-colors hover:bg-white"
+                >
+                  <h3 className="text-[28px] font-medium tracking-tight text-[#22252a]">{article.title}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-[#5d636c]">{article.summary || '暂无摘要'}</p>
+                  <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[#858c96]">
+                    {article.tags?.map(tag => (
+                      <span key={tag} className="workspace-status">{tag}</span>
+                    ))}
+                    <span>{article.publishTime || '刚刚发布'}</span>
+                    <span>{article.viewCount} 阅读</span>
+                  </div>
+                </button>
+              ))}
             </div>
-          ))}
-        </div>
-      </main>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

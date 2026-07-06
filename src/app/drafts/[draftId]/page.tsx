@@ -5,9 +5,17 @@ import { useRouter, useParams } from 'next/navigation';
 import { getUserInfo } from '@/utils/cookie';
 import { draftsApi } from '@/api/drafts';
 import { articlesApi } from '@/api/articles';
-import type { DraftDetailResponse } from '@/types/draft';
+import { aiWritingApi } from '@/api/ai-writing';
+import type { AiTaskStatus, AiTaskType } from '@/types/ai-writing';
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
+
+const AI_ACTIONS: Array<{ label: string; taskType: AiTaskType }> = [
+  { label: '生成大纲', taskType: 'GENERATE_OUTLINE' },
+  { label: '续写正文', taskType: 'GENERATE_BODY' },
+  { label: '润色改写', taskType: 'POLISH_TEXT' },
+  { label: '生成摘要', taskType: 'SUMMARIZE' },
+];
 
 export default function DraftEditorPage() {
   const router = useRouter();
@@ -25,6 +33,11 @@ export default function DraftEditorPage() {
   const [publishing, setPublishing] = useState(false);
   const [tagsInput, setTagsInput] = useState('');
   const [showPublishDialog, setShowPublishDialog] = useState(false);
+  const [aiTaskStatus, setAiTaskStatus] = useState<AiTaskStatus>('idle');
+  const [currentTaskId, setCurrentTaskId] = useState<number | null>(null);
+  const [currentTaskType, setCurrentTaskType] = useState<AiTaskType | null>(null);
+  const [aiResultBuffer, setAiResultBuffer] = useState('');
+  const [aiStatusMessage, setAiStatusMessage] = useState('');
 
   const titleRef = useRef(title);
   const contentRef = useRef(content);
@@ -32,6 +45,7 @@ export default function DraftEditorPage() {
   const coverRef = useRef(coverUrl);
   const savingRef = useRef(false);
   const dirtyRef = useRef(false);
+  const streamControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => { titleRef.current = title; }, [title]);
   useEffect(() => { contentRef.current = content; }, [content]);
@@ -92,6 +106,77 @@ export default function DraftEditorPage() {
     const timer = setTimeout(doSave, 1500);
     return () => clearTimeout(timer);
   }, [title, content, summary, coverUrl, loading, doSave]);
+
+  const handleAiTask = async (taskType: AiTaskType) => {
+    if (aiTaskStatus === 'pending' || aiTaskStatus === 'streaming') return;
+    setCurrentTaskType(taskType);
+    setAiResultBuffer('');
+    setAiStatusMessage('任务提交中...');
+    setAiTaskStatus('pending');
+    try {
+      const resp = await aiWritingApi.submitTask({
+        draftId,
+        taskType,
+        promptParams: { title: titleRef.current },
+      });
+      const taskId = resp.data.taskId;
+      setCurrentTaskId(taskId);
+      setAiTaskStatus('streaming');
+      const controller = await aiWritingApi.streamTask(
+        taskId,
+        event => {
+          if (event.chunk.type === 'status') {
+            setAiStatusMessage(event.chunk.content);
+          }
+          if (event.chunk.type === 'token') {
+            setAiResultBuffer(prev => prev + event.chunk.content);
+          }
+          if (event.chunk.type === 'done') {
+            setAiStatusMessage('生成完成');
+            setAiTaskStatus('done');
+          }
+          if (event.chunk.type === 'error') {
+            setAiStatusMessage(event.chunk.content || '生成失败');
+            setAiTaskStatus('error');
+          }
+        },
+        err => {
+          setAiStatusMessage(err.message || '生成失败');
+          setAiTaskStatus('error');
+        },
+        () => {
+          setAiTaskStatus(prev => prev === 'error' ? 'error' : 'done');
+          streamControllerRef.current = null;
+        },
+      );
+      streamControllerRef.current = controller;
+    } catch (e: unknown) {
+      setAiStatusMessage(e instanceof Error ? e.message : '提交 AI 任务失败');
+      setAiTaskStatus('error');
+    }
+  };
+
+  const stopAiTask = () => {
+    streamControllerRef.current?.abort();
+    streamControllerRef.current = null;
+    setAiStatusMessage('已停止生成');
+    setAiTaskStatus('idle');
+  };
+
+  const appendAiResult = () => {
+    if (!aiResultBuffer.trim()) return;
+    setContent(prev => [prev.trimEnd(), aiResultBuffer.trim()].filter(Boolean).join('\n\n'));
+  };
+
+  const replaceAiResult = () => {
+    if (!aiResultBuffer.trim()) return;
+    setContent(aiResultBuffer.trim());
+  };
+
+  const fillSummaryFromAi = () => {
+    if (!aiResultBuffer.trim()) return;
+    setSummary(aiResultBuffer.trim());
+  };
 
   const handlePublish = async () => {
     setPublishing(true);
@@ -195,24 +280,53 @@ export default function DraftEditorPage() {
             />
           </div>
 
-          {/* AI Writing Panel (placeholder for M3) */}
-          <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-4 mt-2">
-            <h4 className="text-sm font-semibold text-slate-600 mb-3">🤖 AI 写作助手</h4>
+          {/* AI Writing Panel */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-4 mt-2">
+            <div className="flex items-center justify-between mb-3">
+              <h4 className="text-sm font-semibold text-slate-600">AI 写作助手</h4>
+              {currentTaskId && <span className="text-[10px] text-slate-400">#{currentTaskId}</span>}
+            </div>
             <div className="flex flex-col gap-2">
-              {['生成大纲', '续写正文', '润色改写', '生成摘要'].map(action => (
+              {AI_ACTIONS.map(action => (
                 <button
-                  key={action}
-                  disabled
-                  className="w-full text-left px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-400 disabled:cursor-not-allowed"
+                  key={action.taskType}
+                  onClick={() => handleAiTask(action.taskType)}
+                  disabled={aiTaskStatus === 'pending' || aiTaskStatus === 'streaming'}
+                  className="w-full text-left px-3 py-2 rounded-lg border border-slate-200 bg-white text-sm text-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed hover:border-emerald-300"
                 >
-                  {action}
-                  <span className="float-right text-[10px] text-slate-300">即将上线</span>
+                  {action.label}
+                  {currentTaskType === action.taskType && aiTaskStatus === 'streaming' && (
+                    <span className="float-right text-[10px] text-emerald-500">生成中</span>
+                  )}
                 </button>
               ))}
             </div>
-            <p className="text-[10px] text-slate-400 mt-3">
-              AI 写作链路将在 M3 阶段接入，届时可在此处直接调用 AI 生成/润色能力。
-            </p>
+
+            {aiStatusMessage && (
+              <p className={`text-[10px] mt-3 ${aiTaskStatus === 'error' ? 'text-red-500' : 'text-slate-400'}`}>
+                {aiStatusMessage}
+              </p>
+            )}
+
+            {aiResultBuffer && (
+              <div className="mt-3 rounded-lg border border-slate-200 bg-white p-3">
+                <div className="max-h-52 overflow-y-auto whitespace-pre-wrap text-xs leading-relaxed text-slate-600">
+                  {aiResultBuffer}
+                </div>
+                <div className="grid grid-cols-2 gap-2 mt-3">
+                  <button onClick={appendAiResult} className="px-2 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs hover:bg-emerald-100">追加正文</button>
+                  <button onClick={replaceAiResult} className="px-2 py-1.5 rounded-lg bg-slate-100 text-slate-700 text-xs hover:bg-slate-200">替换正文</button>
+                  <button onClick={fillSummaryFromAi} className="px-2 py-1.5 rounded-lg bg-teal-50 text-teal-700 text-xs hover:bg-teal-100">回填摘要</button>
+                  <button onClick={() => setAiResultBuffer('')} className="px-2 py-1.5 rounded-lg bg-slate-50 text-slate-500 text-xs hover:bg-slate-100">清空结果</button>
+                </div>
+              </div>
+            )}
+
+            {(aiTaskStatus === 'pending' || aiTaskStatus === 'streaming') && (
+              <button onClick={stopAiTask} className="w-full mt-3 px-3 py-2 rounded-lg border border-red-100 bg-red-50 text-red-500 text-xs hover:bg-red-100">
+                停止生成
+              </button>
+            )}
           </div>
         </aside>
       </div>

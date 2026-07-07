@@ -103,4 +103,12 @@ export const aiWritingApi = {
 
     return controller;
   },
+
+  /** 查询草稿关联的最近 AI 任务列表 */
+  queryTaskList: async (draftId: number, limit?: number): Promise<Response<AiTaskDetailResponse[]>> => {
+    const params = new URLSearchParams({ draftId: String(draftId) });
+    if (limit !== undefined) params.set('limit', String(limit));
+    const res = await fetch(`${BASE}/ai-writing/task/list?${params}`);
+    return handleResponse<AiTaskDetailResponse[]>(res);
+  },
 };

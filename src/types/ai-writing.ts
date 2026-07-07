@@ -1,6 +1,6 @@
 /** AI 写作模块 DTO */
 
-export type AiTaskType = 'GENERATE_OUTLINE' | 'GENERATE_BODY' | 'POLISH_TEXT' | 'SUMMARIZE';
+export type AiTaskType = 'GENERATE_OUTLINE' | 'GENERATE_BODY' | 'POLISH_TEXT' | 'SUMMARIZE' | 'GENERATE_TITLE' | 'GENERATE_TAGS' | 'QUALITY_CHECK';
 
 export interface SubmitAiTaskRequest {
   draftId: number;

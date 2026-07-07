@@ -1,11 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getUserInfo } from "@/utils/cookie";
 import { draftsApi } from "@/api/drafts";
 import { articlesApi } from "@/api/articles";
-import type { AiTaskType } from "@/types/ai-writing";
 
 import AiWritingPanel from "@/components/AiWritingPanel";
 import PublishDialog from "@/components/PublishDialog";
@@ -26,7 +25,6 @@ export default function DraftEditorPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [publishing, setPublishing] = useState(false);
-  const [tagsInput, setTagsInput] = useState("");
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [selectedText, setSelectedText] = useState("");
 
@@ -52,7 +50,6 @@ export default function DraftEditorPage() {
     coverRef.current = coverUrl;
   }, [coverUrl]);
 
-  // Auth check + load draft
   useEffect(() => {
     const user = getUserInfo();
     if (!user?.user) {
@@ -77,10 +74,8 @@ export default function DraftEditorPage() {
         setLoading(false);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [draftId]);
+  }, [draftId, router]);
 
-  // Auto-save: debounce 1.5s
   const doSave = useCallback(async () => {
     if (savingRef.current) {
       dirtyRef.current = true;
@@ -114,7 +109,6 @@ export default function DraftEditorPage() {
     return () => clearTimeout(timer);
   }, [title, content, summary, coverUrl, loading, doSave]);
 
-  // Selected text tracking
   const handleSelect = useCallback(() => {
     const ta = contentTextareaRef.current;
     if (!ta) return;
@@ -127,7 +121,6 @@ export default function DraftEditorPage() {
     }
   }, []);
 
-  // Build prompt params including selected text and custom instruction
   const getPromptParams = useCallback(() => {
     const params: Record<string, unknown> = { title: titleRef.current };
     if (selectedText) {
@@ -136,13 +129,10 @@ export default function DraftEditorPage() {
     return params;
   }, [selectedText]);
 
-  // Apply AI result to editor fields
   const handleApplyResult = useCallback((action: "append" | "replace" | "fillSummary", content: string) => {
     if (!content.trim()) return;
     if (action === "append") {
-      setContent((prev) =>
-        [prev.trimEnd(), content.trim()].filter(Boolean).join("\n\n"),
-      );
+      setContent((prev) => [prev.trimEnd(), content.trim()].filter(Boolean).join("\n\n"));
     } else if (action === "replace") {
       setContent(content.trim());
     } else if (action === "fillSummary") {

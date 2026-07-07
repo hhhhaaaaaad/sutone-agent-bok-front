@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -52,7 +52,7 @@ interface PptSlideElement {
   radius?: number;
   shadow?: boolean;
   opacity?: number;
-  gradient?: string; // e.g. 'primary' → resolved to theme gradient
+  gradient?: string; // e.g. 'primary' 鈫?resolved to theme gradient
   // Line/divider options
   thickness?: number; // line thickness in inches (for divider)
   // Bullet number
@@ -355,7 +355,7 @@ interface PptTheme {
 const THEMES: PptTheme[] = [
   {
     id: "navy",
-    name: "深海蓝",
+    name: "Deep Navy",
     primary: "1F3864",
     primaryMid: "2E5090",
     primaryLight: "4472C4",
@@ -371,7 +371,7 @@ const THEMES: PptTheme[] = [
   },
   {
     id: "emerald",
-    name: "翡翠绿",
+    name: "Emerald",
     primary: "1B5E3A",
     primaryMid: "2E7D50",
     primaryLight: "4CAF6E",
@@ -387,7 +387,7 @@ const THEMES: PptTheme[] = [
   },
   {
     id: "burgundy",
-    name: "酒红金",
+    name: "Burgundy",
     primary: "6B1D2A",
     primaryMid: "8E2D3E",
     primaryLight: "B84056",
@@ -403,7 +403,7 @@ const THEMES: PptTheme[] = [
   },
   {
     id: "charcoal",
-    name: "极简灰",
+    name: "Charcoal",
     primary: "2C2C2C",
     primaryMid: "4A4A4A",
     primaryLight: "6A6A6A",
@@ -419,7 +419,7 @@ const THEMES: PptTheme[] = [
   },
   {
     id: "ocean",
-    name: "海洋蓝",
+    name: "Ocean",
     primary: "0D47A1",
     primaryMid: "1565C0",
     primaryLight: "42A5F5",
@@ -441,7 +441,7 @@ const DEFAULT_THEME = THEMES[0];
 // Shape elements are now fully skipped (theme handles all decorations)
 
 // Generate PPTX from PptData with professional theme
-// Smart layout inference — ensure visual diversity even when AI doesn't specify layout
+// Smart layout inference 鈥?ensure visual diversity even when AI doesn't specify layout
 const inferLayout = (
   slideData: PptSlide,
   slideIdx: number,
@@ -1075,7 +1075,7 @@ const generatePptx = (data: PptData, theme: PptTheme) => {
           const iconFontSize = el.fontSize || 32;
           const iconX = Math.max(safe.x, el.x || 0);
           const iconY = Math.max(safe.y, el.y || 0);
-          slide.addText(el.icon || el.content || "●", {
+          slide.addText(el.icon || el.content || "•", {
             x: iconX,
             y: iconY,
             w: el.w,
@@ -1178,7 +1178,7 @@ export default function PptPage() {
       id: "1",
       role: "agent",
       content:
-        "你好！我是你的演示稿智能助手。请告诉我你想制作什么主题的演示稿？",
+        "浣犲ソ锛佹垜鏄綘鐨勬紨绀虹鏅鸿兘鍔╂墜銆傝鍛婅瘔鎴戜綘鎯冲埗浣滀粈涔堜富棰樼殑婕旂ず绋匡紵",
       timestamp: Date.now(),
     },
   ]);
@@ -1216,67 +1216,58 @@ export default function PptPage() {
   const PPT_TEMPLATES = [
     {
       category: "business",
-      icon: "💼",
+      icon: "Briefcase",
       label: "商务办公",
       templates: [
         {
           id: "quarterly-report",
           name: "季度工作汇报",
-          desc: "项目进展、数据分析、下季规划",
+          desc: "项目进展、关键数据与下季度规划",
           prompt:
-            "请制作一份2026年Q2季度工作汇报PPT，共9页。\n\n第1页 封面：标题「2026年Q2季度工作汇报」，副标题「技术研发部」，右下角演讲者姓名和日期。\n第2页 本季概览：用3个数据高亮展示核心指标——「项目完成率 92%」「线上事故 0次」「团队满意度 4.8/5」。\n第3页 项目进展：用bullet列表展示4个重点项目——①用户中心重构（已完成80%，预计7月上线）②支付系统升级（已完成，交易成功率99.9%）③数据中台建设（进行中，完成数据采集层）④移动端性能优化（启动速度提升40%）。\n第4页 技术亮点：左右对比布局，左侧「架构优化」列出微服务拆分、缓存策略、CDN加速3个要点，右侧「工程效能」列出CI/CD流水线、自动化测试覆盖率85%、代码审查机制3个要点。\n第5页 数据回顾：用表格展示Q1与Q2核心指标对比（响应时间、可用性、日活、转化率），Q2数据用绿色高亮。\n第6页 团队成果：三列卡片，分别展示「技术突破」（3项专利申请）、「团队成长」（2人晋升、3人入职）、「开源贡献」（5个开源项目贡献）。\n第7页 问题与挑战：用bullet列出3个挑战——①历史技术债积压 ②跨团队协作效率待提升 ③监控体系不够完善，每个挑战后附一句话解决思路。\n第8页 下季规划：时间轴布局，7月完成用户中心上线、8月启动推荐系统、9月完成监控体系2.0。\n第9页 结尾页：感谢语+联系方式。",
+            "Create a 9-slide quarterly business review presentation with a cover, KPI overview, milestone progress, wins, risks, team updates, roadmap, resource requests, and closing slide.",
           scene: "report",
           style: "professional",
         },
         {
           id: "annual-review",
           name: "年度总结报告",
-          desc: "全年回顾、亮点成果、展望未来",
+          desc: "全年复盘、成果亮点与来年目标",
           prompt:
-            "请制作一份2026年度工作总结报告PPT，共10页。\n\n第1页 封面：「2026年度总结报告」，副标题「产品研发中心」，日期2026年12月。\n第2页 年度关键词：用3个大数字展示——「32个项目交付」「98.5%系统可用性」「150+团队成员」。\n第3页 里程碑时间轴：按季度展示4个里程碑——Q1产品2.0上线、Q2海外市场开拓、Q3AI功能发布、Q4用户突破1000万。\n第4页 核心业务成果：三列卡片——「产品侧」3个核心功能上线、「技术侧」架构升级与性能优化、「运营侧」用户增长与留存提升。\n第5页 技术架构演进：左右对比，左侧「年初架构」单体+MySQL，右侧「年末架构」微服务+云原生，中间用对比布局突出变化。\n第6页 数据看板：用表格展示全年12个月核心指标趋势（DAU、收入、NPS、故障数）。\n第7页 团队建设：三列卡片——「人才发展」培训体系+晋升通道、「文化凝聚」团建活动+价值观、「组织效能」OKR+复盘机制。\n第8页 挑战与反思：bullet列出3个反思——①过度设计导致部分项目延期 ②技术选型需更谨慎 ③跨部门沟通仍需加强。\n第9页 2027展望：3个战略方向——①AI原生产品化 ②全球化技术架构 ③开发者生态建设。\n第10页 结尾：感谢+座右铭。",
+            "Create a 10-slide annual review deck covering year overview, key metrics, major milestones, product achievements, organization updates, lessons learned, and next-year priorities.",
           scene: "report",
           style: "professional",
         },
         {
           id: "project-proposal",
           name: "项目立项方案",
-          desc: "项目背景、目标、计划、预算",
+          desc: "背景、目标、方案、预算与排期",
           prompt:
-            "请制作一份智能客服系统项目立项方案PPT，共9页。\n\n第1页 封面：「智能客服系统项目立项方案」，副标题「产品技术部」，日期。\n第2页 项目背景：左侧色带放标题「为什么做」，右侧用bullet列出——①当前人工客服成本占运营支出35% ②平均响应时间8分钟，用户满意度仅72% ③竞品已上线AI客服，我们落后2个季度。\n第3页 项目目标：3个数据高亮——「响应时间 <30秒」「人工成本降低50%」「用户满意度提升至90%」。\n第4页 方案设计：三列卡片——「对话引擎」基于大模型的意图识别+多轮对话，「知识库」产品FAQ+工单历史自动学习，「人工兜底」复杂问题无缝转人工。\n第5页 技术架构：左右对比，左侧「前端」Web+App+小程序多端接入，右侧「后端」LLM服务+向量检索+规则引擎三层架构。\n第6页 实施计划：时间轴——第1月需求确认+技术选型、第2-3月核心开发、第4月内部测试、第5月灰度发布、第6月全量上线。\n第7页 资源需求：表格展示人员配置（2前端+3后端+1算法+1产品+1测试）、硬件资源（GPU服务器2台）、外部依赖（LLM API费用）。\n第8页 风险评估：bullet列出3个风险及应对——①大模型幻觉风险→人工兜底+审核机制 ②数据隐私风险→本地化部署+脱敏 ③用户接受度风险→渐进式上线+反馈收集。\n第9页 结尾：项目slogan+联系方式。",
+            "Create a 9-slide project proposal presentation including problem statement, goals, solution design, implementation plan, budget, risks, and expected outcomes.",
           scene: "report",
-          style: "professional",
-        },
-        {
-          id: "team-intro",
-          name: "团队介绍",
-          desc: "团队成员、职能分工、协作模式",
-          prompt:
-            "请制作一份技术研发团队介绍PPT，共7页。\n\n第1页 封面：「技术研发团队介绍」，副标题「创新驱动·技术赋能」，团队Logo区域。\n第2页 团队概览：3个数据高亮——「50+工程师」「8个技术方向」「3地协作办公」。\n第3页 组织架构：三列卡片——「平台工程组」负责基础架构和DevOps、「业务研发组」负责核心产品开发、「算法团队」负责AI和推荐系统。\n第4页 核心能力：用bullet列出4个能力——①云原生架构设计与实施 ②高并发系统性能优化 ③大模型应用开发 ④全栈工程能力（前端+后端+移动端）。\n第5页 协作方式：左右对比——左侧「敏捷开发」2周迭代+每日站会+迭代演示，右侧「质量保障」代码审查+自动化测试+持续部署。\n第6页 技术成果：三列卡片展示年度亮点——「开源贡献」5个开源项目+2000+ GitHub Stars、「技术专利」12项发明专利、「技术分享」40+场内部分享+10+场外部演讲。\n第7页 结尾：团队slogan+招聘邮箱。",
-          scene: "general",
           style: "professional",
         },
       ],
     },
     {
       category: "roadshow",
-      icon: "🚀",
+      icon: "Rocket",
       label: "路演融资",
       templates: [
         {
           id: "startup-pitch",
           name: "创业融资路演",
-          desc: "痛点、方案、市场、团队、融资",
+          desc: "痛点、方案、市场、增长与融资计划",
           prompt:
-            "请制作一份AI+教育赛道创业融资路演PPT，共11页。\n\n第1页 封面：「智学AI——让每个孩子都有专属AI老师」，公司名+Logo区+融资轮次（Pre-A轮）。\n第2页 痛点洞察：三列卡片——「教育资源不均」一线城市与三四线师资差距3倍、「学习效率低」传统一对一每小时300元、「个性化缺失」千人一面无法因材施教。\n第3页 解决方案：左右对比布局——左侧「传统方式」固定课程+统一进度+被动学习，右侧「智学AI」自适应学习路径+实时反馈+主动探索，中间用divider和VS标识。\n第4页 产品展示：用bullet列出3个核心功能——①AI学情诊断：5分钟精准定位知识薄弱点 ②自适应练习：基于能力动态调整题目难度 ③AI答疑助手：24小时个性化答疑，解题思路而非答案。\n第5页 商业模式：三列卡片——「B2C」个人订阅￥99/月、「B2B」学校合作￥5万/年/校、「B2G」教育局采购区域授权。\n第6页 市场规模：3个数据高亮——「TAM 6000亿」中国K12教育市场、「SAM 1200亿」在线教育细分、「SOM 50亿」AI+教育可触达市场。\n第7页 增长数据：数据高亮页——「注册用户 50万+」「月活增长 180%」「续费率 78%」「NPS 72」。\n第8页 竞争优势：左右对比我方vs竞品——我方「自适应算法领先」「全学科覆盖」「公立校渠道」，竞品「题库驱动」「单科突破」「纯线上C端」。\n第9页 团队介绍：三列卡片——「创始人」前字节跳动AI Lab负责人，清华CS博士、「CTO」前好未来技术总监，10年教育科技经验、「教研负责人」省特级教师，20年一线教学经验。\n第10页 融资计划：bullet列出——融资金额2000万元、估值1亿元、资金用途（40%研发、30%市场、20%团队、10%运营）、18个月跑道。\n第11页 结尾：公司愿景「让AI成为每个孩子的专属老师」+联系方式。",
+            "Create an 11-slide startup pitch deck with problem, solution, market size, product demo, traction, business model, competition, team, financials, and fundraising ask.",
           scene: "pitch",
           style: "creative",
         },
         {
           id: "investor-deck",
-          name: "投资人推介",
-          desc: "核心数据、增长曲线、竞品分析",
+          name: "Investor Update",
+          desc: "核心指标、增长飞轮与未来预测",
           prompt:
-            "请制作一份面向投资人的数据驱动型推介PPT，共9页。\n\n第1页 封面：「数据驱动的增长故事」，公司名+核心Slogan。\n第2页 核心指标：4个数据高亮——「ARR ¥8000万」「YoY增长 156%」「净收入留存 125%」「LTV/CAC 4.2x」。\n第3页 增长飞轮：三列卡片展示——「更多用户」→数据积累→「更好产品」→口碑传播→循环加速。\n第4页 收入模型：用表格展示3条产品线收入（基础版/专业版/企业版）的定价、用户数、收入占比。\n第5页 单位经济：数据高亮——「CAC ¥1200」「LTV ¥5100」「回本周期 8个月」「毛利率 78%」。\n第6页 市场定位：左右对比——左侧「我们」产品驱动增长+自助式上手+高净留存，右侧「竞品」销售驱动+重实施+低留存。\n第7页 增长策略：bullet列出3个增长引擎——①产品自增长：免费版→付费版转化漏斗优化 ②渠道拓展：行业解决方案+ISV生态 ③国际化：东南亚市场先发优势。\n第8页 未来预测：表格展示未来3年财务预测（收入、毛利率、用户数、市场份额）。\n第9页 结尾：融资需求摘要+联系方式。",
+            "Create a 9-slide investor update deck focused on ARR growth, unit economics, retention, growth loops, market position, and next milestones.",
           scene: "pitch",
           style: "professional",
         },
@@ -1284,24 +1275,24 @@ export default function PptPage() {
     },
     {
       category: "education",
-      icon: "📚",
+      icon: "GraduationCap",
       label: "培训教学",
       templates: [
         {
           id: "tech-sharing",
           name: "技术分享",
-          desc: "技术方案、架构、最佳实践",
+          desc: "架构演进、最佳实践与经验复盘",
           prompt:
-            "请制作一份微服务架构演进技术分享PPT，共10页。\n\n第1页 封面：「从单体到微服务——架构演进实战分享」，演讲者姓名+职位+日期。\n第2页 目录：用bullet列出4个章节——①为什么需要微服务 ②架构演进路径 ③踩过的坑与经验 ④未来展望。\n第3页 背景：左侧色带标题「业务痛点」，右侧bullet列出——①代码仓库10万+行，编译需15分钟 ②一个模块故障全站挂 ③团队8人同时改代码冲突频繁 ④新功能上线周期2周+。\n第4页 演进路径：时间轴——Phase1服务拆分（按业务域拆4个服务）→Phase2基础设施（注册中心+配置中心+网关）→Phase3可观测性（链路追踪+指标监控+日志聚合）→Phase4云原生（容器化+K8s+自动扩缩容）。\n第5页 服务拆分策略：左右对比——左侧「按技术层拆」（❌反面教材）导致分布式单体，右侧「按业务域拆」（✅正确做法）用户域/订单域/支付域/商品域各自独立。\n第6页 核心组件：三列卡片——🔧「服务注册与发现」Nacos+健康检查+负载均衡，⚡「API网关」统一入口+鉴权+限流+熔断，📊「可观测性」SkyWalking+Prometheus+ELK。\n第7页 踩坑经验：bullet列出3个血泪教训——①分布式事务：最终一致性>强一致性，用Saga模式 ②服务间循环依赖：引入事件总线解耦 ③配置管理混乱：统一配置中心+灰度发布。\n第8页 成果数据：3个数据高亮——「部署频率 从月更→日更」「故障恢复 从4小时→15分钟」「系统可用性 从99.5%→99.99%」。\n第9页 未来方向：三列卡片——「Service Mesh」Istio+Envoy下沉基础设施、「Serverless」事件驱动+按需弹缩、「AI赋能」智能容量预测+异常检测。\n第10页 结尾：Q&A+参考资源链接。",
+            "Create a 10-slide technical sharing deck about migrating from a monolith to microservices, including pain points, architecture changes, lessons learned, and measurable outcomes.",
           scene: "training",
           style: "academic",
         },
         {
           id: "course-lecture",
           name: "课程讲义",
-          desc: "知识体系、核心概念、案例",
+          desc: "知识框架、核心概念与案例说明",
           prompt:
-            "请制作一份「认知心理学导论」课程讲义PPT，共10页。\n\n第1页 封面：「认知心理学导论——理解人类思维的科学」，教师姓名+课程编号+学期。\n第2页 课程概览：3个数据高亮展示课程框架——「3大核心理论」「6个经典实验」「12个应用案例」。\n第3页 核心概念：三列卡片——🧠「认知负荷理论」工作记忆容量7±2，教学需降低外在负荷，🔬「建构主义」学习者主动构建知识，教师是引导者，🎯「最近发展区」学生独立水平与潜在水平的差距是教学最佳区。\n第4页 信息加工模型：左侧色带标题「人类信息加工」，右侧用bullet列出流程——感觉登记（<1秒）→注意选择（过滤机制）→工作记忆（7±2组块）→长时记忆（无限容量）。每个阶段加emoji图标。\n第5页 经典实验：左右对比——左侧「Stroop效应」色词干扰实验说明自动化加工，右侧「Miller定律」7±2组块理论说明记忆容量限制。\n第6页 记忆原理：三列卡片——「编码」深度加工>浅层加工（Craik & Lockhart），「存储」间隔重复>集中学习（Ebbinghaus遗忘曲线），「提取」情境依赖+状态依赖影响回忆效果。\n第7页 注意力机制：bullet列出3个要点——①选择性注意：鸡尾酒会效应 ②持续性注意：警戒任务中的衰减 ③分配性注意：多任务处理的代价。\n第8页 应用案例：三列卡片——「教育领域」基于认知负荷的教学设计、「UI设计」符合注意规律的界面布局、「人工智能」认知启发的AI架构。\n第9页 本章小结：bullet编号列表——①认知心理学研究人类信息加工过程 ②工作记忆是瓶颈，7±2是关键 ③深度加工促进长时记忆 ④注意力资源有限需合理分配。\n第10页 结尾：思考题+下节预告+参考文献。",
+            "Create a 10-slide lecture deck with learning objectives, key concepts, examples, exercises, and recap for an introductory course.",
           scene: "training",
           style: "academic",
         },
@@ -1309,74 +1300,49 @@ export default function PptPage() {
     },
     {
       category: "data",
-      icon: "📊",
+      icon: "BarChart3",
       label: "数据报告",
       templates: [
         {
           id: "data-dashboard",
           name: "数据看板报告",
-          desc: "关键指标、趋势分析、预警",
+          desc: "关键指标、趋势变化与风险预警",
           prompt:
-            "请制作一份电商平台月度数据看板报告PPT，共8页。\n\n第1页 封面：「2026年5月电商平台数据月报」，副标题「数据智能部」。\n第2页 核心指标：4个数据高亮——「GMV ¥2.8亿」「日均订单 12.5万」「客单价 ¥224」「转化率 4.8%」。\n第3页 流量分析：三列卡片——「UV 5800万」环比+12%，「PV 3.2亿」环比+8%，「人均浏览5.5页」环比持平。\n第4页 用户分析：左右对比——左侧「新用户」占比35%，获客成本¥45，首单转化率28%；右侧「老用户」占比65%，复购率42%，客单价高出新用户60%。\n第5页 品类表现：用表格展示Top5品类（服饰/3C/食品/美妆/家居）的GMV、订单量、增长率、毛利率。\n第6页 营销效果：bullet列出3个重点活动——①5.1大促GMV¥4500万，ROI 1:8.5 ②会员日活动带动老客复购率+15% ③短视频渠道新增用户占比提升至22%。\n第7页 风险预警：三列卡片——⚠️「退货率上升」服饰类退货率18%需关注，📉「搜索转化下降」首页改版后搜索转化降0.3%，🔄「库存周转放缓」部分品类周转天数>30天。\n第8页 下月重点：bullet列出——①优化搜索算法提升转化 ②服饰品类退货率专项治理 ③短视频渠道加大投入 ④会员体系2.0上线。",
+            "Create an 8-slide monthly data report presentation with KPI summary, trend charts, channel analysis, cohort insights, campaign results, risks, and next actions.",
           scene: "report",
           style: "professional",
         },
         {
           id: "competitive-analysis",
           name: "竞品分析",
-          desc: "竞品对比、差异化、策略建议",
+          desc: "产品对比、差异定位与策略建议",
           prompt:
-            "请制作一份AI编程助手竞品分析PPT，共8页。\n\n第1页 封面：「AI编程助手竞品分析报告」，副标题「产品战略部·2026年6月」。\n第2页 市场格局：三列卡片——「海外选手」GitHub Copilot+Cursor+Codeium，「国内选手」通义灵码+百度Comate+CodeGeeX，「新兴玩家」Windsurf+Augment+Cody。\n第3页 功能对比：用表格展示6个竞品在代码补全/对话式编程/多文件编辑/项目理解/私有化部署5个维度的支持情况（✅/⚠️/❌）。\n第4页 核心差异：左右对比——左侧「Copilot优势」生态整合+代码质量+用户基数，右侧「国内产品优势」中文理解+私有化+合规+价格。\n第5页 用户口碑：三列卡片——⭐「易用性」Copilot领先，即装即用，📊「准确率」Cursor的Agent模式代码通过率最高，💰「性价比」Codeium免费版功能最全。\n第6页 SWOT分析：bullet列出我方——S:国内合规+中文优化 W:技术积累不足 O:企业私有化需求爆发 T:Copilot全球扩张。\n第7页 策略建议：bullet列出3个方向——①差异化：深耕企业私有化场景 ②技术追赶：Agent模式+多文件编辑能力 ③生态建设：IDE插件+API开放平台。\n第8页 结尾：总结+下一步行动计划。",
+            "Create an 8-slide competitive analysis deck comparing product positioning, capabilities, pricing, differentiation, SWOT, and strategic recommendations.",
           scene: "report",
           style: "professional",
         },
       ],
     },
     {
-      category: "creative",
-      icon: "🎨",
-      label: "创意设计",
-      templates: [
-        {
-          id: "brand-story",
-          name: "品牌故事",
-          desc: "品牌起源、价值观、愿景",
-          prompt:
-            "请制作一份品牌故事PPT，品牌名「茶里物语」——新中式茶饮品牌，共7页。\n\n第1页 封面：「茶里物语——一杯茶里的东方故事」，品牌Slogan「以茶为媒，链接古今」。\n第2页 品牌起源：左侧色带标题「缘起」，右侧讲述——创始人走访中国20座茶山，发现好茶只出口不内销，决心让国人喝到中国好茶。\n第3页 品牌理念：三列卡片——🍃「寻源」每款茶可溯源至具体茶山和制茶师，🫖「传承」古法制茶+现代萃取技术，🌸「创新」茶+花+果的东方风味融合。\n第4页 产品哲学：左右对比——左侧「传统茶饮」仪式感强但门槛高，右侧「茶里物语」保留仪式感+降低门槛+年轻人友好。\n第5页 空间体验：bullet列出3个设计理念——①新中式空间：竹+木+石材的东方美学 ②互动体验：手作茶饮+茶艺表演 ③社交场景：适合拍照分享的角落设计。\n第6页 品牌愿景：数据高亮——「3年100店」「覆盖20城」「年服务1000万杯」。\n第7页 结尾：品牌Slogan+招商联系方式。",
-          scene: "general",
-          style: "creative",
-        },
-        {
-          id: "event-plan",
-          name: "活动策划方案",
-          desc: "活动主题、流程、预算",
-          prompt:
-            "请制作一份「2026公司年度技术峰会」活动策划方案PPT，共8页。\n\n第1页 封面：「TechForward 2026——年度技术峰会策划方案」，主办方+日期+地点。\n第2页 活动定位：3个数据高亮——「500+参会者」「20+演讲嘉宾」「2天沉浸体验」。\n第3页 活动亮点：三列卡片——🎤「顶级嘉宾」CTO/技术VP/开源维护者，🛠️「动手工坊」AI开发+云原生+前端实战，🤝「社交场景」技术社区晚宴+闪电演讲。\n第4页 议程安排：时间轴展示Day1——09:00开场→10:00主题演讲（3场）→14:00分论坛（AI/架构/前端3个track）→17:00圆桌对话→19:00晚宴。\n第5页 场地规划：左右对比——左侧「主会场」容纳500人+直播设备+同声传译，右侧「分会场」3个200人分会场+工坊区。\n第6页 宣传策略：bullet列出——①提前60天启动倒计时海报 ②技术社区KOL合作推广 ③往届精彩回顾短视频 ④早鸟票+团队票组合优惠。\n第7页 预算概览：用表格展示各项费用（场地/设备/嘉宾/餐饮/宣传/物料）的预算金额和占比。\n第8页 结尾：策划团队+联系方式+报名二维码占位。",
-          scene: "general",
-          style: "creative",
-        },
-      ],
-    },
-    {
       category: "personal",
-      icon: "🌟",
+      icon: "UserRound",
       label: "个人成长",
       templates: [
         {
           id: "resume",
-          name: "个人简历",
-          desc: "教育、经历、技能、项目",
+          name: "Resume",
+          desc: "教育、经历、技能与项目成果",
           prompt:
-            "请制作一份高级Java工程师个人简历PPT，共6页。\n\n第1页 封面：姓名「张三」，职位「高级Java工程师 / 技术负责人」，联系方式（邮箱+手机+GitHub），一句话定位「8年Java架构经验，专注高并发系统设计与微服务治理」。\n第2页 个人简介：左侧色带放头像占位区和姓名，右侧——5年一线互联网经验+3年技术管理经验，主导过日活千万级系统架构设计，带领15人团队完成3次重大架构升级。\n第3页 工作经历：时间轴布局——2024-至今「某大厂」技术负责人，负责推荐系统架构升级；2021-2024「某独角兽」高级工程师，主导订单系统微服务化；2018-2021「某上市公司」Java工程师，参与核心交易系统开发。\n第4页 核心技能：三列卡片——💻「技术栈」Java/Spring Boot/MySQL/Redis/Kafka/ES/Docker/K8s，🏗️「架构能力」微服务设计/分布式系统/高并发方案/DDD领域驱动，🚀「工程效能」CI/CD/自动化测试/代码质量/性能调优。\n第5页 项目成果：数据高亮——「系统可用性 99.99%」「QPS峰值 50万+」「响应时间 P99<100ms」「团队效率提升 3倍」。\n第6页 结尾：教育背景（XX大学·计算机科学·硕士）+一句话「代码改变世界，架构成就未来」。",
+            "Create a 6-slide resume presentation for a senior software engineer, covering profile, experience, skills, flagship projects, achievements, and contact details.",
           scene: "general",
           style: "minimal",
         },
         {
           id: "year-review",
           name: "个人年度回顾",
-          desc: "成就、学习、新年计划",
+          desc: "成就、学习收获与新年计划",
           prompt:
-            "请制作一份2026年个人年度回顾PPT，共7页。\n\n第1页 封面：「我的2026——年度回顾与展望」，姓名+年份。\n第2页 年度关键词：3个数据高亮——「12本书」「6个新技能」「3次突破」。\n第3页 职业成长：时间轴——Q1完成架构师认证、Q2主导核心系统重构、Q3在技术大会做演讲、Q4晋升技术总监。\n第4页 技能收获：三列卡片——📖「技术能力」掌握K8s+Service Mesh+LLM应用开发，🎯「管理能力」团队从8人扩展到20人+建立OKR体系，💡「软技能」公众演讲+跨部门协作+向上管理。\n第5页 年度好书：bullet列出3本——①《凤凰项目》理解DevOps本质 ②《系统设计面试》架构思维升级 ③《纳瓦尔宝典》重新理解财富与幸福。\n第6页 2027计划：三列卡片——🚀「职业」技术VP目标+建立技术影响力，📚「学习」深度学习+系统设计+英语提升，💪「生活」健身100次+旅行3座城市+读15本书。\n第7页 结尾：年度座右铭「Stay hungry, stay foolish」。",
+            "Create a 7-slide personal year-in-review deck covering achievements, growth, books, skills, memorable moments, and next-year plans.",
           scene: "general",
           style: "creative",
         },
@@ -1386,41 +1352,41 @@ export default function PptPage() {
 
   // Style Options
   const STYLE_OPTIONS = [
-    { id: "professional", label: "👔 商务" },
-    { id: "creative", label: "🎨 创意" },
-    { id: "academic", label: "🎓 学术" },
-    { id: "minimal", label: "✨ 极简" },
+    { id: "professional", label: "Professional" },
+    { id: "creative", label: "Creative" },
+    { id: "academic", label: "Academic" },
+    { id: "minimal", label: "Minimal" },
   ];
   const STRUCTURE_OPTIONS = [
-    { id: "auto", label: "🤖 自动" },
-    { id: "title-only", label: "📋 纯标题" },
-    { id: "full", label: "📖 完整" },
-    { id: "concise", label: "⚡ 精简" },
+    { id: "auto", label: "Auto" },
+    { id: "title-only", label: "Title Only" },
+    { id: "full", label: "Full Content" },
+    { id: "concise", label: "Concise" },
   ];
   const TONE_OPTIONS = [
-    { id: "neutral", label: "⚖️ 中性" },
-    { id: "warm", label: "🔥 暖色" },
-    { id: "cool", label: "❄️ 冷色" },
-    { id: "vivid", label: "🌈 鲜艳" },
+    { id: "neutral", label: "Neutral" },
+    { id: "warm", label: "Warm" },
+    { id: "cool", label: "Cool" },
+    { id: "vivid", label: "Vivid" },
   ];
   const SCENE_OPTIONS = [
-    { id: "general", label: "📋 通用" },
-    { id: "report", label: "📊 汇报" },
-    { id: "pitch", label: "🚀 路演" },
-    { id: "training", label: "📚 培训" },
+    { id: "general", label: "General" },
+    { id: "report", label: "Report" },
+    { id: "pitch", label: "Pitch" },
+    { id: "training", label: "Training" },
   ];
   const LAYOUT_OPTIONS = [
-    { id: "auto", label: "自动", desc: "AI自动选择" },
-    { id: "title_classic", label: "经典封面", desc: "上下结构封面" },
-    { id: "title_center", label: "居中封面", desc: "简约边框居中" },
-    { id: "title_split", label: "左右封面", desc: "50/50双色划分" },
-    { id: "content_classic", label: "经典内容", desc: "左侧深色侧边栏" },
-    { id: "content_top", label: "顶栏内容", desc: "顶部横向深色条" },
-    { id: "card_3col", label: "三栏卡片", desc: "3列信息块" },
-    { id: "card_2col", label: "双栏卡片", desc: "2列大信息块" },
-    { id: "comparison", label: "对比布局", desc: "左右对称比较" },
-    { id: "data_highlight", label: "数据高亮", desc: "突出核心数据" },
-    { id: "timeline", label: "时间线", desc: "流程/时间节点" },
+    { id: "auto", label: "Auto", desc: "Let AI choose the slide structure" },
+    { id: "title_classic", label: "Classic Cover", desc: "Top-bottom cover composition" },
+    { id: "title_center", label: "Centered Cover", desc: "Minimal centered headline cover" },
+    { id: "title_split", label: "Split Cover", desc: "50/50 split-color cover layout" },
+    { id: "content_classic", label: "Classic Content", desc: "Sidebar-led content layout" },
+    { id: "content_top", label: "Topbar Content", desc: "Horizontal header content layout" },
+    { id: "card_3col", label: "3-Column Cards", desc: "Three equal information cards" },
+    { id: "card_2col", label: "2-Column Cards", desc: "Two larger content cards" },
+    { id: "comparison", label: "Comparison", desc: "Left-right comparison layout" },
+    { id: "data_highlight", label: "Data Highlight", desc: "Spotlight core metrics and trends" },
+    { id: "timeline", label: "Timeline", desc: "Flow and milestone layout" },
   ];
   const activeTheme =
     THEMES.find((t) => t.id === selectedThemeId) || DEFAULT_THEME;
@@ -1560,7 +1526,7 @@ export default function PptPage() {
           id: Date.now().toString(),
           role: "agent",
           content:
-            "你好！我是你的演示稿智能助手。请告诉我你想制作什么主题的演示稿？",
+            "浣犲ソ锛佹垜鏄綘鐨勬紨绀虹鏅鸿兘鍔╂墜銆傝鍛婅瘔鎴戜綘鎯冲埗浣滀粈涔堜富棰樼殑婕旂ず绋匡紵",
           timestamp: Date.now(),
         },
       ],
@@ -1596,7 +1562,7 @@ export default function PptPage() {
   const handleAddNewModel = () => {
     setEditingModel({
       id: Date.now().toString(),
-      name: "新模型",
+      name: "New Model",
       baseUrl: "https://api.openai.com",
       apiKey: "",
       model: "gpt-4o",
@@ -1673,7 +1639,7 @@ export default function PptPage() {
       {
         id: Date.now().toString(),
         role: "agent",
-        content: "⚠️ 已停止生成。",
+        content: "Generation stopped.",
         timestamp: Date.now(),
       },
     ]);
@@ -1700,17 +1666,17 @@ export default function PptPage() {
       TONE_OPTIONS.find((o) => o.id === selectedTone)?.label || selectedTone;
     const sceneLabel =
       SCENE_OPTIONS.find((o) => o.id === selectedScene)?.label || selectedScene;
-    styleHints.push(`风格=${styleLabel}`);
-    styleHints.push(`结构=${structureLabel}`);
-    styleHints.push(`色调=${toneLabel}`);
-    styleHints.push(`场景=${sceneLabel}`);
+    styleHints.push(`椋庢牸=${styleLabel}`);
+    styleHints.push(`缁撴瀯=${structureLabel}`);
+    styleHints.push(`鑹茶皟=${toneLabel}`);
+    styleHints.push(`鍦烘櫙=${sceneLabel}`);
     if (!selectedLayouts.includes("auto") && selectedLayouts.length > 0) {
       const layoutLabels = selectedLayouts
         .map((id) => LAYOUT_OPTIONS.find((o) => o.id === id)?.label || id)
-        .join("、");
-      styleHints.push(`布局=${layoutLabels}`);
+        .join(" / ");
+      styleHints.push(`甯冨眬=${layoutLabels}`);
     }
-    const enrichedContent = `[设计指令: ${styleHints.join(", ")}]
+    const enrichedContent = `[璁捐鎸囦护: ${styleHints.join(", ")}]
 
 ${content}`;
 
@@ -1720,7 +1686,7 @@ ${content}`;
         {
           id: Date.now().toString(),
           role: "agent",
-          content: "请先选择一个智能体。",
+          content: "Please select an agent first.",
           timestamp: Date.now(),
         },
       ]);
@@ -1780,7 +1746,7 @@ ${content}`;
       let accumulatedSteps: MessageStep[] = [];
 
       setStreamPhase("analyzing");
-      setStreamProgress("正在分析需求...");
+      setStreamProgress("姝ｅ湪鍒嗘瀽闇€姹?..");
 
       const updateStep = (
         phaseStr: string,
@@ -1831,11 +1797,11 @@ ${content}`;
           const { phase, chunk } = event;
 
           const phaseLabel: Record<string, string> = {
-            analyzing: "🔍 分析需求",
-            drawing: "🎨 生成内容",
-            generating: "🎨 生成内容",
-            reviewing: "✅ 检查优化",
-            thinking: "🤔 思考中",
+            analyzing: "Analyzing request",
+            drawing: "馃帹 鐢熸垚鍐呭",
+            generating: "馃帹 鐢熸垚鍐呭",
+            reviewing: "Reviewing output",
+            thinking: "馃 鎬濊€冧腑",
           };
           const currentPhaseLabel = phaseLabel[phase] || phaseLabel.thinking;
 
@@ -1860,7 +1826,7 @@ ${content}`;
               setPptData({ title: pptTitle || "PPT", slides: newSlides });
               renderedSlideCount = newSlides.length;
             }
-            setStreamProgress(`已渲染 ${renderedSlideCount} 页...`);
+            setStreamProgress(`宸叉覆鏌?${renderedSlideCount} 椤?..`);
           } else if (chunk.type === "status") {
             const statusContent = (chunk as StatusChunk).content || "";
             accumulatedText += statusContent;
@@ -1969,7 +1935,7 @@ ${content}`;
           } else if (chunk.type === "error") {
             accumulatedContent +=
               (accumulatedContent ? "\n\n" : "") +
-              `❌ ${(chunk as ErrorChunk).content || "生成失败"}`;
+              `鉂?${(chunk as ErrorChunk).content || "鐢熸垚澶辫触"}`;
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === agentMsgId
@@ -1994,7 +1960,7 @@ ${content}`;
           ) {
             accumulatedContent +=
               (accumulatedContent ? "\n\n" : "") +
-              `❌ 连接异常: ${error.message}`;
+              `鉂?杩炴帴寮傚父: ${error.message}`;
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === agentMsgId
@@ -2050,7 +2016,7 @@ ${content}`;
               );
               accumulatedContent +=
                 (accumulatedContent ? "\n\n" : "") +
-                `✅ PPT 已生成！共 ${normalizedPpt.slides.length} 页，可以预览或下载。`;
+                `PPT generated successfully: ${normalizedPpt.slides.length} slides. You can preview or download it now.`;
               setMessages((prev) =>
                 prev.map((m) =>
                   m.id === agentMsgId
@@ -2084,13 +2050,13 @@ ${content}`;
                     );
                     accumulatedContent +=
                       (accumulatedContent ? "\n\n" : "") +
-                      `✅ PPT 已生成！共 ${norm.slides.length} 页。`;
+                      `PPT generated successfully: ${norm.slides.length} slides.`;
                   } else {
                     displayContent =
                       parsed.message ||
                       parsed.content ||
                       parsed.text ||
-                      "收到响应。";
+                      "Received response.";
                     if (typeof displayContent !== "string")
                       displayContent = JSON.stringify(displayContent);
                     accumulatedContent +=
@@ -2099,7 +2065,7 @@ ${content}`;
                 } catch {
                   accumulatedContent +=
                     (accumulatedContent ? "\n\n" : "") +
-                    "收到响应，但无法解析 PPT 数据。";
+                    "Received a response, but could not parse PPT data.";
                 }
               }
               setMessages((prev) =>
@@ -2134,7 +2100,7 @@ ${content}`;
             }
             accumulatedContent +=
               (accumulatedContent ? "\n\n" : "") +
-              `✅ PPT 已生成！共 ${renderedSlideCount} 页，可以预览或下载。`;
+              `PPT generated successfully: ${renderedSlideCount} slides. You can preview or download it now.`;
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === agentMsgId
@@ -2185,7 +2151,7 @@ ${content}`;
       const activeTheme =
         THEMES.find((t) => t.id === selectedThemeId) || DEFAULT_THEME;
       const pres = generatePptx(pptData, activeTheme);
-      pres.writeFile({ fileName: `${pptData.title || "未命名演示稿"}.pptx` });
+      pres.writeFile({ fileName: `${pptData.title || "鏈懡鍚嶆紨绀虹"}.pptx` });
     } catch (err) {
       console.error("Failed to generate PPTX:", err);
     }
@@ -2210,7 +2176,7 @@ ${content}`;
         id: Date.now().toString(),
         role: "agent",
         content:
-          "你好！我是你的演示稿智能助手。请告诉我你想制作什么主题的演示稿？",
+          "浣犲ソ锛佹垜鏄綘鐨勬紨绀虹鏅鸿兘鍔╂墜銆傝鍛婅瘔鎴戜綘鎯冲埗浣滀粈涔堜富棰樼殑婕旂ず绋匡紵",
         timestamp: Date.now(),
       };
       setSessionId(newBackendId);
@@ -2248,12 +2214,12 @@ ${content}`;
 
   const quickActions = [
     {
-      label: "产品汇报演示稿",
-      text: "请帮我制作一份产品季度汇报PPT，包含业绩数据、重点项目进展、下季度规划，大约8页",
+      label: "Product Presentation",
+      text: "请帮我制作一份产品季度汇报 PPT，包含业绩数据、重点项目进展和下季度规划，大约 8 页。",
     },
     {
-      label: "技术方案演示稿",
-      text: "请帮我制作一份微服务架构技术方案PPT，包含架构设计、技术选型、部署方案，大约6页",
+      label: "技术方案演示",
+      text: "请帮我制作一份微服务架构技术方案 PPT，包含架构设计、技术选型和部署方案，大约 6 页。",
     },
   ];
 
@@ -2695,7 +2661,7 @@ ${content}`;
         className="w-full h-full relative bg-white"
         style={{ fontSize: "2px" }}
       >
-        {/* Theme decorations (mini) — layout-specific */}
+        {/* Theme decorations (mini) 鈥?layout-specific */}
         {renderMiniDecor(layout, slideIdx, t)}
         {/* Actual text content in thumbnail */}
         {slideData.elements
@@ -2738,7 +2704,7 @@ ${content}`;
                   textOverflow: "ellipsis",
                 }}
               >
-                {(el.content || "").replace(/[•\-]/g, "").trim().slice(0, 30)}
+                {(el.content || "").replace(/[鈥-]/g, "").trim().slice(0, 30)}
               </div>
             );
           })}
@@ -2886,7 +2852,7 @@ ${content}`;
               color: el.color ? `#${el.color}` : `#${activeTheme.primary}`,
             }}
           >
-            {el.icon || el.content || "●"}
+            {el.icon || el.content || "•"}
           </div>
         );
       }
@@ -3105,7 +3071,7 @@ ${content}`;
     );
   };
 
-  // Render theme decorations for preview — layout-specific skeletons (ENHANCED)
+  // Render theme decorations for preview 鈥?layout-specific skeletons (ENHANCED)
   const renderThemeDecor = (slideData: PptSlide, slideIdx: number) => {
     const layout = inferLayout(
       slideData,
@@ -3125,7 +3091,7 @@ ${content}`;
     const primaryVertGrad = `linear-gradient(180deg, #${t.primary}, #${t.primaryMid})`;
 
     if (layout === "title_classic" || layout === "end_slide") {
-      // Cover / End Classic — gradient cover + soft accent
+      // Cover / End Classic 鈥?gradient cover + soft accent
       elements.push(
         renderDecorDiv(0, 0, 13.33, t.coverNavyHeight, t.primary, "t-top", {
           gradient: primaryGrad,
@@ -3155,7 +3121,7 @@ ${content}`;
         }),
       );
     } else if (layout === "title_center") {
-      // Cover Center — gradient bars + soft center circle
+      // Cover Center 鈥?gradient bars + soft center circle
       elements.push(
         renderDecorDiv(0, 0, 13.33, 0.25, t.primary, "t-top", {
           gradient: primaryGrad,
@@ -3180,7 +3146,7 @@ ${content}`;
         }),
       );
     } else if (layout === "title_split") {
-      // Cover Split — gradient left + subtle divider
+      // Cover Split 鈥?gradient left + subtle divider
       elements.push(
         renderDecorDiv(0, 0, 6.66, 7.5, t.primary, "t-left", {
           gradient: primaryVertGrad,
@@ -3200,7 +3166,7 @@ ${content}`;
         }),
       );
     } else if (layout === "card_3col") {
-      // 3-Column Cards — shadow cards with rounded top accent
+      // 3-Column Cards 鈥?shadow cards with rounded top accent
       elements.push(
         renderDecorDiv(0, 0, 13.33, 0.9, t.primary, "t-header", {
           gradient: primaryGrad,
@@ -3374,7 +3340,7 @@ ${content}`;
         }),
       );
     } else if (layout === "card_2col") {
-      // 2-Column Cards — shadow + rounded
+      // 2-Column Cards 鈥?shadow + rounded
       elements.push(
         renderDecorDiv(0, 0, 13.33, 0.9, t.primary, "t-header", {
           gradient: primaryGrad,
@@ -3411,7 +3377,7 @@ ${content}`;
         }),
       );
     } else if (layout === "content_top") {
-      // Content Top Bar — gradient header
+      // Content Top Bar 鈥?gradient header
       elements.push(
         renderDecorDiv(0, 0, 13.33, 1.2, t.primary, "t-header", {
           gradient: primaryGrad,
@@ -3449,25 +3415,25 @@ ${content}`;
   };
 
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden theme-bg-darkblue font-sans premium-grid">
+    <div className="workspace-dark-shell flex h-screen w-full flex-col overflow-hidden font-sans">
       {/* ===== Header Bar ===== */}
-      <header className="tool-header h-16 px-6 border-b border-slate-700/60 flex items-center justify-between shrink-0 z-40 bg-slate-900/50 backdrop-blur-md">
+      <header className="tool-header workspace-dark-header flex h-16 items-center justify-between border-b px-4 md:px-6 shrink-0 z-40">
         <div className="flex items-center gap-3">
           <div className="bg-gradient-to-br from-cyan-400 via-indigo-500 to-emerald-500 p-1.5 rounded-xl shadow-[0_10px_24px_rgba(79,70,229,0.22)]">
             <Icons.FilePresentation className="text-white w-5 h-5" />
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-100 tracking-tight">
-              AI Bok 创作社区Sutmuch
+              AI Bok 鍒涗綔绀惧尯Sutmuch
             </h1>
-            <p className="text-[11px] text-slate-400">Sutmuch 演示稿工作台</p>
+            <p className="text-[11px] text-slate-400">Sutmuch 婕旂ず绋垮伐浣滃彴</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 px-4 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-lg hover:bg-slate-700 hover:text-white transition-all text-sm font-medium shadow-sm active:scale-95"
+            className="workspace-secondary-btn flex items-center gap-2 px-4 py-2 text-sm font-medium"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -3482,14 +3448,14 @@ ${content}`;
             >
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            返回工作台
+            杩斿洖宸ヤ綔鍙?
           </button>
 
           <a
             href="https://sukesutone.cn/md/project/ai-agent-scaffold/ai-agent-scaffold.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg transition-all shadow-sm"
+            className="workspace-secondary-btn flex items-center gap-1.5 px-3 py-2 text-xs font-medium"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -3505,15 +3471,15 @@ ${content}`;
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
             </svg>
-            社区指南
+            绀惧尯鎸囧崡
           </a>
 
           <div className="h-6 w-px bg-slate-700 mx-1"></div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-full border border-slate-700 shadow-sm">
+          <div className="workspace-subpanel flex items-center gap-2 rounded-full px-3 py-1.5">
             <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
             <span className="text-xs font-semibold text-slate-300">
-              {currentUser || "访客"}
+              {currentUser || "璁垮"}
             </span>
           </div>
 
@@ -3529,7 +3495,7 @@ ${content}`;
             }`}
           >
             <Icons.Download className="w-4 h-4" />
-            下载演示稿
+            涓嬭浇婕旂ず绋?
           </button>
 
           {pptData && (
@@ -3553,7 +3519,7 @@ ${content}`;
                 <path d="M3 16v3a2 2 0 0 0 2 2h3"></path>
                 <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
               </svg>
-              全屏演示
+              鍏ㄥ睆婕旂ず
             </button>
           )}
 
@@ -3564,9 +3530,9 @@ ${content}`;
                 ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-300"
                 : "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white hover:border-slate-600"
             }`}
-            title="风格设置"
+            title="椋庢牸璁剧疆"
           >
-            🎛️
+            馃帥锔?
           </button>
 
           <button
@@ -3581,7 +3547,7 @@ ${content}`;
             <button
               onClick={() => setIsChatOpen(true)}
               className="p-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
-              title="打开助手"
+              title="鎵撳紑鍔╂墜"
             >
               <Icons.Chat className="w-4 h-4" />
             </button>
@@ -3599,20 +3565,20 @@ ${content}`;
               onClick={() => setLeftTab("templates")}
               className={`flex-1 text-[10px] font-medium py-1 rounded transition ${leftTab === "templates" ? "bg-indigo-50 text-indigo-600" : "text-slate-400 hover:bg-slate-50"}`}
             >
-              📋 模板
+              馃搵 妯℃澘
             </button>
             <button
               onClick={() => setLeftTab("slides")}
               className={`flex-1 text-[10px] font-medium py-1 rounded transition ${leftTab === "slides" ? "bg-indigo-50 text-indigo-600" : "text-slate-400 hover:bg-slate-50"}`}
             >
-              🖼️ 页面
+              馃柤锔?椤甸潰
             </button>
           </div>
 
           {/* Theme Selector (always visible) */}
           <div className="px-3 pt-2 pb-2 border-b border-slate-100">
             <div className="text-[10px] text-slate-400 font-medium mb-1.5">
-              🎨 主题
+              馃帹 涓婚
             </div>
             <div className="flex flex-wrap gap-1.5">
               {THEMES.map((t) => (
@@ -3724,7 +3690,7 @@ ${content}`;
                 <Icons.FilePresentation className="w-8 h-8 mx-auto text-slate-200 mb-2" />
                 <p className="text-[11px] text-slate-400">暂无幻灯片</p>
                 <p className="text-[9px] text-slate-300 mt-1">
-                  在右侧输入需求或选择模板
+                  鍦ㄥ彸渚ц緭鍏ラ渶姹傛垨閫夋嫨妯℃澘
                 </p>
               </div>
             )}
@@ -3734,12 +3700,12 @@ ${content}`;
           <div className="border-t border-slate-100">
             <div className="h-9 px-3 flex items-center justify-between">
               <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                历史
+                鍘嗗彶
               </span>
               <button
                 onClick={handleNewChat}
                 className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition"
-                title="新建"
+                title="鏂板缓"
               >
                 <Icons.Plus className="w-3.5 h-3.5" />
               </button>
@@ -3802,10 +3768,10 @@ ${content}`;
                   <Icons.FilePresentation className="w-12 h-12 text-slate-300" />
                 </div>
                 <p className="text-base text-slate-500 mb-2 font-medium">
-                  生成完成后将在这里预览演示稿
+                  鐢熸垚瀹屾垚鍚庡皢鍦ㄨ繖閲岄瑙堟紨绀虹
                 </p>
                 <p className="text-sm text-slate-400">
-                  在右侧对话区描述你的需求
+                  鍦ㄥ彸渚у璇濆尯鎻忚堪浣犵殑闇€姹?
                 </p>
               </div>
             ) : (
@@ -3890,7 +3856,7 @@ ${content}`;
                 </svg>
               </button>
               <div className="h-4 w-px bg-slate-200 mx-2"></div>
-              <span className="text-xs text-slate-400">← → 翻页</span>
+              <span className="text-xs text-slate-400">鈫?鈫?缈婚〉</span>
             </div>
           )}
         </main>
@@ -3907,7 +3873,7 @@ ${content}`;
           >
             <div className="h-12 px-4 border-b border-slate-100 flex items-center justify-between shrink-0">
               <span className="text-sm font-bold text-slate-800">
-                🎛️ 风格设置
+                馃帥锔?椋庢牸璁剧疆
               </span>
               <button
                 onClick={() => setIsStylePanelOpen(false)}
@@ -3920,7 +3886,7 @@ ${content}`;
               {/* Style */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  风格
+                  椋庢牸
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {STYLE_OPTIONS.map((opt) => (
@@ -3941,7 +3907,7 @@ ${content}`;
               {/* Structure */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  结构
+                  缁撴瀯
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {STRUCTURE_OPTIONS.map((opt) => (
@@ -3962,7 +3928,7 @@ ${content}`;
               {/* Tone */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  色调
+                  鑹茶皟
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {TONE_OPTIONS.map((opt) => (
@@ -3983,7 +3949,7 @@ ${content}`;
               {/* Scene */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  场景
+                  鍦烘櫙
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {SCENE_OPTIONS.map((opt) => (
@@ -4004,7 +3970,7 @@ ${content}`;
               {/* Layout Preference */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  布局偏好
+                  甯冨眬鍋忓ソ
                 </div>
                 <div className="space-y-1">
                   {LAYOUT_OPTIONS.map((opt) => (
@@ -4048,7 +4014,7 @@ ${content}`;
           `}
           >
             {/* Chat Header */}
-            <div className="h-14 px-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+            <div className="workspace-dark-header sticky top-0 z-10 flex h-14 items-center justify-between border-b px-4 md:px-5 shrink-0">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-200 shrink-0 ring-2 ring-white">
                   <Icons.Sparkles className="w-4 h-4" />
@@ -4061,7 +4027,7 @@ ${content}`;
                     style={{ backgroundImage: "none" }}
                   >
                     {agents.length === 0 && (
-                      <option value="">正在加载智能体...</option>
+                      <option value="">姝ｅ湪鍔犺浇鏅鸿兘浣?..</option>
                     )}
                     {agents.map((agent) => (
                       <option key={agent.agentId} value={agent.agentId}>
@@ -4072,7 +4038,7 @@ ${content}`;
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                     <span className="text-[10px] text-slate-500 font-medium leading-tight">
-                      智能助手在线
+                      鏅鸿兘鍔╂墜鍦ㄧ嚎
                     </span>
                   </div>
                 </div>
@@ -4136,10 +4102,10 @@ ${content}`;
                                 <summary className="inline-flex items-center gap-2 cursor-pointer text-xs text-slate-500 hover:text-slate-700 font-medium select-none bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm transition-all hover:border-slate-300">
                                   <Icons.Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                                   <span className="group-open/details:hidden">
-                                    展开执行步骤
+                                    灞曞紑鎵ц姝ラ
                                   </span>
                                   <span className="hidden group-open/details:inline">
-                                    收起执行步骤
+                                    鏀惰捣鎵ц姝ラ
                                   </span>
                                 </summary>
                                 <div className="mt-2 flex flex-col gap-2 p-3 bg-slate-50/50 border border-slate-200 rounded-xl shadow-sm text-sm text-slate-600 max-w-none overflow-x-auto">
@@ -4154,7 +4120,7 @@ ${content}`;
                                             <Icons.Loader className="w-3.5 h-3.5 text-indigo-500" />
                                           ) : (
                                             <span className="text-green-500">
-                                              ✓
+                                              鉁?
                                             </span>
                                           )}
                                           <span>{step.label}</span>
@@ -4301,8 +4267,8 @@ ${content}`;
                   onKeyDown={handleKeyDown}
                   placeholder={
                     isSending
-                      ? "智能助手正在生成中..."
-                      : "输入您的问题，描述您的需求..."
+                      ? "鏅鸿兘鍔╂墜姝ｅ湪鐢熸垚涓?.."
+                      : "杈撳叆鎮ㄧ殑闂锛屾弿杩版偍鐨勯渶姹?.."
                   }
                   disabled={isSending}
                   className="flex-1 px-4 py-3 bg-transparent border-none focus:ring-0 text-[15px] text-slate-800 placeholder:text-slate-400 resize-none max-h-[300px] min-h-[80px] scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent disabled:opacity-50 disabled:cursor-not-allowed outline-none leading-relaxed"
@@ -4314,7 +4280,7 @@ ${content}`;
                     <button
                       onClick={handleStopStream}
                       className="p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center bg-red-100 text-red-600 hover:bg-red-200 shadow-sm"
-                      title="停止生成"
+                      title="鍋滄鐢熸垚"
                     >
                       <Icons.Square className="w-4 h-4" />
                     </button>
@@ -4339,7 +4305,7 @@ ${content}`;
                     onClick={handleRestartSession}
                     disabled={isSending}
                     className="p-2.5 rounded-lg bg-white text-slate-400 hover:bg-slate-50 hover:text-indigo-600 transition-all duration-200 border border-slate-200 hover:border-indigo-100 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="重启对话"
+                    title="閲嶅惎瀵硅瘽"
                   >
                     <Icons.Plus className="w-4 h-4" />
                   </button>
@@ -4368,7 +4334,7 @@ ${content}`;
                     }}
                     className="appearance-none bg-transparent border-none text-[11px] font-medium text-slate-600 focus:ring-0 py-1 pl-1 pr-5 cursor-pointer outline-none"
                   >
-                    <option value="default">默认模型</option>
+                    <option value="default">榛樿妯″瀷</option>
                     {customModels
                       .filter((m) => m.enabled)
                       .map((m) => (
@@ -4376,8 +4342,8 @@ ${content}`;
                           {m.name || m.model}
                         </option>
                       ))}
-                    <option disabled>──────────</option>
-                    <option value="add_new">+ 管理模型</option>
+                    <option disabled>鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€</option>
+                    <option value="add_new">+ 绠＄悊妯″瀷</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-slate-400">
                     <svg
@@ -4391,14 +4357,14 @@ ${content}`;
                 </div>
                 <span className="text-[10px] text-slate-400 ml-auto hidden sm:inline">
                   <kbd className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500">
-                    回车
+                    鍥炶溅
                   </kbd>{" "}
-                  发送
+                  鍙戦€?
                 </span>
               </div>
               <div className="text-center mt-1.5">
                 <p className="text-[10px] text-slate-400">
-                  {isSending ? streamProgress || "生成中..." : ""}
+                  {isSending ? streamProgress || "鐢熸垚涓?.." : ""}
                 </p>
               </div>
             </div>
@@ -4406,15 +4372,15 @@ ${content}`;
         </div>
       </div>
       {showApiConfig && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-6 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-white/20 flex flex-col max-h-[90vh]">
+        <div className="workspace-modal-scrim">
+          <div className="workspace-modal-card flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-indigo-50 rounded-lg">
                   <Icons.Sparkles className="w-4 h-4 text-indigo-500" />
                 </div>
                 <h2 className="text-base font-bold text-slate-800">
-                  自定义模型配置
+                  鑷畾涔夋ā鍨嬮厤缃?
                 </h2>
               </div>
               <button
@@ -4436,7 +4402,7 @@ ${content}`;
                     onClick={handleAddNewModel}
                     className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm text-sm font-medium"
                   >
-                    <Icons.Plus className="w-4 h-4" /> 添加模型
+                    <Icons.Plus className="w-4 h-4" /> 娣诲姞妯″瀷
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -4492,9 +4458,9 @@ ${content}`;
                   ))}
                   {customModels.length === 0 && (
                     <div className="text-center text-xs text-slate-400 py-6">
-                      暂无自定义模型
+                      鏆傛棤鑷畾涔夋ā鍨?
                       <br />
-                      点击上方按钮添加
+                      鐐瑰嚮涓婃柟鎸夐挳娣诲姞
                     </div>
                   )}
                 </div>
@@ -4506,7 +4472,7 @@ ${content}`;
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        展示名称
+                        灞曠ず鍚嶇О
                       </label>
                       <input
                         type="text"
@@ -4518,12 +4484,12 @@ ${content}`;
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="例如：我的GPT-4o"
+                        placeholder="渚嬪锛氭垜鐨凣PT-4o"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        模型名称
+                        妯″瀷鍚嶇О
                       </label>
                       <input
                         type="text"
@@ -4535,12 +4501,12 @@ ${content}`;
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="例如：gpt-4o"
+                        placeholder="渚嬪锛歡pt-4o"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        接口地址
+                        鎺ュ彛鍦板潃
                       </label>
                       <input
                         type="text"
@@ -4552,12 +4518,12 @@ ${content}`;
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="例如：https://api.openai.com"
+                        placeholder="渚嬪锛歨ttps://api.openai.com"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        接口密钥
+                        鎺ュ彛瀵嗛挜
                       </label>
                       <input
                         type="password"
@@ -4574,7 +4540,7 @@ ${content}`;
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        对话接口路径（可选）
+                        瀵硅瘽鎺ュ彛璺緞锛堝彲閫夛級
                       </label>
                       <input
                         type="text"
@@ -4586,7 +4552,7 @@ ${content}`;
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="默认为 v1/chat/completions"
+                        placeholder="榛樿涓?v1/chat/completions"
                       />
                     </div>
                     <div className="pt-2 flex justify-end">
@@ -4594,7 +4560,7 @@ ${content}`;
                         onClick={handleSaveEditingModel}
                         className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-sm transition-all text-sm"
                       >
-                        保存配置
+                        淇濆瓨閰嶇疆
                       </button>
                     </div>
                   </div>
@@ -4602,7 +4568,7 @@ ${content}`;
                   <div className="h-full flex flex-col items-center justify-center text-slate-400">
                     <Icons.Sparkles className="w-12 h-12 mb-3 opacity-20" />
                     <p className="text-sm">
-                      选择左侧模型后可编辑，也可以新建模型
+                      閫夋嫨宸︿晶妯″瀷鍚庡彲缂栬緫锛屼篃鍙互鏂板缓妯″瀷
                     </p>
                   </div>
                 )}
@@ -4662,7 +4628,7 @@ ${content}`;
             </div>
           </div>
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/20 text-xs pointer-events-none">
-            ESC 退出 · ← → 翻页
+            ESC 閫€鍑?路 鈫?鈫?缈婚〉
           </div>
           <div className="absolute bottom-4 right-6 text-white/20 text-xs font-mono pointer-events-none">
             {currentSlideIndex + 1} / {pptData.slides.length}
@@ -4672,3 +4638,13 @@ ${content}`;
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+

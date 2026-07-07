@@ -1,4 +1,4 @@
-export const COOKIE_NAME = "ai_agent_login";
+﻿export const COOKIE_NAME = "ai_agent_login";
 export const COOKIE_DAYS = 7;
 
 export interface UserInfo {
@@ -6,12 +6,16 @@ export interface UserInfo {
   ts: number;
 }
 
+const canUseDocument = () => typeof document !== "undefined";
+
 export const setCookie = (name: string, value: string, days: number) => {
+  if (!canUseDocument()) return;
   const maxAge = Math.max(0, Math.floor(days * 86400));
   document.cookie = `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; Path=/; SameSite=Lax`;
 };
 
 export const getCookie = (name: string): string | null => {
+  if (!canUseDocument()) return null;
   const cookies = document.cookie ? document.cookie.split("; ") : [];
   for (const item of cookies) {
     const eqIndex = item.indexOf("=");
@@ -23,6 +27,7 @@ export const getCookie = (name: string): string | null => {
 };
 
 export const deleteCookie = (name: string) => {
+  if (!canUseDocument()) return;
   document.cookie = `${name}=; Max-Age=0; Path=/; SameSite=Lax`;
 };
 

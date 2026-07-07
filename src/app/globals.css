@@ -2,24 +2,32 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
-  --font-geist-sans: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  --background: #f7f5f2;
+  --foreground: #22252a;
+  --font-geist-sans:
+    "Geist", "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", Arial,
+    sans-serif;
   --font-geist-mono: "JetBrains Mono", Consolas, "SFMono-Regular", monospace;
+  --font-editorial: "Newsreader", "Noto Serif SC", "Songti SC", Georgia, serif;
 
-  /* Custom Light Theme Variables */
-  --bg0: #f8fafc;
-  --bg1: #e2e8f0;
-  --card: rgba(255, 255, 255, 0.9);
-  --card2: rgba(255, 255, 255, 0.95);
-  --text: #0f172a;
-  --muted: #475569;
-  --muted2: #64748b;
-  --border: rgba(15, 23, 42, 0.08);
-  --primary: #22c55e;
-  --primary2: #3b82f6;
+  --bg0: #f7f5f2;
+  --bg1: #f1ece6;
+  --card: #fcfbf8;
+  --card2: #ffffff;
+  --text: #22252a;
+  --muted: #5d636c;
+  --muted2: #858c96;
+  --border: #e6e2db;
+  --border-strong: #d8d3cc;
+  --primary: #22252a;
+  --primary-soft: #6e8fa7;
+  --success: #7fa08a;
   --danger: #ef4444;
-  --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+  --shadow: 0 18px 45px rgba(34, 37, 42, 0.04);
+  --shadow-soft: 0 6px 24px rgba(34, 37, 42, 0.06);
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
 }
 
 @theme inline {
@@ -43,44 +51,60 @@ body {
   min-height: 100vh;
 }
 
-/* Utility classes for the custom theme */
 .theme-bg-gradient {
-  background-color: #e0f2fe;
-  background-image: 
-    radial-gradient(1000px 800px at 0% 0%, rgba(56, 189, 248, 0.25), transparent 50%),
-    radial-gradient(1000px 800px at 100% 0%, rgba(59, 130, 246, 0.15), transparent 50%),
-    radial-gradient(1000px 800px at 50% 100%, rgba(14, 165, 233, 0.15), transparent 50%);
+  background-color: var(--bg0);
+  background-image:
+    radial-gradient(
+      900px 500px at 0% 0%,
+      rgba(213, 226, 232, 0.45),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 500px at 100% 0%,
+      rgba(241, 236, 230, 0.45),
+      transparent 55%
+    );
 }
 
 .theme-bg-yellow {
-  background-color: #fffbeb;
-  background-image: 
-    radial-gradient(1000px 800px at 0% 0%, rgba(251, 191, 36, 0.12), transparent 50%),
-    radial-gradient(1000px 800px at 100% 0%, rgba(245, 158, 11, 0.08), transparent 50%),
-    radial-gradient(1000px 800px at 50% 100%, rgba(217, 119, 6, 0.06), transparent 50%);
+  background-color: var(--bg0);
+  background-image:
+    radial-gradient(
+      900px 500px at 0% 0%,
+      rgba(241, 236, 230, 0.72),
+      transparent 58%
+    ),
+    radial-gradient(
+      900px 500px at 100% 0%,
+      rgba(213, 226, 232, 0.28),
+      transparent 62%
+    );
 }
 
 .theme-bg-darkblue {
-  background-color: #0f172a;
-  background-image: 
-    radial-gradient(1000px 800px at 0% 0%, rgba(56, 189, 248, 0.05), transparent 50%),
-    radial-gradient(1000px 800px at 100% 0%, rgba(59, 130, 246, 0.05), transparent 50%),
-    radial-gradient(1000px 800px at 50% 100%, rgba(14, 165, 233, 0.05), transparent 50%);
-  color: #f8fafc;
+  background-color: #1f2227;
+  background-image:
+    radial-gradient(
+      1200px 600px at 0% 0%,
+      rgba(110, 143, 167, 0.14),
+      transparent 50%
+    ),
+    radial-gradient(
+      1200px 600px at 100% 100%,
+      rgba(127, 160, 138, 0.12),
+      transparent 55%
+    );
+  color: #f4f6f8;
 }
 
 .theme-card {
   border: 1px solid var(--border);
   background: var(--card);
   box-shadow: var(--shadow);
-  backdrop-filter: blur(12px);
 }
 
 .premium-grid {
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.15) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-image: none;
 }
 
 .premium-shell {
@@ -89,55 +113,182 @@ body {
 }
 
 .glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(15, 23, 42, 0.05);
-  box-shadow:
-    0 10px 30px rgba(15, 23, 42, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(22px);
+  background: #ffffff;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
 }
 
 .glass-panel-dark {
-  background: linear-gradient(180deg, #2D333B, #1E293B);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.2);
+  background: linear-gradient(180deg, #2b3038, #1f2227);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(17, 20, 24, 0.28);
 }
 
 .premium-chip {
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(255, 255, 255, 0.7);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border);
+  background: #fcfbf8;
 }
 
 .premium-title {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--text);
 }
 
 .theme-input {
-  border: 1px solid rgba(15, 23, 42, 0.1);
-  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--border);
+  background: #fcfbf8;
   color: var(--text);
 }
 
 .theme-input:focus {
-  border-color: rgba(34, 197, 94, 0.5);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+  border-color: #b4bdc7;
+  box-shadow: 0 0 0 3px rgba(110, 143, 167, 0.12);
   background: #ffffff;
 }
 
 .theme-btn {
-  background: linear-gradient(135deg, var(--primary), #10b981);
+  background: linear-gradient(180deg, #2b3038, #22252a);
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.25);
+  box-shadow: 0 8px 20px rgba(34, 37, 42, 0.14);
 }
 
 .theme-btn-secondary {
-  background: rgba(255, 255, 255, 0.8);
+  background: #fcfbf8;
   color: var(--text);
-  border: 1px solid rgba(15, 23, 42, 0.1);
+  border: 1px solid var(--border);
+}
+
+.workspace-shell {
+  background: var(--bg0);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.workspace-sidebar {
+  background: var(--bg1);
+  border-right: 1px solid var(--border);
+}
+
+.workspace-panel {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.workspace-subpanel {
+  background: #fcfbf8;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.workspace-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fcfbf8;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.workspace-input {
+  height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: #fcfbf8;
+  padding: 0 14px;
+  color: var(--text);
+  outline: none;
+}
+
+.workspace-input:focus {
+  border-color: #b4bdc7;
+  box-shadow: 0 0 0 3px rgba(110, 143, 167, 0.1);
+  background: #ffffff;
+}
+
+.workspace-primary-btn {
+  background: #22252a;
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  border: 1px solid #22252a;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    transform 150ms ease;
+}
+
+.workspace-primary-btn:hover {
+  background: #30343b;
+  border-color: #30343b;
+}
+
+.workspace-secondary-btn {
+  background: #fcfbf8;
+  color: var(--text);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+
+.workspace-secondary-btn:hover {
+  background: #ffffff;
+  border-color: var(--border-strong);
+}
+
+.workspace-editorial {
+  font-family: var(--font-editorial);
+}
+
+.workspace-mono {
+  font-family: var(--font-geist-mono);
+}
+
+.workspace-muted {
+  color: var(--muted);
+}
+
+.workspace-tertiary {
+  color: var(--muted2);
+}
+
+.workspace-divider {
+  height: 1px;
+  width: 100%;
+  background: var(--border);
+}
+
+.workspace-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: #e7ded4;
+  overflow: hidden;
+}
+
+.workspace-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7fa08a, #6e8fa7);
+}
+
+.workspace-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #f3f0eb;
+  padding: 4px 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.workspace-status.success {
+  background: rgba(127, 160, 138, 0.12);
+  color: #617d6a;
 }
 
 /* Custom Scrollbar */

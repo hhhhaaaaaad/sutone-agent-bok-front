@@ -34,3 +34,11 @@ export interface ChatResponseDTO {
     content: string;
     type: string;
 }
+
+/** 通用分页响应 */
+export interface PageResponse<T> {
+  total: number;
+  pageNo: number;
+  pageSize: number;
+  list: T[];
+}

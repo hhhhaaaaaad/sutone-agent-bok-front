@@ -15,7 +15,8 @@ export default function Login() {
     if (userInfo && userInfo.user) {
       router.push("/");
     }
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();

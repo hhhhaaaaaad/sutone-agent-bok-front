@@ -47,6 +47,7 @@ export default function DraftEditorPage() {
   const savingRef = useRef(false);
   const dirtyRef = useRef(false);
   const streamControllerRef = useRef<AbortController | null>(null);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
     titleRef.current = title;
@@ -69,6 +70,8 @@ export default function DraftEditorPage() {
       return;
     }
     if (!draftId) return;
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
 
     (async () => {
       try {
@@ -84,7 +87,8 @@ export default function DraftEditorPage() {
         setLoading(false);
       }
     })();
-  }, [draftId, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftId]);
 
   // Auto-save: debounce 1.5s
   const doSave = useCallback(async () => {

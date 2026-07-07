@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { articlesApi } from '@/api/articles';
 import ReactMarkdown from 'react-markdown';
@@ -14,9 +14,12 @@ export default function ArticleDetailPage() {
   const [article, setArticle] = useState<ArticleDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
     if (!articleId) return;
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     (async () => {
       try {
         const resp = await articlesApi.detail(articleId);

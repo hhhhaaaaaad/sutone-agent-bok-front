@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { articlesApi } from '@/api/articles';
 import type { ArticlePageItem } from '@/types/article';
@@ -10,8 +10,11 @@ export default function ArticlesPage() {
   const [articles, setArticles] = useState<ArticlePageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     (async () => {
       try {
         const resp = await articlesApi.page(1, 20);

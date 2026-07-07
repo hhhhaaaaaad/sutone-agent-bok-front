@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { draftsApi } from '@/api/drafts';
@@ -14,10 +14,13 @@ export default function MePage() {
   const [drafts, setDrafts] = useState<DraftPageItem[]>([]);
   const [articles, setArticles] = useState<ArticlePageItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
     const userInfo = getUserInfo();
     if (!userInfo?.user) { router.push('/login'); return; }
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
 
     (async () => {
       try {
@@ -30,7 +33,8 @@ export default function MePage() {
       } catch { /* ignore */ }
       setLoading(false);
     })();
-  }, [router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = () => {
     clearUserInfo();

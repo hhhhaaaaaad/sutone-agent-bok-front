@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserInfo } from '@/utils/cookie';
 import { draftsApi } from '@/api/drafts';
@@ -12,6 +12,7 @@ export default function DraftsPage() {
   const [drafts, setDrafts] = useState<DraftPageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const fetchedRef = useRef(false);
 
   const loadDrafts = useCallback(async () => {
     setLoading(true);
@@ -48,8 +49,11 @@ export default function DraftsPage() {
   useEffect(() => {
     const user = getUserInfo();
     if (!user?.user) { router.push('/login'); return; }
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     loadDrafts();
-  }, [loadDrafts, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadDrafts]);
 
   const visibleDrafts = drafts.slice(0, 8);
   const collections = [

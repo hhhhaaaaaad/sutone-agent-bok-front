@@ -5,6 +5,7 @@ import type {
   PublishArticleResponse,
   ArticlePageItem,
   ArticleDetailResponse,
+  RevertToDraftResponse,
 } from '@/types/article';
 
 const BASE = API_CONFIG.BASE_URL;
@@ -42,5 +43,13 @@ export const articlesApi = {
   detail: async (articleId: number): Promise<Response<ArticleDetailResponse>> => {
     const res = await fetch(`${BASE}/articles/${articleId}`);
     return handleResponse<ArticleDetailResponse>(res);
+  },
+
+  /** 将已发布文章回退到草稿状态 */
+  revertToDraft: async (articleId: number): Promise<Response<RevertToDraftResponse>> => {
+    const res = await fetch(`${BASE}/articles/${articleId}/revert-to-draft`, {
+      method: 'POST',
+    });
+    return handleResponse<RevertToDraftResponse>(res);
   },
 };

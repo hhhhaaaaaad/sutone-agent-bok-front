@@ -14,6 +14,7 @@ export default function ArticleDetailPage() {
   const [article, setArticle] = useState<ArticleDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [reverting, setReverting] = useState(false);
   const fetchedRef = useRef(false);
 
   useEffect(() => {
@@ -31,6 +32,18 @@ export default function ArticleDetailPage() {
       }
     })();
   }, [articleId]);
+
+  const handleRevertToDraft = async () => {
+    if (!articleId || reverting) return;
+    setReverting(true);
+    try {
+      const resp = await articlesApi.revertToDraft(articleId);
+      router.push(`/drafts/${resp.data.draftId}`);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : '回退失败');
+      setReverting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -52,11 +65,20 @@ export default function ArticleDetailPage() {
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
       <div className="workspace-shell mx-auto max-w-[980px] overflow-hidden bg-[#fcfbf8]">
-        <header className="border-b border-[#e6e2db] px-5 py-4 md:px-7">
-          <button onClick={() => router.push('/articles')} className="workspace-secondary-btn px-3 py-2 text-sm font-medium">
-            返回文章广场
-          </button>
-          <p className="workspace-mono mt-4 text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / 文章详情</p>
+        <header className="border-b border-[#e6e2db] flex items-center justify-between px-5 py-4 md:px-7">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.push('/articles')} className="workspace-secondary-btn px-3 py-2 text-sm font-medium">
+              返回文章广场
+            </button>
+            <button
+              onClick={handleRevertToDraft}
+              disabled={reverting}
+              className="workspace-primary-btn px-3 py-2 text-sm font-medium disabled:opacity-40"
+            >
+              {reverting ? '回退中...' : '继续编辑'}
+            </button>
+          </div>
+          <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / 文章详情</p>
         </header>
 
         <main className="px-5 py-8 md:px-10 md:py-10">

@@ -41,3 +41,7 @@ export interface ArticleDetailResponse {
   favoriteCount: number;
   tags: string[];
 }
+
+export interface RevertToDraftResponse {
+  draftId: number;
+}

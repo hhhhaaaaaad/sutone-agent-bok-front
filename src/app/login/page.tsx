@@ -3,12 +3,25 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { setUserInfo, getUserInfo } from "@/utils/cookie";
+import WordGravity from "./WordGravity";
+
+const WRITER_QUOTES = [
+  "写作，就是坐下来判断自己。 —— 易卜生",
+  "生活从来不是公平的，得到多少，便要靠那个多少做到最好。 —— 萧伯纳",
+  "灵感，是顽强劳动而获得的奖赏。 —— 列宾",
+  "世界以痛吻我，要我报之以歌。 —— 泰戈尔",
+  "真正的发现之旅，不在于寻找新的风景，而在于拥有新的眼光。 —— 普鲁斯特",
+  "没有什么比时间更具有说服力了，因为时间无需通知我们就可以改变一切。 —— 余华",
+];
 
 export default function Login() {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState({ text: "", type: "" });
+  const [quoteIndex, setQuoteIndex] = useState(0);
+  const [typedQuote, setTypedQuote] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const userInfo = getUserInfo();
@@ -17,6 +30,47 @@ export default function Login() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    const quote = WRITER_QUOTES[quoteIndex];
+    const isComplete = typedQuote === quote;
+    const isEmpty = typedQuote.length === 0;
+    const delay = isComplete
+      ? 2800
+      : isEmpty && isDeleting
+        ? 500
+        : isDeleting
+          ? 60
+          : 130;
+
+    const timer = window.setTimeout(() => {
+      if (isComplete && !isDeleting) {
+        setIsDeleting(true);
+        return;
+      }
+
+      if (isEmpty && isDeleting) {
+        setIsDeleting(false);
+        setQuoteIndex((current) => {
+          if (WRITER_QUOTES.length < 2) return current;
+          let next = current;
+          while (next === current) {
+            next = Math.floor(Math.random() * WRITER_QUOTES.length);
+          }
+          return next;
+        });
+        return;
+      }
+
+      setTypedQuote(
+        isDeleting
+          ? quote.slice(0, typedQuote.length - 1)
+          : quote.slice(0, typedQuote.length + 1),
+      );
+    }, delay);
+
+    return () => window.clearTimeout(timer);
+  }, [isDeleting, quoteIndex, typedQuote]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,13 +133,22 @@ export default function Login() {
             <p className="workspace-mono text-[11px] uppercase tracking-[0.22em] text-[#5d636c]">
               Sutmuch 写作系统
             </p>
-            <h1 className="workspace-editorial mt-5 max-w-[8ch] text-[44px] leading-[0.97] text-[#22252a] md:text-[62px]">
-              进入一个安静、专注、可靠的 AI 创作工作台。
+            <h1
+              className="workspace-editorial mt-5 min-h-[4.8em] max-w-[18ch] text-[30px] leading-[1.2] text-[#22252a] md:text-[42px]"
+              aria-label={WRITER_QUOTES[quoteIndex]}
+            >
+              <span aria-hidden="true">{typedQuote}</span>
+              <span
+                aria-hidden="true"
+                className="ml-1 inline-block h-[0.9em] w-[2px] animate-pulse bg-[#7fa08a] align-[-0.05em]"
+              />
             </h1>
             <p className="mt-5 max-w-[44ch] text-sm leading-7 text-[#5d636c]">
               从草稿、资料与文章库之间自然流转。让生成、改写与整理都像编辑纸稿一样克制而顺手。
             </p>
           </div>
+
+          <WordGravity />
 
           <div className="workspace-panel rounded-[12px] p-5">
             <div className="flex items-center justify-between text-[11px] text-[#858c96]">

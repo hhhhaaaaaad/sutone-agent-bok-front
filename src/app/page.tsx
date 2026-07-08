@@ -7,6 +7,19 @@ import { draftsApi } from "@/api/drafts";
 import { articlesApi } from "@/api/articles";
 import type { DraftPageItem } from "@/types/draft";
 import type { ArticlePageItem } from "@/types/article";
+import WordGravity from "./login/WordGravity";
+
+const HOME_WORKSPACE_WORDS = [
+  "Focus",
+  "Context",
+  "Continue",
+  "Structure",
+  "Voice",
+  "Refine",
+  "Create",
+  "Polish",
+  "Publish",
+];
 
 export default function Lobby() {
   const router = useRouter();
@@ -83,9 +96,6 @@ export default function Lobby() {
     Math.max(24, recentDrafts.length * 18 + recentArticles.length * 10),
   );
   const activeDraft = recentDrafts[0];
-  const heroTitle = activeDraft?.title
-    ? `${activeDraft.title} 正在等待最后一轮润色。`
-    : "AI 内容创作工作台的核心，不是生成更多，而是更快回到正在推进的段落。";
   const heroSubtext =
     activeDraft?.summary ||
     "把更新最频繁、保留语气统一、结构自洽的稿件放在最前面，让写作继续在同一条脉络里推进。";
@@ -206,9 +216,7 @@ export default function Lobby() {
                 </p>
                 <div className="mt-3 grid gap-4 xl:grid-cols-[minmax(0,1fr)_160px]">
                   <div>
-                    <h3 className="workspace-editorial max-w-[18ch] text-[34px] leading-[1.02] text-[#22252a] md:text-[48px]">
-                      {heroTitle}
-                    </h3>
+                    <WordGravity words={HOME_WORKSPACE_WORDS} />
                     <p className="mt-4 max-w-[58ch] text-sm leading-7 text-[#5d636c]">
                       {heroSubtext}
                     </p>

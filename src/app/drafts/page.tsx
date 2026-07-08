@@ -80,9 +80,9 @@ export default function DraftsPage() {
   const featured = filteredDrafts[0] ?? drafts[0];
   const rightRailDrafts = drafts.slice(0, 3);
   const collectionStats = [
-    { label: 'Editing', value: drafts.filter((item) => item.status === 0).length },
-    { label: 'Ready', value: drafts.filter((item) => item.status === 1).length },
-    { label: 'Archive', value: drafts.filter((item) => item.status === 2).length },
+    { label: '编辑中', value: drafts.filter((item) => item.status === 0).length },
+    { label: '待发布', value: drafts.filter((item) => item.status === 1).length },
+    { label: '已归档', value: drafts.filter((item) => item.status === 2).length },
   ];
 
   return (
@@ -90,16 +90,16 @@ export default function DraftsPage() {
       <div className="workspace-shell mx-auto grid min-h-[calc(100vh-40px)] max-w-[1280px] grid-cols-1 overflow-hidden xl:grid-cols-[248px_minmax(0,1fr)_280px]">
         <aside className="workspace-sidebar-soft flex flex-col gap-5 px-5 py-6">
           <div>
-            <p className="workspace-mono text-[11px] tracking-[0.16em] text-[#858c96]">Drafts</p>
+            <p className="workspace-mono text-[11px] tracking-[0.16em] text-[#858c96]">草稿工作区</p>
             <h1 className="mt-2 text-[30px] font-semibold tracking-tight text-[#22252a]">草稿列表</h1>
           </div>
 
           <div className="space-y-2">
             {[
               { label: 'AI 首页', path: '/' },
-              { label: 'All Drafts', path: '/drafts' },
-              { label: 'Published', path: '/articles' },
-              { label: 'Archive', path: '/me' },
+              { label: '全部草稿', path: '/drafts' },
+              { label: '已发布文章', path: '/articles' },
+              { label: '个人中心', path: '/me' },
             ].map((item, index) => (
               <button
                 key={item.path}
@@ -116,7 +116,7 @@ export default function DraftsPage() {
           </div>
 
           <div className="workspace-panel rounded-[12px] p-4">
-            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">Collections</p>
+            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">草稿统计</p>
             <div className="mt-3 space-y-3">
               {collectionStats.map((item) => (
                 <div
@@ -139,16 +139,16 @@ export default function DraftsPage() {
         <main className="flex min-h-0 flex-col bg-[#fcfbf8]">
           <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e6e2db] px-5 py-4 md:px-7">
             <div>
-              <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / Draft List</p>
+              <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / 草稿列表</p>
               <h2 className="mt-1 text-[34px] font-semibold tracking-tight text-[#22252a]">继续整理你的写作项目</h2>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <input className="workspace-search w-[180px]" placeholder="Search by title, status" />
+              <input className="workspace-search w-[180px]" placeholder="按标题或状态搜索" />
               <button onClick={loadDrafts} className="workspace-secondary-btn px-4 py-2.5 text-sm font-medium">
                 刷新
               </button>
               <button onClick={handleNewDraft} className="workspace-primary-btn px-4 py-2.5 text-sm font-medium">
-                New Draft
+                新建草稿
               </button>
             </div>
           </header>
@@ -166,7 +166,7 @@ export default function DraftsPage() {
                   {filter.label}
                 </button>
               ))}
-              <span className="ml-auto text-xs text-[#858c96]">{filteredDrafts.length} documents</span>
+              <span className="ml-auto text-xs text-[#858c96]">{filteredDrafts.length} 篇文档</span>
             </div>
 
             {error && (
@@ -179,7 +179,7 @@ export default function DraftsPage() {
               <div className="workspace-subpanel mt-5 rounded-[14px] p-4 md:p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs text-[#858c96]">Selected draft</p>
+                    <p className="text-xs text-[#858c96]">当前选中草稿</p>
                     <h3 className="mt-2 text-[24px] font-medium tracking-tight text-[#22252a]">
                       {featured.title || '未命名草稿'}
                     </h3>
@@ -191,7 +191,7 @@ export default function DraftsPage() {
                     onClick={() => router.push(`/drafts/${featured.draftId}`)}
                     className="workspace-secondary-btn px-4 py-2 text-sm font-medium"
                   >
-                    Open
+                    打开草稿
                   </button>
                 </div>
               </div>
@@ -225,7 +225,7 @@ export default function DraftsPage() {
                       </p>
                       <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[#858c96]">
                         <span>{draft.updateTime || '刚刚更新'}</span>
-                        <span>{draft.status === 0 ? 'Needs polish' : draft.status === 1 ? 'Ready to publish' : 'Archived'}</span>
+                        <span>{draft.status === 0 ? '待润色' : draft.status === 1 ? '待发布' : '已归档'}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -251,7 +251,7 @@ export default function DraftsPage() {
 
         <aside className="workspace-right-rail hidden xl:flex xl:flex-col xl:gap-5 xl:px-5 xl:py-6">
           <div className="workspace-panel rounded-[12px] p-4">
-            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">Recent Activity</p>
+            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">最近动态</p>
             <div className="mt-3 space-y-3">
               {rightRailDrafts.length === 0 ? (
                 <p className="text-sm text-[#858c96]">暂无最近变更。</p>
@@ -267,16 +267,16 @@ export default function DraftsPage() {
           </div>
 
           <div className="workspace-panel rounded-[12px] p-4">
-            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">Actions</p>
+            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">快捷操作</p>
             <div className="mt-3 space-y-2">
               <button onClick={handleNewDraft} className="workspace-primary-btn h-10 w-full text-sm font-medium">
-                Open in Editor
+                打开编辑器
               </button>
               <button onClick={() => router.push('/articles')} className="workspace-secondary-btn h-10 w-full text-sm font-medium">
-                Request AI Polish
+                查看已发布文章
               </button>
               <button onClick={() => router.push('/me')} className="workspace-secondary-btn h-10 w-full text-sm font-medium">
-                Archive
+                前往个人中心
               </button>
             </div>
           </div>

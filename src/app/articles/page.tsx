@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -45,16 +45,16 @@ export default function ArticlesPage() {
       <div className="workspace-shell mx-auto grid min-h-[calc(100vh-40px)] max-w-[1280px] grid-cols-1 overflow-hidden xl:grid-cols-[248px_minmax(0,1fr)_280px]">
         <aside className="workspace-sidebar-soft flex flex-col gap-5 px-5 py-6">
           <div>
-            <p className="workspace-mono text-[11px] tracking-[0.16em] text-[#858c96]">Article Plaza</p>
+            <p className="workspace-mono text-[11px] tracking-[0.16em] text-[#858c96]">文章工作区</p>
             <h1 className="mt-2 text-[30px] font-semibold tracking-tight text-[#22252a]">文章广场</h1>
           </div>
 
           <div className="space-y-2">
             {[
-              { label: 'Home', path: '/' },
-              { label: 'Content Library', path: '/articles' },
-              { label: 'Draft Queue', path: '/drafts' },
-              { label: 'Profile', path: '/me' },
+              { label: 'AI 首页', path: '/' },
+              { label: '内容库', path: '/articles' },
+              { label: '草稿队列', path: '/drafts' },
+              { label: '个人中心', path: '/me' },
             ].map((item, index) => (
               <button
                 key={item.path}
@@ -78,13 +78,13 @@ export default function ArticlesPage() {
         <main className="flex min-h-0 flex-col bg-[#fcfbf8]">
           <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e6e2db] px-5 py-4 md:px-7">
             <div>
-              <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / Article Plaza</p>
+              <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / 文章广场</p>
               <h2 className="mt-1 text-[34px] font-semibold tracking-tight text-[#22252a]">浏览已经完成发布的内容</h2>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <input className="workspace-search w-[180px]" placeholder="Search title, theme, tag" />
+              <input className="workspace-search w-[180px]" placeholder="搜索标题、主题或标签" />
               <button onClick={() => router.push('/me')} className="workspace-secondary-btn px-4 py-2.5 text-sm font-medium">
-                Manage archive
+                管理归档
               </button>
             </div>
           </header>
@@ -108,16 +108,16 @@ export default function ArticlesPage() {
                   <section className="workspace-subpanel rounded-[16px] p-5 md:p-6">
                     <div className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)]">
                       <div className="workspace-panel rounded-[12px] p-4">
-                        <p className="text-xs text-[#858c96]">Feature article</p>
+                        <p className="text-xs text-[#858c96]">推荐文章</p>
                         <div className="mt-4 space-y-2 text-sm text-[#5d636c]">
-                          {(featured.tags?.slice(0, 3) ?? ['Publishing']).map((tag) => (
+                          {(featured.tags?.slice(0, 3) ?? ['发布中']).map((tag) => (
                             <div key={tag} className="workspace-status w-fit">{tag}</div>
                           ))}
                         </div>
                       </div>
 
                       <div>
-                        <p className="text-xs text-[#858c96]">Featured issue</p>
+                        <p className="text-xs text-[#858c96]">本期推荐</p>
                         <h3 className="workspace-editorial mt-2 max-w-[16ch] text-[38px] leading-[1.02] text-[#22252a] md:text-[52px]">
                           {featured.title}
                         </h3>
@@ -136,7 +136,7 @@ export default function ArticlesPage() {
                             阅读文章
                           </button>
                           <button onClick={() => router.push('/drafts')} className="workspace-secondary-btn px-4 py-2.5 text-sm font-medium">
-                            Add to Library
+                            前往草稿区
                           </button>
                         </div>
                       </div>
@@ -148,7 +148,7 @@ export default function ArticlesPage() {
                   <div className="mb-4 flex items-center justify-between gap-3">
                     <h3 className="text-xl font-semibold text-[#22252a]">精选文章</h3>
                     <div className="flex gap-2">
-                      {['Latest', 'Publish', 'Notes'].map((item) => (
+                      {['最新', '发布', '笔记'].map((item) => (
                         <span key={item} className="workspace-toolbar-chip">{item}</span>
                       ))}
                     </div>
@@ -165,7 +165,7 @@ export default function ArticlesPage() {
                           className="workspace-panel workspace-panel-hover grid w-full grid-cols-[80px_minmax(0,1fr)] gap-4 rounded-[16px] p-5 text-left"
                         >
                           <div className="workspace-subpanel flex items-center justify-center rounded-[10px] text-xs text-[#b5aea4]">
-                            Cover
+                            封面
                           </div>
                           <div>
                             <h4 className="text-[22px] font-medium tracking-tight text-[#22252a]">{article.title}</h4>
@@ -199,7 +199,7 @@ export default function ArticlesPage() {
           </div>
 
           <div className="workspace-panel rounded-[12px] p-4">
-            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">Topics</p>
+            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">主题标签</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {topics.length === 0 ? (
                 <span className="text-sm text-[#858c96]">暂无标签</span>

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 :root {
@@ -49,6 +49,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans);
   min-height: 100vh;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 .theme-bg-gradient {
@@ -164,9 +171,15 @@ body {
   box-shadow: var(--shadow);
 }
 
-.workspace-sidebar {
+.workspace-sidebar,
+.workspace-sidebar-soft {
   background: var(--bg1);
   border-right: 1px solid var(--border);
+}
+
+.workspace-right-rail {
+  border-left: 1px solid var(--border);
+  background: #fdfcf9;
 }
 
 .workspace-panel {
@@ -174,6 +187,20 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-soft);
+}
+
+.workspace-panel-hover {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.workspace-panel-hover:hover {
+  background: #ffffff;
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
 }
 
 .workspace-subpanel {
@@ -203,10 +230,22 @@ body {
   outline: none;
 }
 
-.workspace-input:focus {
+.workspace-input:focus,
+.workspace-search:focus {
   border-color: #b4bdc7;
   box-shadow: 0 0 0 3px rgba(110, 143, 167, 0.1);
   background: #ffffff;
+}
+
+.workspace-search {
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  padding: 0 14px;
+  font-size: 12px;
+  color: var(--muted);
+  outline: none;
 }
 
 .workspace-primary-btn {
@@ -238,6 +277,23 @@ body {
 .workspace-secondary-btn:hover {
   background: #ffffff;
   border-color: var(--border-strong);
+}
+
+.workspace-ghost-btn {
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.workspace-ghost-btn:hover {
+  background: rgba(255, 255, 255, 0.65);
+  border-color: var(--border);
+  color: var(--text);
 }
 
 .workspace-editorial {
@@ -291,7 +347,55 @@ body {
   color: #617d6a;
 }
 
-/* Custom Scrollbar */
+.workspace-toolbar-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  padding: 6px 12px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.workspace-modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(34, 37, 42, 0.28);
+  backdrop-filter: blur(8px);
+}
+
+.workspace-modal-card {
+  width: min(100%, 560px);
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: #fcfbf8;
+  box-shadow: 0 32px 80px rgba(34, 37, 42, 0.16);
+}
+
+.workspace-dark-shell {
+  background: #f7f5f2;
+}
+
+.workspace-dark-header {
+  border-bottom: 1px solid var(--border);
+  background: rgba(252, 251, 248, 0.9);
+  backdrop-filter: blur(14px);
+}
+
+.workspace-dark-canvas {
+  background: #20242a;
+  border: 1px solid #2c323a;
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -308,3 +412,36 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+@media (max-width: 1279px) {
+  .workspace-shell {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 1023px) {
+  .workspace-shell {
+    border-radius: 18px;
+  }
+}
+
+@media (max-width: 767px) {
+  body {
+    min-width: 320px;
+  }
+
+  .workspace-shell {
+    border-radius: 16px;
+  }
+
+  .workspace-panel,
+  .workspace-subpanel {
+    border-radius: 14px;
+  }
+
+  .workspace-modal-card {
+    width: 100%;
+    border-radius: 16px;
+  }
+}
+

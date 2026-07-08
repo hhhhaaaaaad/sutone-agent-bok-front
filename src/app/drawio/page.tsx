@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DrawIoEmbed, DrawIoEmbedRef } from "react-drawio";
 import { useRef, useState, useEffect } from "react";
@@ -329,7 +329,7 @@ export default function Home() {
     {
       id: "1",
       role: "agent",
-      content: "你好！我是你的智能架构助手。请选择一个智能体开始对话。",
+      content: "Hello! I'm your diagram assistant. Choose an agent to start.",
       timestamp: Date.now(),
     },
   ]);
@@ -473,8 +473,8 @@ export default function Home() {
           }
 
           const nextTitle =
-            session.title === "新建绘图会话"
-              ? firstUserMessage?.content.slice(0, 20) || "新建绘图会话"
+            session.title === "鏂板缓缁樺浘浼氳瘽"
+              ? firstUserMessage?.content.slice(0, 20) || "鏂板缓缁樺浘浼氳瘽"
               : session.title;
           const nextBackendSessionId = sessionId || "";
           const currentBackendSessionId = session.backendSessionId || "";
@@ -505,12 +505,12 @@ export default function Home() {
     const newSession: Session = {
       id: Date.now().toString(),
       backendSessionId: backendId,
-      title: "新建绘图会话",
+      title: "鏂板缓缁樺浘浼氳瘽",
       messages: [
         {
           id: Date.now().toString(),
           role: "agent",
-          content: "你好！我是你的智能架构助手。请选择一个智能体开始对话。",
+          content: "Hello! I'm your diagram assistant. Choose an agent to start.",
           timestamp: Date.now(),
         },
       ],
@@ -594,7 +594,7 @@ export default function Home() {
   const handleAddNewModel = () => {
     setEditingModel({
       id: Date.now().toString(),
-      name: "新模型",
+      name: "New Model",
       baseUrl: "https://api.openai.com",
       apiKey: "",
       model: "gpt-4o",
@@ -687,7 +687,7 @@ export default function Home() {
           {
             id: Date.now().toString(),
             role: "agent",
-            content: "加载智能体列表失败，请检查后端服务是否启动。",
+            content: "Failed to load agents. Please check whether the backend is running.",
             timestamp: Date.now(),
           },
         ]);
@@ -739,7 +739,7 @@ export default function Home() {
       const initialMsg: Message = {
         id: Date.now().toString(),
         role: "agent",
-        content: "你好！我是你的智能架构助手。请选择一个智能体开始对话。",
+        content: "Hello! I'm your diagram assistant. Choose an agent to start.",
         timestamp: Date.now(),
       };
 
@@ -779,7 +779,7 @@ export default function Home() {
       {
         id: Date.now().toString(),
         role: "agent",
-        content: "⚠️ 已停止生成。",
+        content: "Generation stopped.",
         timestamp: Date.now(),
       },
     ]);
@@ -795,7 +795,7 @@ export default function Home() {
         {
           id: Date.now().toString(),
           role: "agent",
-          content: "请先选择一个智能体。",
+          content: "Please select an agent first.",
           timestamp: Date.now(),
         },
       ]);
@@ -856,7 +856,7 @@ export default function Home() {
 
       // 2. Send Message via Stream
       setStreamPhaseSafely("connecting");
-      setStreamProgressSafely("正在连接...");
+      setStreamProgressSafely("姝ｅ湪杩炴帴...");
 
       // Track incremental merge state
       let nodeCount = 0;
@@ -1045,10 +1045,10 @@ export default function Home() {
 
           // Update phase display
           const phaseLabel: Record<string, string> = {
-            analyzing: "🔍 分析需求",
-            drawing: "🎨 绘制图表",
-            reviewing: "✅ 检查优化",
-            thinking: "🤔 思考中",
+            analyzing: "Analyzing request",
+            drawing: "Drawing diagram",
+            reviewing: "Reviewing result",
+            thinking: "Thinking",
           };
           const currentPhaseLabel = phaseLabel[phase] || phaseLabel.thinking;
 
@@ -1085,7 +1085,7 @@ export default function Home() {
 
               hasIncrementalContent = true;
               nodeCount++;
-              setStreamProgressSafely(`添加节点 #${nodeCount}: ${chunk.label}`);
+              setStreamProgressSafely(`娣诲姞鑺傜偣 #${nodeCount}: ${chunk.label}`);
 
               // Sometimes AI returns empty XML or malformed tags, skip adding to prevent crashing draw.io
               if (
@@ -1131,7 +1131,7 @@ export default function Home() {
               hasIncrementalContent = true;
               edgeCount++;
               setStreamProgressSafely(
-                `添加连线 #${edgeCount}: ${chunk.label || chunk.source + "→" + chunk.target}`,
+                `Added edge #${edgeCount}: ${chunk.label || `${chunk.source}->${chunk.target}`}`,
               );
 
               if (
@@ -1160,7 +1160,7 @@ export default function Home() {
               hasIncrementalContent = true;
               receivedDrawioDone = true;
               finalXml = chunk.content;
-              setStreamProgressSafely("🎨 绘制完成，正在加载最终图表...");
+              setStreamProgressSafely("馃帹 缁樺埗瀹屾垚锛屾鍦ㄥ姞杞芥渶缁堝浘琛?..");
 
               // Only render the diagram and end the process if this is the final Reviewer output (or if there is no reviewer)
               // We identify the final output if phase is 'drawing' or 'done' (since we removed reviewer)
@@ -1402,7 +1402,7 @@ export default function Home() {
 
             case "error": {
               accumulatedContent +=
-                (accumulatedContent ? "\n\n" : "") + `❌ ${chunk.content}`;
+                (accumulatedContent ? "\n\n" : "") + `鉂?${chunk.content}`;
               queueAgentPatch({
                 content: accumulatedContent,
                 steps: cloneSteps(),
@@ -1416,7 +1416,7 @@ export default function Home() {
               if (nodeCount > 0 || receivedDrawioDone) {
                 accumulatedContent +=
                   (accumulatedContent ? "\n\n" : "") +
-                  `✅ 图表绘制完成！共 ${nodeCount} 个节点，${edgeCount} 条连线。`;
+                  `Diagram generated successfully: ${nodeCount} nodes, ${edgeCount} edges.`;
                 queueAgentPatch({
                   content: accumulatedContent,
                   ...(stepsChanged ? { steps: cloneSteps() } : {}),
@@ -1428,7 +1428,7 @@ export default function Home() {
               ) {
                 accumulatedContent +=
                   (accumulatedContent ? "\n\n" : "") +
-                  `⚠️ 未收到有效响应，请重试。`;
+                  `No valid response was received. Please try again.`;
                 queueAgentPatch({
                   content: accumulatedContent,
                   ...(stepsChanged ? { steps: cloneSteps() } : {}),
@@ -1457,7 +1457,7 @@ export default function Home() {
           ) {
             accumulatedContent +=
               (accumulatedContent ? "\n\n" : "") +
-              `❌ 连接异常: ${error.message}`;
+              `鉂?杩炴帴寮傚父: ${error.message}`;
             markAllStepsDone();
             queueAgentPatch({
               content: accumulatedContent,
@@ -1481,7 +1481,7 @@ export default function Home() {
             markAllStepsDone();
             const finalContent =
               (accumulatedContent ? accumulatedContent + "\n\n" : "") +
-              `✅ 图表绘制完成！共 ${nodeCount} 个节点，${edgeCount} 条连线。`;
+              `Diagram generated successfully: ${nodeCount} nodes, ${edgeCount} edges.`;
             accumulatedContent = finalContent;
             queueAgentPatch({ content: finalContent, steps: cloneSteps() });
           } else if (
@@ -1492,7 +1492,7 @@ export default function Home() {
             markAllStepsDone();
             const finalContent =
               (accumulatedContent ? accumulatedContent + "\n\n" : "") +
-              `⚠️ 未收到有效响应，请重试。`;
+              `No valid response was received. Please try again.`;
             accumulatedContent = finalContent;
             queueAgentPatch({ content: finalContent, steps: cloneSteps() });
           } else {
@@ -1605,27 +1605,27 @@ export default function Home() {
 
   const quickActions = [
     {
-      label: "UML类图",
-      text: "请帮我绘制一个电商系统的UML类图，包含用户、订单、商品等类。",
+      label: "UML 类图",
+      text: "请帮我绘制一个电商系统的 UML 类图，包含用户、订单、商品、库存和支付等核心实体。",
     },
     {
       label: "时序图",
-      text: "请帮我绘制一个用户登录注册的时序图，包含客户端、网关、认证服务、数据库。",
+      text: "请帮我绘制一个用户登录与注册流程的时序图，包含客户端、网关、认证服务和数据库。",
     },
     {
       label: "架构图",
-      text: "请帮我绘制一个微服务系统架构图，包含接入层、业务逻辑层和数据层。",
+      text: "请帮我绘制一个微服务系统架构图，包含接入层、业务服务层、消息队列、缓存和数据层。",
     },
     {
       label: "业务流程图",
-      text: "请帮我绘制一个电商购物流程图，包含商品浏览、加入购物车、下单、支付、发货等环节。",
+      text: "请帮我绘制一个电商下单业务流程图，包含浏览商品、加入购物车、提交订单、支付和发货环节。",
     },
   ];
 
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden theme-bg-darkblue font-sans premium-grid">
+    <div className="workspace-dark-shell flex h-screen w-full flex-col overflow-hidden font-sans">
       {/* Header - Minimal & Clean */}
-      <div className="tool-header h-16 px-6 border-b border-slate-700/60 flex items-center justify-between shrink-0 z-40 relative bg-slate-900/50 backdrop-blur-md">
+      <div className="tool-header workspace-dark-header relative z-40 flex h-16 items-center justify-between border-b px-4 md:px-6">
         <div className="flex items-center gap-3">
           <div className="bg-gradient-to-br from-cyan-400 via-indigo-500 to-emerald-500 p-1.5 rounded-xl shadow-[0_10px_24px_rgba(79,70,229,0.22)]">
             <svg
@@ -1646,16 +1646,16 @@ export default function Home() {
           </div>
           <div>
             <h1 className="text-lg font-bold text-slate-100 tracking-tight">
-              AI Bok 创作社区Sutmuch
+              AI Bok 鍒涗綔绀惧尯Sutmuch
             </h1>
-            <p className="text-[11px] text-slate-400">Sutmuch 流程绘图工作台</p>
+            <p className="text-[11px] text-slate-400">Sutmuch flowchart workspace</p>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 px-4 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-lg hover:bg-slate-700 hover:text-white transition-all text-sm font-medium shadow-sm active:scale-95"
+            className="workspace-secondary-btn flex items-center gap-2 px-4 py-2 text-sm font-medium"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1670,14 +1670,14 @@ export default function Home() {
             >
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            返回工作台
+            杩斿洖宸ヤ綔鍙?
           </button>
 
           <a
             href="https://sukesutone.cn/md/project/ai-agent-scaffold/ai-agent-scaffold.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg transition-all shadow-sm"
+            className="workspace-secondary-btn flex items-center gap-1.5 px-3 py-2 text-xs font-medium"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -1693,15 +1693,15 @@ export default function Home() {
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
             </svg>
-            社区指南
+            绀惧尯鎸囧崡
           </a>
 
           <div className="h-6 w-px bg-slate-700 mx-1"></div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-full border border-slate-700 shadow-sm">
+          <div className="workspace-subpanel flex items-center gap-2 rounded-full px-3 py-1.5">
             <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
             <span className="text-xs font-semibold text-slate-300">
-              {currentUser || "访客"}
+              {currentUser || "璁垮"}
             </span>
           </div>
 
@@ -1709,10 +1709,10 @@ export default function Home() {
 
           <button
             onClick={exportDiagram}
-            className="flex items-center gap-2 px-4 py-1.5 bg-slate-800 border border-slate-700 text-slate-300 rounded-lg hover:bg-slate-700 hover:border-slate-600 hover:text-white transition-all text-sm font-medium shadow-sm active:scale-95"
+            className="workspace-secondary-btn flex items-center gap-2 px-4 py-2 text-sm font-medium"
           >
             <Icons.Download className="w-4 h-4" />
-            导出图稿
+            瀵煎嚭鍥剧
           </button>
 
           <button
@@ -1727,7 +1727,7 @@ export default function Home() {
             <button
               onClick={() => setIsChatOpen(true)}
               className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-100"
-              title="打开助手"
+              title="鎵撳紑鍔╂墜"
             >
               <Icons.Chat />
             </button>
@@ -1738,16 +1738,16 @@ export default function Home() {
       {/* Main Layout */}
       <div className="flex flex-1 w-full overflow-hidden relative">
         {/* Sessions Sidebar */}
-        <div className="w-64 bg-white text-slate-600 flex flex-col border-r border-slate-100/60 shrink-0 z-30">
-          <div className="h-14 px-4 flex items-center justify-between border-b border-slate-100 shrink-0">
+        <div className="hidden lg:flex w-64 flex-col border-r border-[#e6e2db] bg-[#f1ece6] text-slate-600 shrink-0 z-30">
+          <div className="flex h-14 items-center justify-between border-b border-[#e6e2db] px-4 shrink-0">
             <span className="font-semibold text-slate-800 flex items-center gap-2">
               <Icons.MessageSquare className="w-4 h-4 text-indigo-600" />
-              绘图记录
+              缁樺浘璁板綍
             </span>
             <button
               onClick={handleNewChat}
               className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-all"
-              title="新建绘图会话"
+              title="鏂板缓缁樺浘浼氳瘽"
             >
               <Icons.Plus className="w-5 h-5" />
             </button>
@@ -1798,7 +1798,7 @@ export default function Home() {
                           : "hover:bg-red-50 text-slate-400 hover:text-red-500"
                       }
                     `}
-                    title="删除会话"
+                    title="鍒犻櫎浼氳瘽"
                   >
                     <Icons.Trash className="w-4 h-4" />
                   </button>
@@ -1806,7 +1806,7 @@ export default function Home() {
               ))}
             {sessions.length === 0 && (
               <div className="text-center py-10 text-xs text-slate-400">
-                暂无会话记录
+                鏆傛棤浼氳瘽璁板綍
               </div>
             )}
           </div>
@@ -1814,7 +1814,7 @@ export default function Home() {
 
         {/* Draw.io Canvas Area */}
         <div className="flex-1 relative bg-slate-50 h-full flex flex-col">
-          <div className="flex-1 m-3 rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white ring-1 ring-slate-100">
+          <div className="workspace-dark-canvas flex-1 m-3 overflow-hidden">
             <DrawIoEmbed
               ref={drawioRef}
               autosave={true}
@@ -1867,7 +1867,7 @@ export default function Home() {
           `}
         >
           {/* Chat Header */}
-          <div className="h-14 px-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+          <div className="workspace-dark-header sticky top-0 z-10 flex h-14 items-center justify-between border-b px-4 md:px-5 shrink-0">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-200 shrink-0 ring-2 ring-white">
                 <Icons.Sparkles className="w-4 h-4" />
@@ -1880,7 +1880,7 @@ export default function Home() {
                   style={{ backgroundImage: "none" }}
                 >
                   {agents.length === 0 && (
-                    <option value="">正在加载智能体...</option>
+                    <option value="">姝ｅ湪鍔犺浇鏅鸿兘浣?..</option>
                   )}
                   {agents.map((agent) => (
                     <option key={agent.agentId} value={agent.agentId}>
@@ -1891,7 +1891,7 @@ export default function Home() {
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                   <span className="text-[10px] text-slate-500 font-medium leading-tight">
-                    智能助手在线
+                    鏅鸿兘鍔╂墜鍦ㄧ嚎
                   </span>
                 </div>
               </div>
@@ -1953,10 +1953,10 @@ export default function Home() {
                               <summary className="inline-flex items-center gap-2 cursor-pointer text-xs text-slate-500 hover:text-slate-700 font-medium select-none bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm transition-all hover:border-slate-300">
                                 <Icons.Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                                 <span className="group-open/details:hidden">
-                                  展开执行步骤
+                                  灞曞紑鎵ц姝ラ
                                 </span>
                                 <span className="hidden group-open/details:inline">
-                                  收起执行步骤
+                                  鏀惰捣鎵ц姝ラ
                                 </span>
                               </summary>
                               <div className="mt-2 flex flex-col gap-2 p-3 bg-slate-50/50 border border-slate-200 rounded-xl shadow-sm text-sm text-slate-600 max-w-none overflow-x-auto">
@@ -1971,7 +1971,7 @@ export default function Home() {
                                           <Icons.Loader className="w-3.5 h-3.5 text-indigo-500" />
                                         ) : (
                                           <span className="text-green-500">
-                                            ✓
+                                            鉁?
                                           </span>
                                         )}
                                         <span>{step.label}</span>
@@ -2129,8 +2129,8 @@ export default function Home() {
                 onKeyDown={handleKeyDown}
                 placeholder={
                   isSending
-                    ? "AI 正在生成中..."
-                    : "输入您的问题，描述您的需求..."
+                    ? "AI 姝ｅ湪鐢熸垚涓?.."
+                    : "杈撳叆鎮ㄧ殑闂锛屾弿杩版偍鐨勯渶姹?.."
                 }
                 disabled={isSending}
                 className="flex-1 px-4 py-3 bg-transparent border-none focus:ring-0 text-[15px] text-slate-800 placeholder:text-slate-400 resize-none max-h-[300px] min-h-[80px] scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent disabled:opacity-50 disabled:cursor-not-allowed leading-relaxed"
@@ -2142,7 +2142,7 @@ export default function Home() {
                   <button
                     onClick={handleStopStream}
                     className="p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center bg-red-100 text-red-600 hover:bg-red-200 shadow-sm"
-                    title="停止生成"
+                    title="鍋滄鐢熸垚"
                   >
                     <Icons.Square className="w-4 h-4" />
                   </button>
@@ -2167,7 +2167,7 @@ export default function Home() {
                   onClick={handleRestartSession}
                   disabled={isSending}
                   className="p-2.5 rounded-lg bg-white text-slate-400 hover:bg-slate-50 hover:text-indigo-600 transition-all duration-200 border border-slate-200 hover:border-indigo-100 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="重启对话"
+                  title="閲嶅惎瀵硅瘽"
                 >
                   <Icons.Plus className="w-4 h-4" />
                 </button>
@@ -2196,7 +2196,7 @@ export default function Home() {
                   }}
                   className="appearance-none bg-transparent border-none text-[11px] font-medium text-slate-600 focus:ring-0 py-1 pl-1 pr-5 cursor-pointer outline-none"
                 >
-                  <option value="default">默认模型</option>
+                  <option value="default">榛樿妯″瀷</option>
                   {customModels
                     .filter((m) => m.enabled)
                     .map((m) => (
@@ -2204,8 +2204,8 @@ export default function Home() {
                         {m.name || m.model}
                       </option>
                     ))}
-                  <option disabled>──────────</option>
-                  <option value="add_new">+ 管理模型</option>
+                  <option disabled>鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€</option>
+                  <option value="add_new">+ 绠＄悊妯″瀷</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-slate-400">
                   <svg
@@ -2219,14 +2219,14 @@ export default function Home() {
               </div>
               <span className="text-[10px] text-slate-400 ml-auto hidden sm:inline">
                 <kbd className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500">
-                  回车
+                  鍥炶溅
                 </kbd>{" "}
-                发送
+                鍙戦€?
               </span>
             </div>
             <div className="text-center mt-1.5">
               <p className="text-[10px] text-slate-400">
-                {isSending ? streamProgress || "生成中..." : ""}
+                {isSending ? streamProgress || "鐢熸垚涓?.." : ""}
               </p>
             </div>
           </div>
@@ -2235,17 +2235,17 @@ export default function Home() {
 
       {/* Export Modal - Polished */}
       {imgData && (
-        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-6 animate-in fade-in duration-200">
-          <div className="bg-white p-0 rounded-2xl shadow-2xl max-h-[90vh] flex flex-col w-full max-w-4xl overflow-hidden animate-in zoom-in-95 duration-200 border border-white/20">
+        <div className="workspace-modal-scrim">
+          <div className="workspace-modal-card flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden p-0">
             <div className="flex justify-between items-center px-6 py-4 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-100 text-green-600 rounded-lg">
                   <Icons.Download className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-slate-800">导出完成</h2>
+                  <h2 className="text-lg font-bold text-slate-800">瀵煎嚭瀹屾垚</h2>
                   <p className="text-xs text-slate-500">
-                    当前图稿已经成功转换，可直接预览或下载。
+                    褰撳墠鍥剧宸茬粡鎴愬姛杞崲锛屽彲鐩存帴棰勮鎴栦笅杞姐€?
                   </p>
                 </div>
               </div>
@@ -2261,7 +2261,7 @@ export default function Home() {
               <div className="bg-white p-2 rounded shadow-sm border border-slate-200">
                 <img
                   src={imgData}
-                  alt="导出的图稿预览"
+                  alt="导出图稿预览"
                   className="max-w-full h-auto object-contain"
                 />
               </div>
@@ -2272,15 +2272,15 @@ export default function Home() {
                 onClick={() => setImgData(null)}
                 className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors text-sm"
               >
-                关闭预览
+                鍏抽棴棰勮
               </button>
               <a
                 href={imgData}
-                download="流程图稿.svg"
+                download="娴佺▼鍥剧.svg"
                 className="px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all text-sm flex items-center gap-2"
               >
                 <Icons.Download className="w-4 h-4" />
-                下载文件
+                涓嬭浇鏂囦欢
               </a>
             </div>
           </div>
@@ -2289,8 +2289,8 @@ export default function Home() {
 
       {/* Rename Modal */}
       {isRenameModalOpen && (
-        <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-6 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-white/20">
+        <div className="workspace-modal-scrim">
+          <div className="workspace-modal-card w-full max-w-md overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
               <h2 className="text-lg font-bold text-slate-800">重命名会话</h2>
               <button
@@ -2303,7 +2303,7 @@ export default function Home() {
 
             <div className="p-6">
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                会话名称
+                浼氳瘽鍚嶇О
               </label>
               <input
                 type="text"
@@ -2311,7 +2311,7 @@ export default function Home() {
                 onChange={(e) => setNewSessionTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleRenameSave()}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                placeholder="输入新的会话名称"
+                placeholder="杈撳叆鏂扮殑浼氳瘽鍚嶇О"
                 autoFocus
               />
             </div>
@@ -2321,13 +2321,13 @@ export default function Home() {
                 onClick={() => setIsRenameModalOpen(false)}
                 className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors text-sm"
               >
-                取消
+                鍙栨秷
               </button>
               <button
                 onClick={handleRenameSave}
                 className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all text-sm"
               >
-                保存修改
+                淇濆瓨淇敼
               </button>
             </div>
           </div>
@@ -2335,15 +2335,15 @@ export default function Home() {
       )}
       {/* Custom Models Settings Modal */}
       {showApiConfig && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-50 p-6 animate-in fade-in duration-200">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-white/20 flex flex-col max-h-[90vh]">
+        <div className="workspace-modal-scrim">
+          <div className="workspace-modal-card flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden">
             <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 bg-indigo-50 rounded-lg">
                   <Icons.Sparkles className="w-4 h-4 text-indigo-500" />
                 </div>
                 <h2 className="text-base font-bold text-slate-800">
-                  自定义模型配置
+                  鑷畾涔夋ā鍨嬮厤缃?
                 </h2>
               </div>
               <button
@@ -2365,7 +2365,7 @@ export default function Home() {
                     onClick={handleAddNewModel}
                     className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm text-sm font-medium"
                   >
-                    <Icons.Plus className="w-4 h-4" /> 添加模型
+                    <Icons.Plus className="w-4 h-4" /> 娣诲姞妯″瀷
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -2421,9 +2421,9 @@ export default function Home() {
                   ))}
                   {customModels.length === 0 && (
                     <div className="text-center text-xs text-slate-400 py-6">
-                      暂无自定义模型
+                      鏆傛棤鑷畾涔夋ā鍨?
                       <br />
-                      点击上方按钮添加
+                      鐐瑰嚮涓婃柟鎸夐挳娣诲姞
                     </div>
                   )}
                 </div>
@@ -2435,7 +2435,7 @@ export default function Home() {
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        展示名称
+                        灞曠ず鍚嶇О
                       </label>
                       <input
                         type="text"
@@ -2447,12 +2447,12 @@ export default function Home() {
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="例如：我的GPT-4o"
+                        placeholder="渚嬪锛氭垜鐨凣PT-4o"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        模型名称
+                        妯″瀷鍚嶇О
                       </label>
                       <input
                         type="text"
@@ -2464,12 +2464,12 @@ export default function Home() {
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="例如：gpt-4o"
+                        placeholder="渚嬪锛歡pt-4o"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        接口地址
+                        鎺ュ彛鍦板潃
                       </label>
                       <input
                         type="text"
@@ -2481,12 +2481,12 @@ export default function Home() {
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="例如：https://api.openai.com"
+                        placeholder="渚嬪锛歨ttps://api.openai.com"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        接口密钥
+                        鎺ュ彛瀵嗛挜
                       </label>
                       <input
                         type="password"
@@ -2503,7 +2503,7 @@ export default function Home() {
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        对话接口路径（可选）
+                        瀵硅瘽鎺ュ彛璺緞锛堝彲閫夛級
                       </label>
                       <input
                         type="text"
@@ -2515,7 +2515,7 @@ export default function Home() {
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="默认为 v1/chat/completions"
+                        placeholder="榛樿涓?v1/chat/completions"
                       />
                     </div>
                     <div className="pt-2 flex justify-end">
@@ -2523,14 +2523,14 @@ export default function Home() {
                         onClick={handleSaveEditingModel}
                         className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-sm transition-all text-sm"
                       >
-                        保存配置
+                        淇濆瓨閰嶇疆
                       </button>
                     </div>
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center text-slate-400">
                     <Icons.Sparkles className="w-12 h-12 mb-3 opacity-20" />
-                    <p className="text-sm">选择左侧模型进行编辑，或点击添加</p>
+                    <p className="text-sm">閫夋嫨宸︿晶妯″瀷杩涜缂栬緫锛屾垨鐐瑰嚮娣诲姞</p>
                   </div>
                 )}
               </div>
@@ -2541,3 +2541,14 @@ export default function Home() {
     </div>
   );
 }
+
+
+
+
+
+
+
+
+
+
+

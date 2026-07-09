@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
-@import "@uiw/react-markdown-editor/markdown-editor.css";
-@import "@uiw/react-markdown-preview/markdown.css";
+@import "@mdxeditor/editor/style.css";
 
 :root {
   --background: #f7f5f2;
@@ -443,27 +442,37 @@ select {
   border-radius: 12px;
 }
 
-.wmde-markdown {
-  background: transparent;
-}
-
-.wmde-markdown-var {
+.mdxeditor-theme {
+  height: 100%;
   color: #22252a;
   background: transparent;
-  font-family: var(--font-geist-sans);
+  --accentBase: #22252a;
+  --accentBgSubtle: #f3f0eb;
+  --baseBg: transparent;
+  --basePageBg: transparent;
+  --baseBorder: #e6e2db;
+  --baseTextContrast: #22252a;
+  --baseText: #22252a;
+  --baseTextSubtle: #858c96;
+  --font-body: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
-.wmde-markdown-var .wmde-markdown {
-  color: #3f444b;
-}
-
-.wmde-markdown-var .cm-editor,
-.wmde-markdown-var .cm-scroller,
-.wmde-markdown-var .w-md-editor,
-.wmde-markdown-var .w-md-editor-toolbar,
-.wmde-markdown-var .w-md-editor-content,
-.wmde-markdown-var .w-md-editor-preview {
+.mdxeditor-theme .mdxeditor-root-contenteditable,
+.mdxeditor-theme .mdxeditor-toolbar,
+.mdxeditor-theme .cm-editor,
+.mdxeditor-theme .cm-scroller {
   background: transparent;
+}
+
+.mdxeditor-toolbar {
+  border-bottom: 1px solid var(--border);
+  padding: 12px 14px;
+}
+
+.mdxeditor-theme .mdxeditor-root-contenteditable {
+  min-height: 100%;
+  padding: 20px 28px 28px;
 }
 
 ::-webkit-scrollbar {

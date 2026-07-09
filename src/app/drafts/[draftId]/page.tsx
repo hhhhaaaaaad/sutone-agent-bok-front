@@ -9,10 +9,11 @@ import { articlesApi } from "@/api/articles";
 import AiWritingPanel from "@/components/AiWritingPanel";
 import PublishDialog from "@/components/PublishDialog";
 import DraftMetaPanel from "@/components/DraftMetaPanel";
-import UiwMarkdownEditor from "@/components/UiwMarkdownEditor";
+import MdxEditor from "@/components/MdxEditor";
+import type { MDXEditorMethods } from "@mdxeditor/editor";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
-type EditorMode = "native" | "markdown";
+type EditorMode = "native" | "visual";
 
 export default function DraftEditorPage() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function DraftEditorPage() {
   const summaryRef = useRef(summary);
   const coverRef = useRef(coverUrl);
   const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const visualEditorRef = useRef<MDXEditorMethods>(null);
   const savingRef = useRef(false);
   const dirtyRef = useRef(false);
   const fetchedRef = useRef(false);
@@ -113,7 +115,7 @@ export default function DraftEditorPage() {
   }, [title, content, summary, coverUrl, loading, doSave]);
 
   useEffect(() => {
-    if (editorMode === "markdown") {
+    if (editorMode === "visual") {
       setSelectedText("");
     }
   }, [editorMode]);
@@ -165,6 +167,16 @@ export default function DraftEditorPage() {
       setShowPublishDialog(false);
     }
   };
+
+  useEffect(() => {
+    if (editorMode !== "visual") return;
+    const editor = visualEditorRef.current;
+    if (!editor) return;
+    const currentMarkdown = editor.getMarkdown();
+    if (currentMarkdown !== content) {
+      editor.setMarkdown(content);
+    }
+  }, [content, editorMode]);
 
   if (loading) {
     return (
@@ -259,7 +271,7 @@ export default function DraftEditorPage() {
             <div className="workspace-panel rounded-[12px] p-4">
               <p className="text-sm text-[#22252a]">编辑模式</p>
               <p className="mt-2 text-xs leading-5 text-[#858c96]">
-                原生编辑更适合直接输入 Markdown 语法；Markdown 编辑器模式提供 UIW 自带工具栏和预览面板。
+                原生编辑保留 Markdown 源码输入；可视化编辑会直接在渲染后的内容上编辑，并提供更强的工具栏。
               </p>
             </div>
           </aside>
@@ -267,32 +279,35 @@ export default function DraftEditorPage() {
           <section className="flex min-w-0 flex-1 flex-col bg-[#fcfbf8]">
             <div className="border-b border-[#e6e2db] px-5 py-3 md:px-8">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  {[
-                    { key: "native", label: "原生编辑" },
-                    { key: "markdown", label: "Markdown 编辑器" },
-                  ].map((item) => {
-                    const active = editorMode === item.key;
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => setEditorMode(item.key as EditorMode)}
-                        className={`rounded-[10px] px-3 py-2 text-xs font-medium transition-colors ${
-                          active
-                            ? "bg-[#22252a] text-white"
-                            : "bg-[#f3f0eb] text-[#5d636c] hover:bg-[#ece7df]"
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    );
-                  })}
+                <div className="relative inline-grid grid-cols-2 rounded-full bg-[#f3f0eb] p-1">
+                  <span
+                    className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-[#22252a] transition-transform duration-200 ${
+                      editorMode === "visual" ? "translate-x-full" : "translate-x-0"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setEditorMode("native")}
+                    className={`relative z-10 px-4 py-2 text-xs font-medium transition-colors ${
+                      editorMode === "native" ? "text-white" : "text-[#5d636c]"
+                    }`}
+                  >
+                    原生编辑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditorMode("visual")}
+                    className={`relative z-10 px-4 py-2 text-xs font-medium transition-colors ${
+                      editorMode === "visual" ? "text-white" : "text-[#5d636c]"
+                    }`}
+                  >
+                    可视化编辑
+                  </button>
                 </div>
                 <p className="text-xs text-[#858c96]">
                   {editorMode === "native"
                     ? "当前为原生 Markdown 输入，不显示工具栏。"
-                    : "当前为 UIW Markdown 编辑器，显示工具栏和预览。"}
+                    : "当前为渲染后直接编辑模式，顶部提供撤销重做和格式工具栏。"}
                 </p>
               </div>
             </div>
@@ -311,11 +326,11 @@ export default function DraftEditorPage() {
                   />
                 </div>
               ) : (
-                <div className="wmde-markdown-var h-full overflow-hidden px-5 py-5 md:px-8 md:py-6">
+                <div className="h-full overflow-hidden px-5 py-5 md:px-8 md:py-6">
                   <div className="h-full overflow-hidden rounded-[16px] border border-[#e6e2db] bg-[#faf8f4]">
-                    <UiwMarkdownEditor
-                      value={content}
-                      height="100%"
+                    <MdxEditor
+                      ref={visualEditorRef}
+                      markdown={content}
                       onChange={setContent}
                     />
                   </div>

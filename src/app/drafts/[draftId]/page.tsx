@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -9,8 +9,10 @@ import { articlesApi } from "@/api/articles";
 import AiWritingPanel from "@/components/AiWritingPanel";
 import PublishDialog from "@/components/PublishDialog";
 import DraftMetaPanel from "@/components/DraftMetaPanel";
+import UiwMarkdownEditor from "@/components/UiwMarkdownEditor";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
+type EditorMode = "native" | "markdown";
 
 export default function DraftEditorPage() {
   const router = useRouter();
@@ -27,6 +29,7 @@ export default function DraftEditorPage() {
   const [publishing, setPublishing] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [selectedText, setSelectedText] = useState("");
+  const [editorMode, setEditorMode] = useState<EditorMode>("native");
 
   const titleRef = useRef(title);
   const contentRef = useRef(content);
@@ -109,6 +112,12 @@ export default function DraftEditorPage() {
     return () => clearTimeout(timer);
   }, [title, content, summary, coverUrl, loading, doSave]);
 
+  useEffect(() => {
+    if (editorMode === "markdown") {
+      setSelectedText("");
+    }
+  }, [editorMode]);
+
   const handleSelect = useCallback(() => {
     const ta = contentTextareaRef.current;
     if (!ta) return;
@@ -123,22 +132,27 @@ export default function DraftEditorPage() {
 
   const getPromptParams = useCallback(() => {
     const params: Record<string, unknown> = { title: titleRef.current };
-    if (selectedText) {
+    if (editorMode === "native" && selectedText) {
       params.selectedText = selectedText;
     }
     return params;
-  }, [selectedText]);
+  }, [editorMode, selectedText]);
 
-  const handleApplyResult = useCallback((action: "append" | "replace" | "fillSummary", content: string) => {
-    if (!content.trim()) return;
-    if (action === "append") {
-      setContent((prev) => [prev.trimEnd(), content.trim()].filter(Boolean).join("\n\n"));
-    } else if (action === "replace") {
-      setContent(content.trim());
-    } else if (action === "fillSummary") {
-      setSummary(content.trim());
-    }
-  }, []);
+  const handleApplyResult = useCallback(
+    (action: "append" | "replace" | "fillSummary", nextContent: string) => {
+      if (!nextContent.trim()) return;
+      if (action === "append") {
+        setContent((prev) =>
+          [prev.trimEnd(), nextContent.trim()].filter(Boolean).join("\n\n"),
+        );
+      } else if (action === "replace") {
+        setContent(nextContent.trim());
+      } else if (action === "fillSummary") {
+        setSummary(nextContent.trim());
+      }
+    },
+    [],
+  );
 
   const handlePublish = async (tags: string[]) => {
     setPublishing(true);
@@ -162,7 +176,7 @@ export default function DraftEditorPage() {
 
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1180px] flex-col overflow-hidden">
+      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1440px] flex-col overflow-hidden">
         <header className="flex h-[72px] items-center justify-between gap-4 border-b border-[#e6e2db] bg-[#fcfbf8] px-4 md:px-6">
           <div className="flex min-w-0 items-center gap-4">
             <button
@@ -243,26 +257,70 @@ export default function DraftEditorPage() {
               </p>
             </div>
             <div className="workspace-panel rounded-[12px] p-4">
-              <p className="text-sm text-[#22252a]">写作建议</p>
-              <ul className="mt-2 space-y-2 text-xs leading-5 text-[#5d636c]">
-                <li>先补标题与摘要，再展开正文结构。</li>
-                <li>发布前检查标签和封面图链接。</li>
-                <li>长段落建议拆分成短节，便于后续润色。</li>
-              </ul>
+              <p className="text-sm text-[#22252a]">编辑模式</p>
+              <p className="mt-2 text-xs leading-5 text-[#858c96]">
+                原生编辑更适合直接输入 Markdown 语法；Markdown 编辑器模式提供 UIW 自带工具栏和预览面板。
+              </p>
             </div>
           </aside>
 
           <section className="flex min-w-0 flex-1 flex-col bg-[#fcfbf8]">
-            <div className="flex-1 overflow-y-auto px-5 py-6 md:px-10 md:py-8">
-              <textarea
-                ref={contentTextareaRef}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onMouseUp={handleSelect}
-                onKeyUp={handleSelect}
-                placeholder="开始输入正文内容，支持 Markdown 标题、列表、代码块等语法。"
-                className="min-h-full w-full resize-none bg-transparent text-[15px] leading-8 text-[#22252a] outline-none placeholder:text-[#b9b2a8]"
-              />
+            <div className="border-b border-[#e6e2db] px-5 py-3 md:px-8">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  {[
+                    { key: "native", label: "原生编辑" },
+                    { key: "markdown", label: "Markdown 编辑器" },
+                  ].map((item) => {
+                    const active = editorMode === item.key;
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() => setEditorMode(item.key as EditorMode)}
+                        className={`rounded-[10px] px-3 py-2 text-xs font-medium transition-colors ${
+                          active
+                            ? "bg-[#22252a] text-white"
+                            : "bg-[#f3f0eb] text-[#5d636c] hover:bg-[#ece7df]"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-[#858c96]">
+                  {editorMode === "native"
+                    ? "当前为原生 Markdown 输入，不显示工具栏。"
+                    : "当前为 UIW Markdown 编辑器，显示工具栏和预览。"}
+                </p>
+              </div>
+            </div>
+
+            <div className="min-h-0 flex-1 overflow-hidden">
+              {editorMode === "native" ? (
+                <div className="h-full overflow-y-auto px-5 py-6 md:px-8 md:py-8">
+                  <textarea
+                    ref={contentTextareaRef}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    onMouseUp={handleSelect}
+                    onKeyUp={handleSelect}
+                    placeholder="开始输入正文内容，支持 Markdown 标题、列表、代码块、表格、数学公式等语法。"
+                    className="min-h-full w-full resize-none bg-transparent text-[15px] leading-8 text-[#22252a] outline-none placeholder:text-[#b9b2a8]"
+                  />
+                </div>
+              ) : (
+                <div className="wmde-markdown-var h-full overflow-hidden px-5 py-5 md:px-8 md:py-6">
+                  <div className="h-full overflow-hidden rounded-[16px] border border-[#e6e2db] bg-[#faf8f4]">
+                    <UiwMarkdownEditor
+                      value={content}
+                      height="100%"
+                      onChange={setContent}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 

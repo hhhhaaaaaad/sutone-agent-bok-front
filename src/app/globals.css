@@ -1,5 +1,7 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @plugin "@tailwindcss/typography";
+@import "@uiw/react-markdown-editor/markdown-editor.css";
+@import "@uiw/react-markdown-preview/markdown.css";
 
 :root {
   --background: #f7f5f2;
@@ -439,6 +441,29 @@ select {
 .article-markdown :where(table) {
   overflow: hidden;
   border-radius: 12px;
+}
+
+.wmde-markdown {
+  background: transparent;
+}
+
+.wmde-markdown-var {
+  color: #22252a;
+  background: transparent;
+  font-family: var(--font-geist-sans);
+}
+
+.wmde-markdown-var .wmde-markdown {
+  color: #3f444b;
+}
+
+.wmde-markdown-var .cm-editor,
+.wmde-markdown-var .cm-scroller,
+.wmde-markdown-var .w-md-editor,
+.wmde-markdown-var .w-md-editor-toolbar,
+.wmde-markdown-var .w-md-editor-content,
+.wmde-markdown-var .w-md-editor-preview {
+  background: transparent;
 }
 
 ::-webkit-scrollbar {

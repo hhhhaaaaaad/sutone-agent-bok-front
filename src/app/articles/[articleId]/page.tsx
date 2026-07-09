@@ -5,7 +5,45 @@ import { useRouter, useParams } from 'next/navigation';
 import { articlesApi } from '@/api/articles';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import rehypeHighlight from 'rehype-highlight';
 import type { ArticleDetailResponse } from '@/types/article';
+
+function StreamMarkdown({ content }: { content: string }) {
+  const [displayedContent, setDisplayedContent] = useState('');
+
+  useEffect(() => {
+    const source = content || '';
+
+    if (!source) return;
+
+    let index = 0;
+    const step = Math.max(2, Math.ceil(source.length / 900));
+    const timer = window.setInterval(() => {
+      index = Math.min(source.length, index + step);
+      setDisplayedContent(source.slice(0, index));
+
+      if (index >= source.length) {
+        window.clearInterval(timer);
+      }
+    }, 24);
+
+    return () => window.clearInterval(timer);
+  }, [content]);
+
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[
+        rehypeKatex,
+        [rehypeHighlight, { detect: true, ignoreMissing: true }],
+      ]}
+    >
+      {displayedContent}
+    </ReactMarkdown>
+  );
+}
 
 export default function ArticleDetailPage() {
   const router = useRouter();
@@ -98,10 +136,8 @@ export default function ArticleDetailPage() {
             </div>
           )}
 
-          <article className="prose prose-slate mt-10 max-w-none prose-headings:text-[#22252a] prose-p:text-[#3f444b] prose-li:text-[#4f555d]">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {article.contentMd || ''}
-            </ReactMarkdown>
+          <article className="article-markdown prose prose-slate mt-10 max-w-none prose-headings:text-[#22252a] prose-p:text-[#3f444b] prose-li:text-[#4f555d]">
+            <StreamMarkdown key={article.articleId} content={article.contentMd || ''} />
           </article>
 
           <div className="mt-12 flex flex-wrap items-center gap-3 border-t border-[#e6e2db] pt-6">

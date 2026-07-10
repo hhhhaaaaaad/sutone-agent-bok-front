@@ -8,6 +8,7 @@ import { articlesApi } from "@/api/articles";
 import type { DraftPageItem } from "@/types/draft";
 import type { ArticlePageItem } from "@/types/article";
 import WordGravity from "./login/WordGravity";
+import WorkspaceHeader from "@/components/WorkspaceHeader";
 
 const HOME_WORKSPACE_WORDS = [
   "Focus",
@@ -74,14 +75,6 @@ export default function Lobby() {
     }
   };
 
-  const navItems = [
-    { label: "首页工作台", path: "/" },
-    { label: "草稿列表", path: "/drafts" },
-    { label: "文章广场", path: "/articles" },
-    { label: "流程绘图", path: "/drawio" },
-    { label: "演示文稿", path: "/ppt" },
-  ];
-
   const toolEntries = [
     { title: "大纲编排", hint: "进入", action: () => handleNewDraft() },
     {
@@ -128,37 +121,11 @@ export default function Lobby() {
 
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto grid min-h-[calc(100vh-40px)] max-w-[1180px] grid-cols-1 overflow-hidden xl:grid-cols-[248px_1fr]">
-        <aside className="workspace-sidebar flex flex-col px-6 py-5">
-          <div>
-            <h1 className="text-[30px] font-semibold tracking-tight text-[#22252a]">
-              Sutmuch 创作台
-            </h1>
-            <p className="workspace-mono mt-1 text-[11px] tracking-[0.16em] text-[#858c96]">
-              AI 写作工作区
-            </p>
-          </div>
-
-          <nav className="mt-8 space-y-2">
-            {navItems.map((item) => {
-              const active = item.path === "/";
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => router.push(item.path)}
-                  className={`flex h-[42px] w-full items-center rounded-[8px] px-4 text-left text-sm transition-colors ${
-                    active
-                      ? "border border-[#e6e2db] bg-white text-[#22252a]"
-                      : "text-[#5d636c] hover:bg-white/60"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="workspace-panel mt-8 rounded-[12px] p-4">
+      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1180px] flex-col overflow-hidden">
+        <WorkspaceHeader activePath="/" userName={currentUser} onLogout={handleLogout} />
+        <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[224px_1fr]">
+        <aside className="workspace-sidebar flex flex-col px-5 py-5">
+          <div className="workspace-panel rounded-[12px] p-4">
             <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">
               今日安排
             </p>
@@ -172,17 +139,8 @@ export default function Lobby() {
             </div>
           </div>
 
-          <div className="mt-auto flex items-center justify-between pt-10 text-xs text-[#5d636c]">
-            <div>
-              <p className="font-medium text-[#22252a]">{currentUser}</p>
-              <p className="mt-1">主编</p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="workspace-secondary-btn px-3 py-2 text-xs font-medium"
-            >
-              退出
-            </button>
+          <div className="workspace-subpanel mt-auto rounded-[12px] p-4 text-xs leading-6 text-[#5d636c]">
+            主菜单已移动到顶部，可以在创作、草稿与发布内容之间快速切换。
           </div>
         </aside>
 
@@ -412,6 +370,7 @@ export default function Lobby() {
             </aside>
           </div>
         </main>
+        </div>
       </div>
     </div>
   );

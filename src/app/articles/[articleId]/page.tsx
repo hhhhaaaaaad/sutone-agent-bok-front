@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { articlesApi } from '@/api/articles';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import type { ArticleDetailResponse } from '@/types/article';
+import WorkspaceHeader from '@/components/WorkspaceHeader';
 
 export default function ArticleDetailPage() {
   const router = useRouter();
@@ -64,6 +65,7 @@ export default function ArticleDetailPage() {
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
       <div className="workspace-shell mx-auto max-w-[980px] overflow-hidden bg-[#fcfbf8]">
+        <WorkspaceHeader activePath="/articles" />
         <header className="border-b border-[#e6e2db] flex items-center justify-between px-5 py-4 md:px-7">
           <div className="flex items-center gap-3">
             <button onClick={() => router.push('/articles')} className="workspace-secondary-btn px-3 py-2 text-sm font-medium">
@@ -77,7 +79,7 @@ export default function ArticleDetailPage() {
               {reverting ? '回退中...' : '继续编辑'}
             </button>
           </div>
-          <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / 文章详情</p>
+          <p className="workspace-mono hidden text-[11px] tracking-[0.14em] text-[#858c96] sm:block">工作区 / 文章详情</p>
         </header>
 
         <main className="px-5 py-8 md:px-10 md:py-10">

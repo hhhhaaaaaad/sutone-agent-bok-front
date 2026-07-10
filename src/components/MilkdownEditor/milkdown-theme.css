@@ -26,44 +26,6 @@
   --crepe-shadow-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
 }
 
-/* ── Global page theme ── */
-html[data-crepe-theme="light"] {
-  --background: #f7f5f2;
-  --foreground: #22252a;
-  --bg0: #f7f5f2;
-  --bg1: #f1ece6;
-  --card: #fcfbf8;
-  --card2: #ffffff;
-  --text: #22252a;
-  --muted: #5d636c;
-  --muted2: #858c96;
-  --border: #e6e2db;
-  --border-strong: #d8d3cc;
-  --primary: #22252a;
-  --primary-soft: #6e8fa7;
-  --success: #7fa08a;
-  --shadow: 0 18px 45px rgba(34, 37, 42, 0.04);
-  --shadow-soft: 0 6px 24px rgba(34, 37, 42, 0.06);
-}
-html[data-crepe-theme="dark"] {
-  --background: #1f1b16;
-  --foreground: #eae1d9;
-  --bg0: #1f1b16;
-  --bg1: #2a241d;
-  --card: #2a241d;
-  --card2: #332c24;
-  --text: #eae1d9;
-  --muted: #9c8f80;
-  --muted2: #7a6e62;
-  --border: #3f3830;
-  --border-strong: #564a3f;
-  --primary: #f4bd6f;
-  --primary-soft: #7fa0b8;
-  --success: #7fa08a;
-  --shadow: 0 18px 45px rgba(0, 0, 0, 0.25);
-  --shadow-soft: 0 6px 24px rgba(0, 0, 0, 0.2);
-}
-
 /* ── Formula numbering ── */
 .milkdown {
   counter-reset: equation;
@@ -138,23 +100,23 @@ html[data-crepe-theme="dark"] {
 
 /* Dark theme (default) */
 [data-crepe-theme="dark"] .milkdown {
-  --crepe-color-background: #1f1b16;
-  --crepe-color-on-background: #eae1d9;
-  --crepe-color-surface: #18120b;
-  --crepe-color-surface-low: #201b13;
-  --crepe-color-on-surface: #ede0d4;
-  --crepe-color-on-surface-variant: #d3c4b4;
-  --crepe-color-outline: #9c8f80;
-  --crepe-color-primary: #f4bd6f;
-  --crepe-color-secondary: #56442a;
-  --crepe-color-on-secondary: #fbdebc;
-  --crepe-color-inverse: #ede0d4;
-  --crepe-color-on-inverse: #362f27;
-  --crepe-color-inline-code: #ffb4ab;
-  --crepe-color-error: #ffb4ab;
-  --crepe-color-hover: #251f17;
-  --crepe-color-selected: #3b342b;
-  --crepe-color-inline-area: #3f3830;
+  --crepe-color-background: #171b21;
+  --crepe-color-on-background: #edf1f5;
+  --crepe-color-surface: #1b2027;
+  --crepe-color-surface-low: #20262e;
+  --crepe-color-on-surface: #e4e9ee;
+  --crepe-color-on-surface-variant: #aeb7c2;
+  --crepe-color-outline: #65717e;
+  --crepe-color-primary: #9dbdd1;
+  --crepe-color-secondary: #334453;
+  --crepe-color-on-secondary: #dce7f0;
+  --crepe-color-inverse: #dce7f0;
+  --crepe-color-on-inverse: #171b21;
+  --crepe-color-inline-code: #ff9aa1;
+  --crepe-color-error: #ff7b83;
+  --crepe-color-hover: #242b34;
+  --crepe-color-selected: #303a45;
+  --crepe-color-inline-area: #2b333d;
 
   --crepe-font-title: Georgia, Cambria, 'Times New Roman', Times, serif;
   --crepe-font-default: 'Open Sans', Arial, Helvetica, sans-serif;

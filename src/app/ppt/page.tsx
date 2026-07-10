@@ -14,6 +14,7 @@ import { AiAgentConfigResponseDTO } from "@/types/api";
 import pptxgen from "pptxgenjs";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import WorkspaceHeader from "@/components/WorkspaceHeader";
 
 // Message type definition
 type MessageStep = {
@@ -3416,6 +3417,7 @@ ${content}`;
 
   return (
     <div className="workspace-dark-shell flex h-screen w-full flex-col overflow-hidden font-sans">
+      <WorkspaceHeader activePath="/ppt" />
       {/* ===== Header Bar ===== */}
       <header className="tool-header workspace-dark-header flex h-16 items-center justify-between border-b px-4 md:px-6 shrink-0 z-40">
         <div className="flex items-center gap-3">
@@ -4638,8 +4640,6 @@ ${content}`;
     </div>
   );
 }
-
-
 
 
 

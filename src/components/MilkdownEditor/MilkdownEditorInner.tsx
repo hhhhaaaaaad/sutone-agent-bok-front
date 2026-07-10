@@ -26,12 +26,7 @@ function EditorContent({
   markdown,
   onChange,
   editorRef,
-  isDark,
-  onToggleTheme,
-}: MilkdownEditorInnerProps & {
-  isDark: boolean;
-  onToggleTheme: () => void;
-}) {
+}: MilkdownEditorInnerProps) {
   const crepeRef = useRef<Crepe | null>(null);
   const onChangeRef = useRef(onChange);
   useEffect(() => {
@@ -93,13 +88,6 @@ function EditorContent({
     }
   };
 
-  useEffect(() => {
-    document.documentElement.dataset.crepeTheme = isDark ? "dark" : "light";
-    return () => {
-      delete document.documentElement.dataset.crepeTheme;
-    };
-  }, [isDark]);
-
   return (
     <>
       <Milkdown />
@@ -109,13 +97,6 @@ function EditorContent({
         className="fixed right-4 top-[72px] z-30 flex h-8 w-8 items-center justify-center rounded-lg border border-[#e6e2db] bg-white text-sm font-mono font-bold text-[#5d636c] shadow-sm hover:border-[#b4bdc7] transition"
       >
         ∑
-      </button>
-      <button
-        title={isDark ? "切换亮色背景" : "切换暗色背景"}
-        onClick={onToggleTheme}
-        className="fixed right-4 top-[112px] z-30 flex h-8 w-8 items-center justify-center rounded-lg border border-[#e6e2db] bg-white text-sm shadow-sm hover:border-[#b4bdc7] transition"
-      >
-        {isDark ? "☀" : "☾"}
       </button>
       {formulaOpen && (
         <FormulaDialog
@@ -130,7 +111,6 @@ function EditorContent({
 const MilkdownEditorInner = forwardRef<MilkdownEditorHandle, Omit<MilkdownEditorInnerProps, "editorRef">>(
   function MilkdownEditorInner(props, ref) {
     const editorRef = useRef<MilkdownEditorHandle | null>(null);
-    const [isDark, setIsDark] = useState(false);
 
     useImperativeHandle(ref, () => ({
       getMarkdown: () => editorRef.current?.getMarkdown() ?? "",
@@ -142,8 +122,6 @@ const MilkdownEditorInner = forwardRef<MilkdownEditorHandle, Omit<MilkdownEditor
         <EditorContent
           {...props}
           editorRef={editorRef}
-          isDark={isDark}
-          onToggleTheme={() => setIsDark((v) => !v)}
         />
       </MilkdownProvider>
     );

@@ -10,6 +10,7 @@ import AiWritingPanel from "@/components/AiWritingPanel";
 import PublishDialog from "@/components/PublishDialog";
 import DraftMetaPanel from "@/components/DraftMetaPanel";
 import MilkdownEditor, { type MilkdownEditorHandle } from "@/components/MilkdownEditor";
+import WorkspaceHeader from "@/components/WorkspaceHeader";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type EditorMode = "native" | "visual";
@@ -188,6 +189,7 @@ export default function DraftEditorPage() {
   return (
     <div className="h-screen theme-bg-gradient p-2 overflow-hidden">
       <div className="workspace-shell mx-auto flex h-full flex-col overflow-hidden">
+        <WorkspaceHeader activePath="/drafts" />
         <header className="flex h-[60px] items-center justify-between gap-4 border-b border-[#e6e2db] bg-[#fcfbf8] px-4">
           <div className="flex min-w-0 items-center gap-4">
             <button

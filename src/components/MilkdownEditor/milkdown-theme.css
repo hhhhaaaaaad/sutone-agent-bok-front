@@ -1,0 +1,127 @@
+/* Light theme */
+[data-crepe-theme="light"] .milkdown {
+  --crepe-color-background: #fffdfb;
+  --crepe-color-on-background: #1f1b16;
+  --crepe-color-surface: #fff8f4;
+  --crepe-color-surface-low: #fff1e5;
+  --crepe-color-on-surface: #201b13;
+  --crepe-color-on-surface-variant: #4f4539;
+  --crepe-color-outline: #817567;
+  --crepe-color-primary: #805610;
+  --crepe-color-secondary: #fbdebc;
+  --crepe-color-on-secondary: #271904;
+  --crepe-color-inverse: #362f27;
+  --crepe-color-on-inverse: #fcefe2;
+  --crepe-color-inline-code: #ba1a1a;
+  --crepe-color-error: #ba1a1a;
+  --crepe-color-hover: #f9ecdf;
+  --crepe-color-selected: #ede0d4;
+  --crepe-color-inline-area: #e4d8cc;
+
+  --crepe-font-title: Georgia, Cambria, 'Times New Roman', Times, serif;
+  --crepe-font-default: 'Open Sans', Arial, Helvetica, sans-serif;
+  --crepe-font-code: Fira Code, Menlo, Monaco, 'Courier New', Courier, monospace;
+
+  --crepe-shadow-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  --crepe-shadow-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+}
+
+/* ── Formula numbering ── */
+.milkdown {
+  counter-reset: equation;
+}
+
+.katex-display {
+  counter-increment: equation;
+  display: flex !important;
+  align-items: center;
+}
+
+.katex-display > .katex {
+  flex: 1;
+}
+
+.katex-display::after {
+  content: "(" counter(equation) ")";
+  min-width: 2em;
+  text-align: right;
+  margin-left: 1em;
+}
+
+/* ── Article-appropriate heading sizes ── */
+.milkdown h1 {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  margin-top: 1.5em !important;
+  margin-bottom: 0.5em !important;
+}
+.milkdown h2 {
+  font-size: 1.4rem !important;
+  font-weight: 600 !important;
+  line-height: 1.35 !important;
+  margin-top: 1.4em !important;
+  margin-bottom: 0.4em !important;
+}
+.milkdown h3 {
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  margin-top: 1.2em !important;
+  margin-bottom: 0.3em !important;
+}
+.milkdown h4 {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  line-height: 1.45 !important;
+}
+.milkdown h5,
+.milkdown h6 {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+}
+
+/* Paragraphs */
+.milkdown p {
+  font-size: 0.95rem !important;
+  line-height: 1.75 !important;
+  margin-bottom: 0.75em !important;
+}
+
+/* ── Editor container ── */
+.milkdown {
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+.milkdown .editor {
+  padding: 1.5rem;
+  outline: none;
+}
+
+/* Dark theme (default) */
+[data-crepe-theme="dark"] .milkdown {
+  --crepe-color-background: #171b21;
+  --crepe-color-on-background: #edf1f5;
+  --crepe-color-surface: #1b2027;
+  --crepe-color-surface-low: #20262e;
+  --crepe-color-on-surface: #e4e9ee;
+  --crepe-color-on-surface-variant: #aeb7c2;
+  --crepe-color-outline: #65717e;
+  --crepe-color-primary: #9dbdd1;
+  --crepe-color-secondary: #334453;
+  --crepe-color-on-secondary: #dce7f0;
+  --crepe-color-inverse: #dce7f0;
+  --crepe-color-on-inverse: #171b21;
+  --crepe-color-inline-code: #ff9aa1;
+  --crepe-color-error: #ff7b83;
+  --crepe-color-hover: #242b34;
+  --crepe-color-selected: #303a45;
+  --crepe-color-inline-area: #2b333d;
+
+  --crepe-font-title: Georgia, Cambria, 'Times New Roman', Times, serif;
+  --crepe-font-default: 'Open Sans', Arial, Helvetica, sans-serif;
+  --crepe-font-code: Fira Code, Menlo, Monaco, 'Courier New', Courier, monospace;
+
+  --crepe-shadow-1: 0px 1px 2px 0px rgba(255, 255, 255, 0.3), 0px 1px 3px 1px rgba(255, 255, 255, 0.15);
+  --crepe-shadow-2: 0px 1px 2px 0px rgba(255, 255, 255, 0.3), 0px 2px 6px 2px rgba(255, 255, 255, 0.15);
+}

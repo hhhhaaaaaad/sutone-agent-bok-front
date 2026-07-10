@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { articlesApi } from '@/api/articles';
 import type { ArticlePageItem } from '@/types/article';
+import WorkspaceHeader from '@/components/WorkspaceHeader';
 
 export default function ArticlesPage() {
   const router = useRouter();
@@ -42,32 +43,13 @@ export default function ArticlesPage() {
 
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto grid min-h-[calc(100vh-40px)] max-w-[1280px] grid-cols-1 overflow-hidden xl:grid-cols-[248px_minmax(0,1fr)_280px]">
+      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1280px] flex-col overflow-hidden">
+        <WorkspaceHeader activePath="/articles" />
+        <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[220px_minmax(0,1fr)_280px]">
         <aside className="workspace-sidebar-soft flex flex-col gap-5 px-5 py-6">
           <div>
             <p className="workspace-mono text-[11px] tracking-[0.16em] text-[#858c96]">文章工作区</p>
-            <h1 className="mt-2 text-[30px] font-semibold tracking-tight text-[#22252a]">文章广场</h1>
-          </div>
-
-          <div className="space-y-2">
-            {[
-              { label: 'AI 首页', path: '/' },
-              { label: '内容库', path: '/articles' },
-              { label: '草稿队列', path: '/drafts' },
-              { label: '个人中心', path: '/me' },
-            ].map((item, index) => (
-              <button
-                key={item.path}
-                onClick={() => router.push(item.path)}
-                className={`flex h-[42px] w-full items-center rounded-[8px] px-4 text-left text-sm transition-colors ${
-                  index === 1
-                    ? 'border border-[#e6e2db] bg-white text-[#22252a]'
-                    : 'text-[#5d636c] hover:bg-white/60'
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
+            <h2 className="mt-2 text-[24px] font-semibold tracking-tight text-[#22252a]">内容概览</h2>
           </div>
 
           <div className="workspace-panel rounded-[12px] p-4 text-sm leading-7 text-[#5d636c]">
@@ -213,6 +195,7 @@ export default function ArticlesPage() {
             </div>
           </div>
         </aside>
+        </div>
       </div>
     </div>
   );

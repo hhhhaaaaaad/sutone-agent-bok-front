@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -9,8 +9,11 @@ import { articlesApi } from "@/api/articles";
 import AiWritingPanel from "@/components/AiWritingPanel";
 import PublishDialog from "@/components/PublishDialog";
 import DraftMetaPanel from "@/components/DraftMetaPanel";
+import MilkdownEditor, { type MilkdownEditorHandle } from "@/components/MilkdownEditor";
+import WorkspaceHeader from "@/components/WorkspaceHeader";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
+type EditorMode = "native" | "visual";
 
 export default function DraftEditorPage() {
   const router = useRouter();
@@ -27,12 +30,14 @@ export default function DraftEditorPage() {
   const [publishing, setPublishing] = useState(false);
   const [showPublishDialog, setShowPublishDialog] = useState(false);
   const [selectedText, setSelectedText] = useState("");
+  const [editorMode, setEditorMode] = useState<EditorMode>("native");
 
   const titleRef = useRef(title);
   const contentRef = useRef(content);
   const summaryRef = useRef(summary);
   const coverRef = useRef(coverUrl);
   const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const visualEditorRef = useRef<MilkdownEditorHandle>(null);
   const savingRef = useRef(false);
   const dirtyRef = useRef(false);
   const fetchedRef = useRef(false);
@@ -109,6 +114,12 @@ export default function DraftEditorPage() {
     return () => clearTimeout(timer);
   }, [title, content, summary, coverUrl, loading, doSave]);
 
+  useEffect(() => {
+    if (editorMode === "visual") {
+      setSelectedText("");
+    }
+  }, [editorMode]);
+
   const handleSelect = useCallback(() => {
     const ta = contentTextareaRef.current;
     if (!ta) return;
@@ -123,22 +134,27 @@ export default function DraftEditorPage() {
 
   const getPromptParams = useCallback(() => {
     const params: Record<string, unknown> = { title: titleRef.current };
-    if (selectedText) {
+    if (editorMode === "native" && selectedText) {
       params.selectedText = selectedText;
     }
     return params;
-  }, [selectedText]);
+  }, [editorMode, selectedText]);
 
-  const handleApplyResult = useCallback((action: "append" | "replace" | "fillSummary", content: string) => {
-    if (!content.trim()) return;
-    if (action === "append") {
-      setContent((prev) => [prev.trimEnd(), content.trim()].filter(Boolean).join("\n\n"));
-    } else if (action === "replace") {
-      setContent(content.trim());
-    } else if (action === "fillSummary") {
-      setSummary(content.trim());
-    }
-  }, []);
+  const handleApplyResult = useCallback(
+    (action: "append" | "replace" | "fillSummary", nextContent: string) => {
+      if (!nextContent.trim()) return;
+      if (action === "append") {
+        setContent((prev) =>
+          [prev.trimEnd(), nextContent.trim()].filter(Boolean).join("\n\n"),
+        );
+      } else if (action === "replace") {
+        setContent(nextContent.trim());
+      } else if (action === "fillSummary") {
+        setSummary(nextContent.trim());
+      }
+    },
+    [],
+  );
 
   const handlePublish = async (tags: string[]) => {
     setPublishing(true);
@@ -152,6 +168,16 @@ export default function DraftEditorPage() {
     }
   };
 
+  useEffect(() => {
+    if (editorMode !== "visual") return;
+    const editor = visualEditorRef.current;
+    if (!editor) return;
+    const currentMarkdown = editor.getMarkdown();
+    if (currentMarkdown !== content) {
+      editor.setMarkdown(content);
+    }
+  }, [content, editorMode]);
+
   if (loading) {
     return (
       <div className="min-h-screen theme-bg-gradient flex items-center justify-center">
@@ -161,9 +187,10 @@ export default function DraftEditorPage() {
   }
 
   return (
-    <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1180px] flex-col overflow-hidden">
-        <header className="flex h-[72px] items-center justify-between gap-4 border-b border-[#e6e2db] bg-[#fcfbf8] px-4 md:px-6">
+    <div className="h-screen theme-bg-gradient p-2 overflow-hidden">
+      <div className="workspace-shell mx-auto flex h-full flex-col overflow-hidden">
+        <WorkspaceHeader activePath="/drafts" />
+        <header className="flex h-[60px] items-center justify-between gap-4 border-b border-[#e6e2db] bg-[#fcfbf8] px-4">
           <div className="flex min-w-0 items-center gap-4">
             <button
               onClick={() => router.push("/drafts")}
@@ -224,7 +251,7 @@ export default function DraftEditorPage() {
         )}
 
         <div className="flex min-h-0 flex-1">
-          <aside className="hidden w-[240px] shrink-0 border-r border-[#e6e2db] bg-[#f1ece6] p-5 lg:flex lg:flex-col lg:gap-4">
+          <aside className="hidden w-[200px] shrink-0 border-r border-[#e6e2db] bg-[#f1ece6] p-4 lg:flex lg:flex-col lg:gap-3">
             <div>
               <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">
                 当前状态
@@ -243,30 +270,77 @@ export default function DraftEditorPage() {
               </p>
             </div>
             <div className="workspace-panel rounded-[12px] p-4">
-              <p className="text-sm text-[#22252a]">写作建议</p>
-              <ul className="mt-2 space-y-2 text-xs leading-5 text-[#5d636c]">
-                <li>先补标题与摘要，再展开正文结构。</li>
-                <li>发布前检查标签和封面图链接。</li>
-                <li>长段落建议拆分成短节，便于后续润色。</li>
-              </ul>
+              <p className="text-sm text-[#22252a]">编辑模式</p>
+              <p className="mt-2 text-xs leading-5 text-[#858c96]">
+                原生编辑保留 Markdown 源码输入；可视化编辑会直接在渲染后的内容上编辑，并提供更强的工具栏。
+              </p>
             </div>
           </aside>
 
           <section className="flex min-w-0 flex-1 flex-col bg-[#fcfbf8]">
-            <div className="flex-1 overflow-y-auto px-5 py-6 md:px-10 md:py-8">
-              <textarea
-                ref={contentTextareaRef}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onMouseUp={handleSelect}
-                onKeyUp={handleSelect}
-                placeholder="开始输入正文内容，支持 Markdown 标题、列表、代码块等语法。"
-                className="min-h-full w-full resize-none bg-transparent text-[15px] leading-8 text-[#22252a] outline-none placeholder:text-[#b9b2a8]"
-              />
+            <div className="border-b border-[#e6e2db] px-4 py-2">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="relative inline-grid grid-cols-2 rounded-full bg-[#f3f0eb] p-1">
+                  <span
+                    className={`absolute inset-y-1 left-1 w-[calc(50%-4px)] rounded-full bg-[#22252a] transition-transform duration-200 ${
+                      editorMode === "visual" ? "translate-x-full" : "translate-x-0"
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setEditorMode("native")}
+                    className={`relative z-10 px-4 py-2 text-xs font-medium transition-colors ${
+                      editorMode === "native" ? "text-white" : "text-[#5d636c]"
+                    }`}
+                  >
+                    原生编辑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditorMode("visual")}
+                    className={`relative z-10 px-4 py-2 text-xs font-medium transition-colors ${
+                      editorMode === "visual" ? "text-white" : "text-[#5d636c]"
+                    }`}
+                  >
+                    可视化编辑
+                  </button>
+                </div>
+                <p className="text-xs text-[#858c96]">
+                  {editorMode === "native"
+                    ? "当前为原生 Markdown 输入，不显示工具栏。"
+                    : "当前为渲染后直接编辑模式，顶部提供撤销重做和格式工具栏。"}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto">
+              {editorMode === "native" ? (
+                <div className="h-full overflow-y-auto px-5 py-6 md:px-8 md:py-8">
+                  <textarea
+                    ref={contentTextareaRef}
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    onMouseUp={handleSelect}
+                    onKeyUp={handleSelect}
+                    placeholder="开始输入正文内容，支持 Markdown 标题、列表、代码块、表格、数学公式等语法。"
+                    className="min-h-full w-full resize-none bg-transparent text-[15px] leading-8 text-[#22252a] outline-none placeholder:text-[#b9b2a8]"
+                  />
+                </div>
+              ) : (
+                <div className="px-5 py-5 md:px-8 md:py-6 min-h-full">
+                  <div className="rounded-[16px] border border-[#e6e2db] bg-[#faf8f4] min-h-full">
+                    <MilkdownEditor
+                      ref={visualEditorRef}
+                      markdown={content}
+                      onChange={setContent}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </section>
 
-          <aside className="w-[320px] shrink-0 border-l border-[#e6e2db] bg-[#fcfbf8] p-5">
+          <aside className="w-[260px] shrink-0 border-l border-[#e6e2db] bg-[#fcfbf8] p-4 overflow-y-auto">
             <DraftMetaPanel
               summary={summary}
               coverUrl={coverUrl}

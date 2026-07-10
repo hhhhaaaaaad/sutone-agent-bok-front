@@ -39,6 +39,15 @@ export default function WordGravity({ words: items = DEFAULT_WORDS }: WordGravit
     let frame = 0;
     let lastTime = performance.now();
     let dragConstraint: ReturnType<typeof Constraint.create> | null = null;
+    let wordColor = "rgba(65, 68, 73, 0.64)";
+    let activeWordColor = "#4f6858";
+
+    const syncThemeColors = () => {
+      const styles = getComputedStyle(document.documentElement);
+      wordColor = styles.getPropertyValue("--gravity-word").trim() || wordColor;
+      activeWordColor =
+        styles.getPropertyValue("--gravity-word-active").trim() || activeWordColor;
+    };
 
     const pointerPosition = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -165,7 +174,7 @@ export default function WordGravity({ words: items = DEFAULT_WORDS }: WordGravit
         context.save();
         context.translate(body.position.x, body.position.y);
         context.rotate(body.angle);
-        context.fillStyle = dragConstraint?.bodyB === body ? "#4f6858" : "rgba(65, 68, 73, 0.64)";
+        context.fillStyle = dragConstraint?.bodyB === body ? activeWordColor : wordColor;
         context.fillText(text, 0, 1);
         context.restore();
       });
@@ -173,18 +182,25 @@ export default function WordGravity({ words: items = DEFAULT_WORDS }: WordGravit
     };
 
     const observer = new ResizeObserver(reset);
+    const themeObserver = new MutationObserver(syncThemeColors);
     observer.observe(canvas);
+    themeObserver.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
     canvas.addEventListener("pointerenter", onPointerEnter);
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerup", onPointerUp);
     canvas.addEventListener("pointercancel", onPointerUp);
+    syncThemeColors();
     reset();
     frame = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
+      themeObserver.disconnect();
       Composite.clear(engine.world, false, true);
       Engine.clear(engine);
       canvas.removeEventListener("pointerenter", onPointerEnter);
@@ -202,9 +218,6 @@ export default function WordGravity({ words: items = DEFAULT_WORDS }: WordGravit
         className="h-[210px] w-full touch-none select-none"
         aria-label="可拖拽的 AI 写作关键词"
       />
-      <span className="pointer-events-none absolute bottom-2 right-3 workspace-mono text-[9px] tracking-[0.12em] text-[#9da1a7]">
-        HOVER TO RELEASE · DRAG TO MOVE
-      </span>
     </div>
   );
 }

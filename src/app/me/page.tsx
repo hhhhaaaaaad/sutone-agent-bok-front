@@ -7,14 +7,19 @@ import { draftsApi } from '@/api/drafts';
 import { articlesApi } from '@/api/articles';
 import type { DraftPageItem } from '@/types/draft';
 import type { ArticlePageItem } from '@/types/article';
+import WorkspaceHeader from '@/components/WorkspaceHeader';
 
 export default function MePage() {
   const router = useRouter();
-  const [user] = useState(() => getUserInfo()?.user || '');
+  const [user, setUser] = useState('');
   const [drafts, setDrafts] = useState<DraftPageItem[]>([]);
   const [articles, setArticles] = useState<ArticlePageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const fetchedRef = useRef(false);
+
+  useEffect(() => {
+    setUser(getUserInfo()?.user || '');
+  }, []);
 
   useEffect(() => {
     const userInfo = getUserInfo();
@@ -44,6 +49,7 @@ export default function MePage() {
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
       <div className="workspace-shell mx-auto max-w-[980px] overflow-hidden bg-[#fcfbf8]">
+        <WorkspaceHeader activePath="/me" userName={user} onLogout={handleLogout} />
         <header className="flex items-center justify-between border-b border-[#e6e2db] px-5 py-4 md:px-7">
           <div>
             <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / 个人中心</p>
@@ -51,7 +57,6 @@ export default function MePage() {
           </div>
           <div className="flex items-center gap-3">
             <button onClick={() => router.push('/')} className="workspace-secondary-btn px-3 py-2 text-sm font-medium">返回首页</button>
-            <button onClick={handleLogout} className="workspace-secondary-btn px-3 py-2 text-sm font-medium">退出登录</button>
           </div>
         </header>
 

@@ -3,47 +3,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { articlesApi } from '@/api/articles';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import rehypeHighlight from 'rehype-highlight';
+import MarkdownRenderer from '@/components/MarkdownRenderer';
 import type { ArticleDetailResponse } from '@/types/article';
-
-function StreamMarkdown({ content }: { content: string }) {
-  const [displayedContent, setDisplayedContent] = useState('');
-
-  useEffect(() => {
-    const source = content || '';
-
-    if (!source) return;
-
-    let index = 0;
-    const step = Math.max(2, Math.ceil(source.length / 900));
-    const timer = window.setInterval(() => {
-      index = Math.min(source.length, index + step);
-      setDisplayedContent(source.slice(0, index));
-
-      if (index >= source.length) {
-        window.clearInterval(timer);
-      }
-    }, 24);
-
-    return () => window.clearInterval(timer);
-  }, [content]);
-
-  return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[
-        rehypeKatex,
-        [rehypeHighlight, { detect: true, ignoreMissing: true }],
-      ]}
-    >
-      {displayedContent}
-    </ReactMarkdown>
-  );
-}
+import WorkspaceHeader from '@/components/WorkspaceHeader';
 
 export default function ArticleDetailPage() {
   const router = useRouter();
@@ -103,6 +65,7 @@ export default function ArticleDetailPage() {
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
       <div className="workspace-shell mx-auto max-w-[980px] overflow-hidden bg-[#fcfbf8]">
+        <WorkspaceHeader activePath="/articles" />
         <header className="border-b border-[#e6e2db] flex items-center justify-between px-5 py-4 md:px-7">
           <div className="flex items-center gap-3">
             <button onClick={() => router.push('/articles')} className="workspace-secondary-btn px-3 py-2 text-sm font-medium">
@@ -116,7 +79,7 @@ export default function ArticleDetailPage() {
               {reverting ? '回退中...' : '继续编辑'}
             </button>
           </div>
-          <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">工作区 / 文章详情</p>
+          <p className="workspace-mono hidden text-[11px] tracking-[0.14em] text-[#858c96] sm:block">工作区 / 文章详情</p>
         </header>
 
         <main className="px-5 py-8 md:px-10 md:py-10">
@@ -137,7 +100,11 @@ export default function ArticleDetailPage() {
           )}
 
           <article className="article-markdown prose prose-slate mt-10 max-w-none prose-headings:text-[#22252a] prose-p:text-[#3f444b] prose-li:text-[#4f555d]">
-            <StreamMarkdown key={article.articleId} content={article.contentMd || ''} />
+            <MarkdownRenderer
+              key={article.articleId}
+              content={article.contentMd || ''}
+              stream
+            />
           </article>
 
           <div className="mt-12 flex flex-wrap items-center gap-3 border-t border-[#e6e2db] pt-6">

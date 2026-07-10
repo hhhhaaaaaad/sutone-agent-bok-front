@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { aiWritingApi } from "@/api/ai-writing";
-import type { AiTaskStatus, AiTaskType, AiTaskDetailResponse } from "@/types/ai-writing";
+import type { AiTaskStatus, AiTaskType, AiTaskDetailResponse, StreamEvent } from "@/types/ai-writing";
 
 interface AiWritingPanelProps {
   draftId: number;
@@ -42,6 +42,32 @@ interface TaskCard {
   status: number;
 }
 
+const PHASE_LABELS: Record<string, string> = {
+  analyzing: "分析草稿",
+  generating: "生成内容",
+  reviewing: "质量审查",
+  thinking: "思考中",
+};
+
+function PhaseIndicator({ phase }: { phase: string }) {
+  const steps = ["analyzing", "generating", "reviewing"];
+  const currentIndex = steps.indexOf(phase);
+
+  return (
+    <div className="mt-3 flex items-center gap-2">
+      {steps.map((step, index) => (
+        <div key={step} className="flex items-center gap-1">
+          <div className={`w-2 h-2 rounded-full ${index <= currentIndex ? "bg-[#567260]" : "bg-[#e6e2db]"}`} />
+          <span className={`text-[10px] ${index <= currentIndex ? "text-[#567260]" : "text-[#b9b2a8]"}`}>
+            {PHASE_LABELS[step]}
+          </span>
+          {index < steps.length - 1 && <div className="w-4 h-px bg-[#e6e2db]" />}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function AiWritingPanel({ draftId, content, getPromptParams, onApplyResult }: AiWritingPanelProps) {
   const [customInstruction, setCustomInstruction] = useState("");
   const [showAux, setShowAux] = useState(false);
@@ -50,6 +76,7 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
   const [currentTaskType, setCurrentTaskType] = useState<AiTaskType | null>(null);
   const [aiResultBuffer, setAiResultBuffer] = useState("");
   const [aiStatusMessage, setAiStatusMessage] = useState("");
+  const [currentPhase, setCurrentPhase] = useState("");
   const [taskHistory, setTaskHistory] = useState<TaskCard[]>([]);
   const streamControllerRef = useRef<AbortController | null>(null);
 
@@ -91,9 +118,11 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
       setAiTaskStatus("streaming");
       const controller = await aiWritingApi.streamTask(
         taskId,
-        (event) => {
+        (event: StreamEvent) => {
+          setCurrentPhase(event.phase);
           if (event.chunk.type === "status") setAiStatusMessage(event.chunk.content);
           if (event.chunk.type === "token") setAiResultBuffer((prev) => prev + event.chunk.content);
+          if (event.chunk.type === "result") setAiResultBuffer(event.chunk.content);
           if (event.chunk.type === "done") { setAiStatusMessage("生成完成"); setAiTaskStatus("done"); }
           if (event.chunk.type === "error") { setAiStatusMessage(event.chunk.content || "生成失败"); setAiTaskStatus("error"); }
         },
@@ -150,6 +179,9 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
       </button>
       {showAux && <div className="mt-2 space-y-2">{renderActionButtons(AUX_ACTIONS)}</div>}
 
+      {currentPhase && aiTaskStatus === "streaming" && (
+        <PhaseIndicator phase={currentPhase} />
+      )}
       {aiStatusMessage && (
         <p className={`mt-3 text-[11px] ${aiTaskStatus === "error" ? "text-red-500" : "text-[#858c96]"}`}>{aiStatusMessage}</p>
       )}

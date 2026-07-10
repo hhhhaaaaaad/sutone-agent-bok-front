@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { setUserInfo, getUserInfo } from "@/utils/cookie";
 import WordGravity from "./WordGravity";
+import ThemeToggle from "@/components/Theme/ThemeToggle";
 
 const WRITER_QUOTES = [
   "写作，就是坐下来判断自己。 —— 易卜生",
@@ -126,7 +127,10 @@ export default function Login() {
               </span>
               <span className="workspace-mono">Sutmuch</span>
             </div>
-            <span className="workspace-mono">安静入口</span>
+            <div className="flex items-center gap-3">
+              <span className="workspace-mono">安静入口</span>
+              <ThemeToggle compact />
+            </div>
           </div>
 
           <div>

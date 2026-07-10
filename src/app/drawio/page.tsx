@@ -18,6 +18,7 @@ import {
 import { AiAgentConfigResponseDTO } from "@/types/api";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import WorkspaceHeader from "@/components/WorkspaceHeader";
 
 // Message type definition
 type MessageStep = {
@@ -1624,6 +1625,7 @@ export default function Home() {
 
   return (
     <div className="workspace-dark-shell flex h-screen w-full flex-col overflow-hidden font-sans">
+      <WorkspaceHeader activePath="/drawio" />
       {/* Header - Minimal & Clean */}
       <div className="tool-header workspace-dark-header relative z-40 flex h-16 items-center justify-between border-b px-4 md:px-6">
         <div className="flex items-center gap-3">
@@ -2541,8 +2543,6 @@ export default function Home() {
     </div>
   );
 }
-
-
 
 
 

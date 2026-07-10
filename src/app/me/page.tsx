@@ -10,11 +10,15 @@ import type { ArticlePageItem } from '@/types/article';
 
 export default function MePage() {
   const router = useRouter();
-  const [user] = useState(() => getUserInfo()?.user || '');
+  const [user, setUser] = useState('');
   const [drafts, setDrafts] = useState<DraftPageItem[]>([]);
   const [articles, setArticles] = useState<ArticlePageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const fetchedRef = useRef(false);
+
+  useEffect(() => {
+    setUser(getUserInfo()?.user || '');
+  }, []);
 
   useEffect(() => {
     const userInfo = getUserInfo();

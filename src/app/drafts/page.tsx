@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserInfo } from '@/utils/cookie';
 import { draftsApi } from '@/api/drafts';

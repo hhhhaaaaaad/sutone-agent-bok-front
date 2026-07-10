@@ -29,12 +29,12 @@ export interface AiTaskDetailResponse {
 }
 
 export interface StreamChunk {
-  type: 'status' | 'token' | 'done' | 'error';
+  type: 'status' | 'token' | 'result' | 'done' | 'error';
   content: string;
 }
 
 export interface StreamEvent {
-  phase: 'thinking' | 'generating' | 'done' | 'error';
+  phase: 'analyzing' | 'generating' | 'reviewing' | 'thinking' | 'done' | 'error';
   chunk: StreamChunk;
 }
 

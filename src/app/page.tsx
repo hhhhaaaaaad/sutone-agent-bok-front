@@ -23,11 +23,17 @@ const HOME_WORKSPACE_WORDS = [
 
 export default function Lobby() {
   const router = useRouter();
-  const [currentUser] = useState(() => getUserInfo()?.user || "");
+  const [currentUser, setCurrentUser] = useState("");
   const [recentDrafts, setRecentDrafts] = useState<DraftPageItem[]>([]);
   const [recentArticles, setRecentArticles] = useState<ArticlePageItem[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [nowLabel, setNowLabel] = useState("");
   const fetchedRef = useRef(false);
+
+  useEffect(() => {
+    setCurrentUser(getUserInfo()?.user || "");
+    setNowLabel(`${new Date().toLocaleDateString("zh-CN", { month: "long", day: "numeric", weekday: "short" })} · ${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`);
+  }, []);
 
   useEffect(() => {
     const userInfo = getUserInfo();
@@ -113,9 +119,6 @@ export default function Lobby() {
       text: `${article.title} 已进入文章广场`,
     })),
   ].slice(0, 4);
-
-  const now = new Date();
-  const nowLabel = `${now.toLocaleDateString("zh-CN", { month: "long", day: "numeric", weekday: "short" })} · ${now.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
 
   const renderDraftStatus = (draft: DraftPageItem) => {
     if (draft.status === 0) return "待润色";

@@ -9,8 +9,7 @@ import { articlesApi } from "@/api/articles";
 import AiWritingPanel from "@/components/AiWritingPanel";
 import PublishDialog from "@/components/PublishDialog";
 import DraftMetaPanel from "@/components/DraftMetaPanel";
-import MdxEditor from "@/components/MdxEditor";
-import type { MDXEditorMethods } from "@mdxeditor/editor";
+import MilkdownEditor, { type MilkdownEditorHandle } from "@/components/MilkdownEditor";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type EditorMode = "native" | "visual";
@@ -37,7 +36,7 @@ export default function DraftEditorPage() {
   const summaryRef = useRef(summary);
   const coverRef = useRef(coverUrl);
   const contentTextareaRef = useRef<HTMLTextAreaElement>(null);
-  const visualEditorRef = useRef<MDXEditorMethods>(null);
+  const visualEditorRef = useRef<MilkdownEditorHandle>(null);
   const savingRef = useRef(false);
   const dirtyRef = useRef(false);
   const fetchedRef = useRef(false);
@@ -187,9 +186,9 @@ export default function DraftEditorPage() {
   }
 
   return (
-    <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1440px] flex-col overflow-hidden">
-        <header className="flex h-[72px] items-center justify-between gap-4 border-b border-[#e6e2db] bg-[#fcfbf8] px-4 md:px-6">
+    <div className="h-screen theme-bg-gradient p-2 overflow-hidden">
+      <div className="workspace-shell mx-auto flex h-full flex-col overflow-hidden">
+        <header className="flex h-[60px] items-center justify-between gap-4 border-b border-[#e6e2db] bg-[#fcfbf8] px-4">
           <div className="flex min-w-0 items-center gap-4">
             <button
               onClick={() => router.push("/drafts")}
@@ -250,7 +249,7 @@ export default function DraftEditorPage() {
         )}
 
         <div className="flex min-h-0 flex-1">
-          <aside className="hidden w-[240px] shrink-0 border-r border-[#e6e2db] bg-[#f1ece6] p-5 lg:flex lg:flex-col lg:gap-4">
+          <aside className="hidden w-[200px] shrink-0 border-r border-[#e6e2db] bg-[#f1ece6] p-4 lg:flex lg:flex-col lg:gap-3">
             <div>
               <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">
                 当前状态
@@ -277,7 +276,7 @@ export default function DraftEditorPage() {
           </aside>
 
           <section className="flex min-w-0 flex-1 flex-col bg-[#fcfbf8]">
-            <div className="border-b border-[#e6e2db] px-5 py-3 md:px-8">
+            <div className="border-b border-[#e6e2db] px-4 py-2">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="relative inline-grid grid-cols-2 rounded-full bg-[#f3f0eb] p-1">
                   <span
@@ -312,7 +311,7 @@ export default function DraftEditorPage() {
               </div>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-hidden">
+            <div className="flex-1 min-h-0 overflow-y-auto">
               {editorMode === "native" ? (
                 <div className="h-full overflow-y-auto px-5 py-6 md:px-8 md:py-8">
                   <textarea
@@ -326,9 +325,9 @@ export default function DraftEditorPage() {
                   />
                 </div>
               ) : (
-                <div className="h-full overflow-hidden px-5 py-5 md:px-8 md:py-6">
-                  <div className="h-full overflow-hidden rounded-[16px] border border-[#e6e2db] bg-[#faf8f4]">
-                    <MdxEditor
+                <div className="px-5 py-5 md:px-8 md:py-6 min-h-full">
+                  <div className="rounded-[16px] border border-[#e6e2db] bg-[#faf8f4] min-h-full">
+                    <MilkdownEditor
                       ref={visualEditorRef}
                       markdown={content}
                       onChange={setContent}
@@ -339,7 +338,7 @@ export default function DraftEditorPage() {
             </div>
           </section>
 
-          <aside className="w-[320px] shrink-0 border-l border-[#e6e2db] bg-[#fcfbf8] p-5">
+          <aside className="w-[260px] shrink-0 border-l border-[#e6e2db] bg-[#fcfbf8] p-4 overflow-y-auto">
             <DraftMetaPanel
               summary={summary}
               coverUrl={coverUrl}

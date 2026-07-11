@@ -49,7 +49,7 @@ export default function Lobby() {
       try {
         const [dResp, aResp] = await Promise.all([
           draftsApi.page(1, 5),
-          articlesApi.page(1, 5),
+          articlesApi.page({ pageNo: 1, pageSize: 5 }),
         ]);
         setRecentDrafts(dResp.data.list ?? []);
         setRecentArticles(aResp.data.list ?? []);

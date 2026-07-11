@@ -25,6 +25,7 @@ export const aiWritingApi = {
   /** 提交 AI 写作任务 */
   submitTask: async (data: SubmitAiTaskRequest): Promise<Response<SubmitAiTaskResponse>> => {
     const res = await fetch(`${BASE}/ai-writing/task/submit`, {
+      credentials: 'include',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -34,7 +35,9 @@ export const aiWritingApi = {
 
   /** 查询任务详情 */
   queryTaskDetail: async (taskId: number): Promise<Response<AiTaskDetailResponse>> => {
-    const res = await fetch(`${BASE}/ai-writing/task/${taskId}`);
+    const res = await fetch(`${BASE}/ai-writing/task/${taskId}`, {
+      credentials: "include",
+    });
     return handleResponse<AiTaskDetailResponse>(res);
   },
 
@@ -49,6 +52,7 @@ export const aiWritingApi = {
 
     try {
       const res = await fetch(`${BASE}/ai-writing/task/stream?taskId=${taskId}`, {
+      credentials: 'include',
         headers: { Accept: 'text/event-stream' },
         signal: controller.signal,
       });
@@ -108,7 +112,9 @@ export const aiWritingApi = {
   queryTaskList: async (draftId: number, limit?: number): Promise<Response<AiTaskDetailResponse[]>> => {
     const params = new URLSearchParams({ draftId: String(draftId) });
     if (limit !== undefined) params.set('limit', String(limit));
-    const res = await fetch(`${BASE}/ai-writing/task/list?${params}`);
+    const res = await fetch(`${BASE}/ai-writing/task/list?${params}`, {
+      credentials: "include",
+    });
     return handleResponse<AiTaskDetailResponse[]>(res);
   },
 };

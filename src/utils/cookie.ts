@@ -3,6 +3,7 @@ export const COOKIE_DAYS = 7;
 
 export interface UserInfo {
   user: string;
+  userId: number;
   ts: number;
 }
 
@@ -41,8 +42,8 @@ export const getUserInfo = (): UserInfo | null => {
   }
 };
 
-export const setUserInfo = (user: string) => {
-  const payload: UserInfo = { user, ts: Date.now() };
+export const setUserInfo = (user: string, userId: number) => {
+  const payload: UserInfo = { user, userId, ts: Date.now() };
   setCookie(COOKIE_NAME, JSON.stringify(payload), COOKIE_DAYS);
 };
 

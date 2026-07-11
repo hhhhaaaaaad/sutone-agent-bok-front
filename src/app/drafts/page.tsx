@@ -6,8 +6,11 @@ import { getUserInfo } from '@/utils/cookie';
 import { draftsApi } from '@/api/drafts';
 import type { DraftPageItem } from '@/types/draft';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
+import Pagination from '@/components/Pagination';
 
 type FilterKey = 'all' | 'editing' | 'ready' | 'archived';
+
+const PAGE_SIZE = 10;
 
 const FILTERS: Array<{ key: FilterKey; label: string }> = [
   { key: 'all', label: '全部草稿' },
@@ -23,13 +26,17 @@ export default function DraftsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
+  const [pageNo, setPageNo] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
 
-  const loadDrafts = useCallback(async () => {
+  const loadDrafts = useCallback(async (pn: number, ps: number) => {
     setLoading(true);
     setError('');
     try {
-      const resp = await draftsApi.page(1, 20);
+      const resp = await draftsApi.page(pn, ps);
       setDrafts(resp.data.list ?? []);
+      setTotal(resp.data.total ?? 0);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '加载草稿失败');
     } finally {
@@ -43,8 +50,8 @@ export default function DraftsPage() {
       router.push('/login');
       return;
     }
-    loadDrafts();
-  }, [loadDrafts, router]);
+    loadDrafts(pageNo, pageSize);
+  }, [loadDrafts, pageNo, pageSize, router]);
 
   const handleNewDraft = async () => {
     try {
@@ -126,7 +133,7 @@ export default function DraftsPage() {
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <input className="workspace-search w-[180px]" placeholder="按标题或状态搜索" />
-              <button onClick={loadDrafts} className="workspace-secondary-btn px-4 py-2.5 text-sm font-medium">
+              <button onClick={() => loadDrafts(pageNo, pageSize)} className="workspace-secondary-btn px-4 py-2.5 text-sm font-medium">
                 刷新
               </button>
               <button onClick={handleNewDraft} className="workspace-primary-btn px-4 py-2.5 text-sm font-medium">
@@ -228,6 +235,9 @@ export default function DraftsPage() {
                 ))
               )}
             </div>
+            {!loading && drafts.length > 0 && (
+              <Pagination pageNo={pageNo} pageSize={pageSize} total={total} onChange={(pn, ps) => { setPageNo(pn); setPageSize(ps); loadDrafts(pn, ps); }} />
+            )}
           </div>
         </main>
 

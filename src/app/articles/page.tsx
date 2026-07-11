@@ -5,28 +5,52 @@ import { useRouter } from 'next/navigation';
 import { articlesApi } from '@/api/articles';
 import type { ArticlePageItem } from '@/types/article';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
+import Pagination from '@/components/Pagination';
 
 export default function ArticlesPage() {
   const router = useRouter();
   const [articles, setArticles] = useState<ArticlePageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pageNo, setPageNo] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [keyword, setKeyword] = useState('');
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fetchedRef = useRef(false);
+
+  const fetchPage = (pn: number, ps: number, kw: string) => {
+    setLoading(true);
+    articlesApi.page({ pageNo: pn, pageSize: ps, keyword: kw || undefined })
+      .then((resp) => {
+        setArticles(resp.data.list ?? []);
+        setTotal(resp.data.total ?? 0);
+      })
+      .catch((e: unknown) => setError(e instanceof Error ? e.message : '加载文章失败'))
+      .finally(() => setLoading(false));
+  };
 
   useEffect(() => {
     if (fetchedRef.current) return;
     fetchedRef.current = true;
-    (async () => {
-      try {
-        const resp = await articlesApi.page(1, 20);
-        setArticles(resp.data.list ?? []);
-      } catch (e: unknown) {
-        setError(e instanceof Error ? e.message : '加载文章失败');
-      } finally {
-        setLoading(false);
-      }
-    })();
+    queueMicrotask(() => fetchPage(1, pageSize, ''));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleSearch = (value: string) => {
+    setKeyword(value);
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    searchTimer.current = setTimeout(() => {
+      setPageNo(1);
+      fetchPage(1, pageSize, value);
+    }, 400);
+  };
+
+  const handlePageChange = (pn: number, ps: number) => {
+    setPageNo(pn);
+    setPageSize(ps);
+    fetchPage(pn, ps, keyword);
+  };
 
   const featured = articles[0];
   const listItems = articles.slice(featured ? 1 : 0);
@@ -64,7 +88,10 @@ export default function ArticlesPage() {
               <h2 className="mt-1 text-[34px] font-semibold tracking-tight text-[#22252a]">浏览已经完成发布的内容</h2>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <input className="workspace-search w-[180px]" placeholder="搜索标题、主题或标签" />
+              <input className="workspace-search w-[180px]" placeholder="搜索标题、主题或标签"
+                value={keyword}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
               <button onClick={() => router.push('/me')} className="workspace-secondary-btn px-4 py-2.5 text-sm font-medium">
                 管理归档
               </button>
@@ -168,6 +195,9 @@ export default function ArticlesPage() {
                   </div>
                 </section>
               </>
+            )}
+            {!loading && articles.length > 0 && (
+              <Pagination pageNo={pageNo} pageSize={pageSize} total={total} onChange={handlePageChange} />
             )}
           </div>
         </main>

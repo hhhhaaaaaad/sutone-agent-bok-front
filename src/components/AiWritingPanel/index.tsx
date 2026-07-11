@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { aiWritingApi } from "@/api/ai-writing";
+import MarkdownRenderer from "@/components/MarkdownRenderer";
 import type { AiTaskStatus, AiTaskType, AiTaskDetailResponse, StreamEvent } from "@/types/ai-writing";
 
 interface AiWritingPanelProps {
@@ -75,6 +76,7 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
   const [currentTaskId, setCurrentTaskId] = useState<number | null>(null);
   const [currentTaskType, setCurrentTaskType] = useState<AiTaskType | null>(null);
   const [aiResultBuffer, setAiResultBuffer] = useState("");
+  const [aiFormattedResult, setAiFormattedResult] = useState("");
   const [aiStatusMessage, setAiStatusMessage] = useState("");
   const [currentPhase, setCurrentPhase] = useState("");
   const [taskHistory, setTaskHistory] = useState<TaskCard[]>([]);
@@ -102,6 +104,7 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
     if (aiTaskStatus === "pending" || aiTaskStatus === "streaming") return;
     setCurrentTaskType(taskType);
     setAiResultBuffer("");
+    setAiFormattedResult("");
     setAiStatusMessage("任务提交中...");
     setAiTaskStatus("pending");
 
@@ -110,6 +113,8 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
     if (customInstruction.trim()) {
       promptParams.customInstruction = customInstruction.trim();
     }
+    promptParams.formatInstruction =
+      "每个标题独占一行，标题后立刻换行再写正文，严禁标题和正文挤在同一行。标题文字不超过15字。";
 
     try {
       const resp = await aiWritingApi.submitTask({ draftId, taskType, promptParams });
@@ -122,7 +127,11 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
           setCurrentPhase(event.phase);
           if (event.chunk.type === "status") setAiStatusMessage(event.chunk.content);
           if (event.chunk.type === "token") setAiResultBuffer((prev) => prev + event.chunk.content);
-          if (event.chunk.type === "result") setAiResultBuffer(event.chunk.content);
+          if (event.chunk.type === "result") {
+            // result 是后端经过 formatMarkdown 规范化的终稿，用于采纳
+            setAiFormattedResult(event.chunk.content);
+            setAiResultBuffer(event.chunk.content);
+          }
           if (event.chunk.type === "done") { setAiStatusMessage("生成完成"); setAiTaskStatus("done"); }
           if (event.chunk.type === "error") { setAiStatusMessage(event.chunk.content || "生成失败"); setAiTaskStatus("error"); }
         },
@@ -189,12 +198,18 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
       {aiResultBuffer && (
         <div className="mt-3 rounded-[12px] border border-[#e6e2db] bg-white p-3">
           <p className="text-[10px] text-[#858c96] mb-1">{currentTaskType ? TASK_TYPE_LABELS[currentTaskType] || currentTaskType : "AI 结果"}</p>
-          <div className="max-h-52 overflow-y-auto whitespace-pre-wrap text-xs leading-6 text-[#5d636c]">{aiResultBuffer}</div>
+          {aiTaskStatus === "streaming" && (
+            <p className="mb-1 text-[10px] text-[#b08968]">预览态，格式化终稿以最终结果为准</p>
+          )}
+          <MarkdownRenderer
+            content={aiResultBuffer}
+            className="max-h-52 overflow-y-auto text-xs leading-6 text-[#5d636c] markdown-body"
+          />
           <div className="mt-3 grid grid-cols-2 gap-2">
-            <button onClick={() => onApplyResult("append", aiResultBuffer)} className="rounded-[10px] bg-[#eef5f0] px-2 py-2 text-xs text-[#567260] transition hover:bg-[#e4efe8]">追加正文</button>
-            <button onClick={() => onApplyResult("replace", aiResultBuffer)} className="rounded-[10px] bg-[#f0ede8] px-2 py-2 text-xs text-[#5d636c] transition hover:bg-[#e7e1d8]">替换正文</button>
-            <button onClick={() => onApplyResult("fillSummary", aiResultBuffer)} className="rounded-[10px] bg-[#edf3f6] px-2 py-2 text-xs text-[#56738a] transition hover:bg-[#e2ebf0]">回填摘要</button>
-            <button onClick={() => setAiResultBuffer("")} className="rounded-[10px] bg-[#f7f5f2] px-2 py-2 text-xs text-[#858c96] transition hover:bg-[#ece7df]">清空结果</button>
+            <button onClick={() => onApplyResult("append", aiFormattedResult || aiResultBuffer)} disabled={aiTaskStatus === "streaming"} className="rounded-[10px] bg-[#eef5f0] px-2 py-2 text-xs text-[#567260] transition hover:bg-[#e4efe8] disabled:opacity-40 disabled:cursor-not-allowed">追加正文</button>
+            <button onClick={() => onApplyResult("replace", aiFormattedResult || aiResultBuffer)} disabled={aiTaskStatus === "streaming"} className="rounded-[10px] bg-[#f0ede8] px-2 py-2 text-xs text-[#5d636c] transition hover:bg-[#e7e1d8] disabled:opacity-40 disabled:cursor-not-allowed">替换正文</button>
+            <button onClick={() => onApplyResult("fillSummary", aiFormattedResult || aiResultBuffer)} disabled={aiTaskStatus === "streaming"} className="rounded-[10px] bg-[#edf3f6] px-2 py-2 text-xs text-[#56738a] transition hover:bg-[#e2ebf0] disabled:opacity-40 disabled:cursor-not-allowed">回填摘要</button>
+            <button onClick={() => { setAiResultBuffer(""); setAiFormattedResult(""); }} className="rounded-[10px] bg-[#f7f5f2] px-2 py-2 text-xs text-[#858c96] transition hover:bg-[#ece7df]">清空结果</button>
           </div>
         </div>
       )}

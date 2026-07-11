@@ -8,17 +8,28 @@ import { articlesApi } from '@/api/articles';
 import type { DraftPageItem } from '@/types/draft';
 import type { ArticlePageItem } from '@/types/article';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
+import Pagination from '@/components/Pagination';
+
+const PAGE_SIZE = 10;
 
 export default function MePage() {
   const router = useRouter();
   const [user, setUser] = useState('');
+  const [userId, setUserId] = useState<number | null>(null);
   const [drafts, setDrafts] = useState<DraftPageItem[]>([]);
   const [articles, setArticles] = useState<ArticlePageItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [draftPageNo, setDraftPageNo] = useState(1);
+  const [draftPageSize, setDraftPageSize] = useState(10);
+  const [draftTotal, setDraftTotal] = useState(0);
+  const [articlePageNo, setArticlePageNo] = useState(1);
+  const [articlePageSize, setArticlePageSize] = useState(10);
+  const [articleTotal, setArticleTotal] = useState(0);
   const fetchedRef = useRef(false);
 
   useEffect(() => {
-    setUser(getUserInfo()?.user || '');
+    const info = getUserInfo();
+    if (info) { setUser(info.user); setUserId(info.userId); }
   }, []);
 
   useEffect(() => {
@@ -26,20 +37,25 @@ export default function MePage() {
     if (!userInfo?.user) { router.push('/login'); return; }
     if (fetchedRef.current) return;
     fetchedRef.current = true;
-
-    (async () => {
-      try {
-        const [dResp, aResp] = await Promise.all([
-          draftsApi.page(1, 5),
-          articlesApi.page(1, 5),
-        ]);
-        setDrafts(dResp.data.list ?? []);
-        setArticles(aResp.data.list ?? []);
-      } catch { /* ignore */ }
-      setLoading(false);
-    })();
+    fetchData(1, draftPageSize, 1, articlePageSize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const fetchData = async (dpn: number, dps: number, apn: number, aps: number) => {
+    const info = getUserInfo();
+    setLoading(true);
+    try {
+      const [dResp, aResp] = await Promise.all([
+        draftsApi.page(dpn, dps),
+        articlesApi.page({ pageNo: apn, pageSize: aps, userId: info?.userId }),
+      ]);
+      setDrafts(dResp.data.list ?? []);
+      setArticles(aResp.data.list ?? []);
+      setDraftTotal(dResp.data.total ?? 0);
+      setArticleTotal(aResp.data.total ?? 0);
+    } catch { /* ignore */ }
+    setLoading(false);
+  };
 
   const handleLogout = () => {
     clearUserInfo();
@@ -83,14 +99,17 @@ export default function MePage() {
             ) : drafts.length === 0 ? (
               <p className="text-sm text-[#858c96]">暂无草稿</p>
             ) : (
-              <div className="grid gap-3">
-                {drafts.map(d => (
-                  <button key={d.draftId} onClick={() => router.push(`/drafts/${d.draftId}`)} className="workspace-panel rounded-[14px] p-4 text-left">
-                    <span className="text-sm font-medium text-[#22252a]">{d.title || '未命名草稿'}</span>
-                    <span className="ml-3 text-xs text-[#858c96]">{d.updateTime}</span>
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="grid gap-3">
+                  {drafts.map(d => (
+                    <button key={d.draftId} onClick={() => router.push(`/drafts/${d.draftId}`)} className="workspace-panel rounded-[14px] p-4 text-left">
+                      <span className="text-sm font-medium text-[#22252a]">{d.title || '未命名草稿'}</span>
+                      <span className="ml-3 text-xs text-[#858c96]">{d.updateTime}</span>
+                    </button>
+                  ))}
+                </div>
+                <Pagination pageNo={draftPageNo} pageSize={draftPageSize} total={draftTotal} onChange={(pn, ps) => { setDraftPageNo(pn); setDraftPageSize(ps); fetchData(pn, ps, articlePageNo, articlePageSize); }} />
+              </>
             )}
           </section>
 
@@ -104,14 +123,17 @@ export default function MePage() {
             ) : articles.length === 0 ? (
               <p className="text-sm text-[#858c96]">暂无文章</p>
             ) : (
-              <div className="grid gap-3">
-                {articles.map(a => (
-                  <button key={a.articleId} onClick={() => router.push(`/articles/${a.articleId}`)} className="workspace-panel rounded-[14px] p-4 text-left">
-                    <span className="text-sm font-medium text-[#22252a]">{a.title}</span>
-                    <span className="ml-3 text-xs text-[#858c96]">{a.publishTime} · {a.viewCount} 阅读</span>
-                  </button>
-                ))}
-              </div>
+              <>
+                <div className="grid gap-3">
+                  {articles.map(a => (
+                    <button key={a.articleId} onClick={() => router.push(`/articles/${a.articleId}`)} className="workspace-panel rounded-[14px] p-4 text-left">
+                      <span className="text-sm font-medium text-[#22252a]">{a.title}</span>
+                      <span className="ml-3 text-xs text-[#858c96]">{a.publishTime} · {a.viewCount} 阅读</span>
+                    </button>
+                  ))}
+                </div>
+                <Pagination pageNo={articlePageNo} pageSize={articlePageSize} total={articleTotal} onChange={(pn, ps) => { setArticlePageNo(pn); setArticlePageSize(ps); fetchData(draftPageNo, draftPageSize, pn, ps); }} />
+              </>
             )}
           </section>
         </main>

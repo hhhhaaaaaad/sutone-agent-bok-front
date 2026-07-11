@@ -68,7 +68,7 @@ export interface DoneChunk {
 // PPT streaming chunks
 export interface PptSlideChunk {
     type: 'ppt_slide';
-    slide: any;
+    slide: Record<string, unknown>;
     title?: string;
     slideIndex?: number;
 }
@@ -105,6 +105,7 @@ export const agentApi = {
      */
     queryAiAgentConfigList: async (): Promise<Response<AiAgentConfigResponseDTO[]>> => {
         const response = await fetch(`${API_CONFIG.BASE_URL}/query_ai_agent_config_list`, {
+      credentials: 'include',
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -119,6 +120,7 @@ export const agentApi = {
      */
     createSession: async (agentId: string, userId: string): Promise<Response<CreateSessionResponseDTO>> => {
         const response = await fetch(`${API_CONFIG.BASE_URL}/create_session`, {
+      credentials: 'include',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -134,6 +136,7 @@ export const agentApi = {
      */
     chat: async (data: ChatRequestDTO): Promise<Response<ChatResponseDTO>> => {
         const response = await fetch(`${API_CONFIG.BASE_URL}/chat`, {
+      credentials: 'include',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -159,6 +162,7 @@ export const agentApi = {
 
         try {
             const response = await fetch(`${API_CONFIG.BASE_URL}/chat_stream`, {
+      credentials: 'include',
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -215,8 +219,8 @@ export const agentApi = {
                     if (!controller.signal.aborted) {
                         onComplete();
                     }
-                } catch (err: any) {
-                    if (err.name === 'AbortError') {
+                } catch (err: unknown) {
+                    if (err instanceof DOMException && err.name === 'AbortError') {
                         // User cancelled, no error, but call complete to cleanup UI state
                         onComplete();
                         return;
@@ -226,8 +230,8 @@ export const agentApi = {
             };
 
             processStream();
-        } catch (err: any) {
-            if (err.name !== 'AbortError') {
+        } catch (err: unknown) {
+            if (!(err instanceof DOMException) || err.name !== 'AbortError') {
                 onError(err instanceof Error ? err : new Error(String(err)));
             }
         }

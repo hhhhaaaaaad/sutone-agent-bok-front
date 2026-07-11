@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { setUserInfo, getUserInfo } from "@/utils/cookie";
+import { authApi } from "@/api/auth";
 import WordGravity from "./WordGravity";
 import ThemeToggle from "@/components/Theme/ThemeToggle";
 
@@ -20,6 +21,8 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState({ text: "", type: "" });
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [typedQuote, setTypedQuote] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -73,28 +76,36 @@ export default function Login() {
     return () => window.clearTimeout(timer);
   }, [isDeleting, quoteIndex, typedQuote]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMsg({ text: "", type: "" });
+    setLoading(true);
 
     if (!username || !password) {
       setMsg({ text: "请输入账号与密码。", type: "error" });
+      setLoading(false);
       return;
     }
 
-    if (username !== "admin" || password !== "admin") {
+    try {
+      if (isRegistering) {
+        await authApi.register({ username, password, nickname: username });
+        setMsg({ text: "注册成功，请登录。", type: "info" });
+        setIsRegistering(false);
+      } else {
+        const user = await authApi.login({ username, password });
+        setUserInfo(username, user.userId);
+        setMsg({ text: "登录成功，正在跳转…", type: "info" });
+        setTimeout(() => router.push("/"), 500);
+      }
+    } catch (err: unknown) {
       setMsg({
-        text: "账号或密码错误（演示账号：admin / admin）。",
+        text: err instanceof Error ? err.message : "操作失败，请重试",
         type: "error",
       });
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    setUserInfo(username);
-    setMsg({ text: "登录成功，正在跳转…", type: "info" });
-    setTimeout(() => {
-      router.push("/");
-    }, 500);
   };
 
   const handleFillDemo = () => {
@@ -194,19 +205,20 @@ export default function Login() {
           <div className="workspace-panel w-full max-w-[420px] rounded-[16px] p-6 md:p-8">
             <div>
               <p className="workspace-mono text-[11px] tracking-[0.16em] text-[#858c96]">
-                欢迎回来
+                {isRegistering ? "创建新账号" : "欢迎回来"}
               </p>
               <h2 className="mt-3 text-[36px] font-semibold tracking-tight text-[#22252a]">
-                登录创作工作台
+                {isRegistering ? "注册创作工作台" : "登录创作工作台"}
               </h2>
               <p className="mt-3 text-sm leading-6 text-[#5d636c]">
-                使用你的工作邮箱继续最近的写作、整理与发布流程。演示账号为
-                `admin / admin`。
+                {isRegistering
+                  ? "创建一个新账号开始写作、整理与发布流程。"
+                  : "使用你的工作邮箱继续最近的写作、整理与发布流程。演示账号为 `admin / admin`。"}
               </p>
             </div>
 
             <form
-              onSubmit={handleLogin}
+              onSubmit={handleSubmit}
               autoComplete="on"
               className="mt-8 space-y-5"
             >
@@ -254,17 +266,22 @@ export default function Login() {
               <div className="space-y-3 pt-1">
                 <button
                   type="submit"
+                  disabled={loading}
                   className="workspace-primary-btn h-11 w-full text-sm font-medium"
                 >
-                  进入工作台
+                  {loading
+                    ? (isRegistering ? "注册中…" : "登录中…")
+                    : (isRegistering ? "注册新账号" : "进入工作台")}
                 </button>
-                <button
-                  type="button"
-                  onClick={handleFillDemo}
-                  className="workspace-secondary-btn h-11 w-full text-sm font-medium"
-                >
-                  填充演示账号
-                </button>
+                {!isRegistering && (
+                  <button
+                    type="button"
+                    onClick={handleFillDemo}
+                    className="workspace-secondary-btn h-11 w-full text-sm font-medium"
+                  >
+                    填充演示账号
+                  </button>
+                )}
               </div>
             </form>
 
@@ -272,6 +289,16 @@ export default function Login() {
               className={`min-h-5 pt-3 text-xs ${msg.type === "error" ? "text-red-500" : "text-[#858c96]"}`}
             >
               {msg.text}
+            </div>
+
+            <div className="mt-3 text-center text-[11px] text-[#858c96]">
+              <button
+                type="button"
+                onClick={() => { setIsRegistering(!isRegistering); setMsg({ text: "", type: "" }); }}
+                className="hover:text-[#22252a] transition"
+              >
+                {isRegistering ? "已有账号？去登录" : "没有账号？注册一个"}
+              </button>
             </div>
 
             <div className="mt-5 flex items-center justify-between border-t border-[#e6e2db] pt-5 text-[11px] text-[#858c96]">

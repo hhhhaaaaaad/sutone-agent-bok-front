@@ -31,6 +31,8 @@ export interface AiTaskDetailResponse {
 export interface StreamChunk {
   type: 'status' | 'token' | 'result' | 'done' | 'error';
   content: string;
+  /** 层四：结构化块的原始 JSON（token 由块渲染而来时透传，用于调试/可视化，前端渲染以 content 为准） */
+  raw?: string;
 }
 
 export interface StreamEvent {

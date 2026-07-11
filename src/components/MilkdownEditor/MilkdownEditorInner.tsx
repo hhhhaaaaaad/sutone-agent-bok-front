@@ -29,6 +29,7 @@ function EditorContent({
 }: MilkdownEditorInnerProps) {
   const crepeRef = useRef<Crepe | null>(null);
   const onChangeRef = useRef(onChange);
+  const syncingRef = useRef(false);
   useEffect(() => {
     onChangeRef.current = onChange;
   });
@@ -46,6 +47,7 @@ function EditorContent({
 
     crepe.on((listener) => {
       listener.markdownUpdated((_, md) => {
+        if (syncingRef.current) return;
         onChangeRef.current(md);
       });
     });
@@ -54,14 +56,22 @@ function EditorContent({
     return crepe;
   }, []);
 
-  useEffect(() => {
+  const safeReplaceAll = (md: string) => {
     const crepe = crepeRef.current;
     if (!crepe || crepe.editor.status !== EditorStatus.Created) return;
+    if (crepe.getMarkdown() === md) return;
+    syncingRef.current = true;
     try {
-      crepe.editor.action(replaceAll(markdown));
+      crepe.editor.action(replaceAll(md));
     } catch {
       // ignore transient editor state
+    } finally {
+      syncingRef.current = false;
     }
+  };
+
+  useEffect(() => {
+    safeReplaceAll(markdown);
   }, [markdown]);
 
   useImperativeHandle(
@@ -69,11 +79,7 @@ function EditorContent({
     () => ({
       getMarkdown: () => crepeRef.current?.getMarkdown() ?? markdown,
       setMarkdown: (md: string) => {
-        try {
-          crepeRef.current?.editor.action(replaceAll(md));
-        } catch {
-          // ignore
-        }
+        safeReplaceAll(md);
       },
     }),
     [markdown]
@@ -81,11 +87,7 @@ function EditorContent({
 
   const handleInsertFormula = (latex: string, displayMode: boolean) => {
     const md = displayMode ? `$$\n${latex}\n$$` : `$${latex}$`;
-    try {
-      crepeRef.current?.editor.action(replaceAll(md));
-    } catch {
-      // ignore
-    }
+    safeReplaceAll(md);
   };
 
   return (

@@ -87,7 +87,7 @@ export default function WorkspaceHeader({
       </nav>
 
       <div className="workspace-top-actions">
-        {userName && <span className="workspace-top-user">{userName}</span>}
+        {userName && <span className="workspace-top-user" suppressHydrationWarning>{userName}</span>}
         <ThemeToggle compact />
         {onLogout && (
           <button

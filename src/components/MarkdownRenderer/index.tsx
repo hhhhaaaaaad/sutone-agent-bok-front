@@ -6,6 +6,7 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeHighlight from "rehype-highlight";
+import DrawioViewer from "@/components/DrawioViewer";
 
 type MarkdownRendererProps = {
   content: string;
@@ -54,6 +55,24 @@ export default function MarkdownRenderer({
           rehypeKatex,
           [rehypeHighlight, { detect: true, ignoreMissing: true }],
         ]}
+        components={{
+          code({ className, children, node, ...props }) {
+            const match = /language-(\w+)/.exec(className || "");
+            const language = match ? match[1] : "";
+
+            const content = String(children).replace(/\n$/, "");
+
+            if (language === "drawio" && content.length > 0) {
+              return <DrawioViewer xml={content} />;
+            }
+
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          },
+        }}
       >
         {renderContent}
       </ReactMarkdown>

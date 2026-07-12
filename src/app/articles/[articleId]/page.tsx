@@ -103,7 +103,6 @@ export default function ArticleDetailPage() {
             <MarkdownRenderer
               key={article.articleId}
               content={article.contentMd || ''}
-              stream
             />
           </article>
 

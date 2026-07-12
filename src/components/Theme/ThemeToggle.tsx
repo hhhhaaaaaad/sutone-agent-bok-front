@@ -7,8 +7,8 @@ export default function ThemeToggle({ compact = false }: { compact?: boolean }) 
   const isDark = theme === "dark";
 
   return (
-    <div className="theme-toggle-wrap" title={isDark ? "切换到亮色主题" : "切换到黑夜主题"}>
-      {!compact && <span className="theme-toggle-label">黑夜</span>}
+    <div className="theme-toggle-wrap" title={isDark ? "切换到亮色主题" : "切换到黑夜主题"} suppressHydrationWarning>
+      {!compact && <span className="theme-toggle-label" suppressHydrationWarning>黑夜</span>}
       <button
         type="button"
         role="switch"

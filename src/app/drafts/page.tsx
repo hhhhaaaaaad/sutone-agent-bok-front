@@ -21,7 +21,11 @@ const FILTERS: Array<{ key: FilterKey; label: string }> = [
 
 export default function DraftsPage() {
   const router = useRouter();
-  const [currentUser] = useState(() => getUserInfo()?.user || '');
+  const [currentUser, setCurrentUser] = useState('');
+
+  useEffect(() => {
+    setCurrentUser(getUserInfo()?.user || '');
+  }, []);
   const [drafts, setDrafts] = useState<DraftPageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

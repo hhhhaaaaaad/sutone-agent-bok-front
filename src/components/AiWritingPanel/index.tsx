@@ -46,12 +46,13 @@ interface TaskCard {
 const PHASE_LABELS: Record<string, string> = {
   analyzing: "分析草稿",
   generating: "生成内容",
+  illustrating: "识别配图",
   reviewing: "质量审查",
   thinking: "思考中",
 };
 
 function PhaseIndicator({ phase }: { phase: string }) {
-  const steps = ["analyzing", "generating", "reviewing"];
+  const steps = ["analyzing", "generating", "illustrating", "reviewing"];
   const currentIndex = steps.indexOf(phase);
 
   return (
@@ -69,8 +70,9 @@ function PhaseIndicator({ phase }: { phase: string }) {
   );
 }
 
-export default function AiWritingPanel({ draftId, content, getPromptParams, onApplyResult }: AiWritingPanelProps) {
+export default function AiWritingPanel({ draftId, getPromptParams, onApplyResult }: AiWritingPanelProps) {
   const [customInstruction, setCustomInstruction] = useState("");
+  const [enableIllustration, setEnableIllustration] = useState(false);
   const [showAux, setShowAux] = useState(false);
   const [aiTaskStatus, setAiTaskStatus] = useState<AiTaskStatus>("idle");
   const [currentTaskId, setCurrentTaskId] = useState<number | null>(null);
@@ -117,7 +119,7 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
       "每个标题独占一行，标题后立刻换行再写正文，严禁标题和正文挤在同一行。标题文字不超过15字。";
 
     try {
-      const resp = await aiWritingApi.submitTask({ draftId, taskType, promptParams });
+      const resp = await aiWritingApi.submitTask({ draftId, taskType, promptParams, enableIllustration });
       const taskId = resp.data.taskId;
       setCurrentTaskId(taskId);
       setAiTaskStatus("streaming");
@@ -143,7 +145,7 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
       setAiStatusMessage(e instanceof Error ? e.message : "提交 AI 任务失败");
       setAiTaskStatus("error");
     }
-  }, [draftId, customInstruction, aiTaskStatus, getPromptParams]);
+  }, [draftId, customInstruction, aiTaskStatus, getPromptParams, enableIllustration]);
 
   const stopAiTask = useCallback(() => {
     streamControllerRef.current?.abort();
@@ -179,6 +181,16 @@ export default function AiWritingPanel({ draftId, content, getPromptParams, onAp
           placeholder="输入自定义写作指令（可选）" rows={2}
           className="w-full rounded-[10px] border border-[#e6e2db] bg-white p-2 text-xs text-[#5d636c] outline-none placeholder:text-[#b9b2a8] resize-none" />
       </div>
+
+      <label className="mt-2 flex items-center gap-2 text-xs text-[#858c96] cursor-pointer">
+        <input
+          type="checkbox"
+          checked={enableIllustration}
+          onChange={(e) => setEnableIllustration(e.target.checked)}
+          className="h-3.5 w-3.5 rounded border-[#d1cec6] accent-[#567260]"
+        />
+        启用 AI 配图（自动识别正文配图需求并生成架构图/流程图/时序图）
+      </label>
 
       <div className="mt-2 space-y-2">{renderActionButtons(WRITING_ACTIONS)}</div>
 

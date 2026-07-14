@@ -127,7 +127,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen theme-bg-yellow p-5 md:p-7">
-      <div className="workspace-shell mx-auto grid min-h-[calc(100vh-40px)] max-w-[1180px] grid-cols-1 overflow-hidden lg:grid-cols-[0.95fr_1.35fr]">
+      <div className="workspace-shell mx-auto grid min-h-[calc(100vh-40px)] max-w-[1280px] grid-cols-1 overflow-hidden lg:grid-cols-[0.95fr_1.35fr]">
         <section className="flex flex-col gap-6 bg-[#f1ece6] px-7 py-6 md:px-10 md:py-8">
           <div className="flex items-center justify-between text-[11px] tracking-[0.18em] text-[#858c96]">
             <div className="flex items-center gap-2">

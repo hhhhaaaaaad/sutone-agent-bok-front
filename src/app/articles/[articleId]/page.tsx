@@ -2,7 +2,9 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { articlesApi } from '@/api/articles';
+import { socialApi } from '@/api/social';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import type { ArticleDetailResponse } from '@/types/article';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
@@ -14,9 +16,17 @@ export default function ArticleDetailPage() {
   const [article, setArticle] = useState<ArticleDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentUser, setCurrentUser] = useState('');
   const [reverting, setReverting] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [likeLoading, setLikeLoading] = useState(false);
+  const [favorited, setFavorited] = useState(false);
+  const [favoriteCount, setFavoriteCount] = useState(0);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
   const fetchedRef = useRef(false);
 
+  useEffect(() => { queueMicrotask(() => setCurrentUser(getUserInfo()?.user || '')); }, []);
   useEffect(() => {
     if (!articleId) return;
     if (fetchedRef.current) return;
@@ -25,6 +35,18 @@ export default function ArticleDetailPage() {
       try {
         const resp = await articlesApi.detail(articleId);
         setArticle(resp.data);
+        setLikeCount(resp.data.likeCount);
+        setFavoriteCount(resp.data.favoriteCount);
+        try {
+          const likeStatus = await socialApi.getLikeStatus(articleId);
+          setLiked(likeStatus.data.liked);
+          setLikeCount(likeStatus.data.likeCount);
+        } catch { /* use detail-provided count */ }
+        try {
+          const favStatus = await socialApi.getFavoriteStatus(articleId);
+          setFavorited(favStatus.data.favorited);
+          setFavoriteCount(favStatus.data.favoriteCount);
+        } catch { /* use detail-provided count */ }
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : '加载失败');
       } finally {
@@ -32,6 +54,8 @@ export default function ArticleDetailPage() {
       }
     })();
   }, [articleId]);
+
+  const handleLogout = () => { clearUserInfo(); router.push('/login'); };
 
   const handleRevertToDraft = async () => {
     if (!articleId || reverting) return;
@@ -42,6 +66,48 @@ export default function ArticleDetailPage() {
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '回退失败');
       setReverting(false);
+    }
+  };
+
+  const handleLikeToggle = async () => {
+    if (likeLoading) return;
+    setLikeLoading(true);
+    const prevLiked = liked;
+    const prevCount = likeCount;
+    setLiked(!liked);
+    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+    try {
+      const resp = liked
+        ? await socialApi.unlike(articleId)
+        : await socialApi.like(articleId);
+      setLiked(resp.data.liked);
+      setLikeCount(resp.data.likeCount);
+    } catch {
+      setLiked(prevLiked);
+      setLikeCount(prevCount);
+    } finally {
+      setLikeLoading(false);
+    }
+  };
+
+  const handleFavoriteToggle = async () => {
+    if (favoriteLoading) return;
+    setFavoriteLoading(true);
+    const prevFav = favorited;
+    const prevCount = favoriteCount;
+    setFavorited(!favorited);
+    setFavoriteCount(favorited ? favoriteCount - 1 : favoriteCount + 1);
+    try {
+      const resp = favorited
+        ? await socialApi.unfavorite(articleId)
+        : await socialApi.favorite(articleId);
+      setFavorited(resp.data.favorited);
+      setFavoriteCount(resp.data.favoriteCount);
+    } catch {
+      setFavorited(prevFav);
+      setFavoriteCount(prevCount);
+    } finally {
+      setFavoriteLoading(false);
     }
   };
 
@@ -64,8 +130,8 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto max-w-[980px] overflow-hidden bg-[#fcfbf8]">
-        <WorkspaceHeader activePath="/articles" />
+      <div className="workspace-shell mx-auto max-w-[1280px] overflow-hidden bg-[#fcfbf8]">
+        <WorkspaceHeader activePath="/articles" userName={currentUser} onLogout={handleLogout} />
         <header className="border-b border-[#e6e2db] flex items-center justify-between px-5 py-4 md:px-7">
           <div className="flex items-center gap-3">
             <button onClick={() => router.push('/articles')} className="workspace-secondary-btn px-3 py-2 text-sm font-medium">
@@ -107,13 +173,20 @@ export default function ArticleDetailPage() {
           </article>
 
           <div className="mt-12 flex flex-wrap items-center gap-3 border-t border-[#e6e2db] pt-6">
-            <button disabled className="workspace-secondary-btn px-4 py-2 text-sm text-[#858c96] disabled:cursor-not-allowed">
-              点赞 {article.likeCount}
+            <button
+              onClick={handleLikeToggle}
+              disabled={likeLoading}
+              className={`px-4 py-2 text-sm font-medium ${liked ? 'workspace-primary-btn' : 'workspace-secondary-btn'} disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {likeLoading ? '...' : liked ? `已点赞 ${likeCount}` : `点赞 ${likeCount}`}
             </button>
-            <button disabled className="workspace-secondary-btn px-4 py-2 text-sm text-[#858c96] disabled:cursor-not-allowed">
-              收藏 {article.favoriteCount}
+            <button
+              onClick={handleFavoriteToggle}
+              disabled={favoriteLoading}
+              className={`px-4 py-2 text-sm font-medium ${favorited ? 'workspace-primary-btn' : 'workspace-secondary-btn'} disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {favoriteLoading ? '...' : favorited ? `已收藏 ${favoriteCount}` : `收藏 ${favoriteCount}`}
             </button>
-            <span className="ml-auto text-xs text-[#858c96]">互动功能将在后续阶段接入</span>
           </div>
         </main>
       </div>

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUserInfo } from '@/utils/cookie';
+import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { draftsApi } from '@/api/drafts';
 import type { DraftPageItem } from '@/types/draft';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
@@ -33,6 +33,8 @@ export default function DraftsPage() {
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+
+  const handleLogout = () => { clearUserInfo(); router.push('/login'); };
 
   const loadDrafts = useCallback(async (pn: number, ps: number) => {
     setLoading(true);
@@ -100,7 +102,7 @@ export default function DraftsPage() {
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
       <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1280px] flex-col overflow-hidden">
-        <WorkspaceHeader activePath="/drafts" userName={currentUser} />
+        <WorkspaceHeader activePath="/drafts" userName={currentUser} onLogout={handleLogout} />
         <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[220px_minmax(0,1fr)_280px]">
         <aside className="workspace-sidebar-soft flex flex-col gap-5 px-5 py-6">
           <div>

@@ -6,6 +6,7 @@ import type {
   ArticlePageItem,
   ArticleDetailResponse,
   RevertToDraftResponse,
+  LeaderboardItem,
 } from '@/types/article';
 
 const BASE = API_CONFIG.BASE_URL;
@@ -59,6 +60,20 @@ export const articlesApi = {
       credentials: "include",
     });
     return handleResponse<ArticleDetailResponse>(res);
+  },
+
+  /** 排行榜 */
+  leaderboard: async (
+    period: 'daily' | 'weekly' = 'daily',
+    n: number = 10,
+  ): Promise<Response<LeaderboardItem[]>> => {
+    const searchParams = new URLSearchParams();
+    searchParams.set('period', period);
+    searchParams.set('n', String(n));
+    const res = await fetch(`${BASE}/articles/leaderboard?${searchParams}`, {
+      credentials: 'include',
+    });
+    return handleResponse<LeaderboardItem[]>(res);
   },
 
   /** 将已发布文章回退到草稿状态 */

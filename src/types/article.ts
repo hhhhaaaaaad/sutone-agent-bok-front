@@ -22,6 +22,8 @@ export interface ArticlePageItem {
   coverUrl?: string;
   publishTime: string;
   viewCount: number;
+  likeCount: number;
+  favoriteCount: number;
   tags: string[];
 }
 
@@ -44,4 +46,20 @@ export interface ArticleDetailResponse {
 
 export interface RevertToDraftResponse {
   draftId: number;
+}
+
+export interface LikeStatusResponse {
+  liked: boolean;
+  likeCount: number;
+}
+
+export interface FavoriteStatusResponse {
+  favorited: boolean;
+  favoriteCount: number;
+}
+
+export interface LeaderboardItem {
+  articleId: number;
+  title: string;
+  heatScore: number;
 }

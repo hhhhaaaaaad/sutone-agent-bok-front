@@ -591,6 +591,7 @@ const stripMdCodeBlock = (s: string): string =>
     .replace(/\n?```\s*$/i, "")
     .trim();
 
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const normalizePptSlide = (slide: any): PptSlide => {
   const metaKeys = new Set([
     "kind",
@@ -622,6 +623,7 @@ const normalizePptSlide = (slide: any): PptSlide => {
   ]);
   return {
     ...slide,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
     elements: (slide.elements || []).map((el: any) => {
       // Normalize content field
       if (
@@ -679,14 +681,16 @@ const normalizePptData = (data: PptData): PptData => {
 
 const tryParsePpt = (raw: unknown): PptData | null => {
   try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let parsedObj: any = null;
     if (typeof raw === "string") {
-      let clean = stripMdCodeBlock(raw);
+      const clean = stripMdCodeBlock(raw);
       if (clean.match(/\}\s*\{/)) {
         try {
           const arr = JSON.parse(`[${clean.replace(/\}\s*\{/g, "},{")}]`);
           parsedObj =
             arr.find(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
               (item: any) => item.type === "ppt" || (item.slides && item.title),
             ) || arr[arr.length - 1];
         } catch (e) {}
@@ -697,6 +701,7 @@ const tryParsePpt = (raw: unknown): PptData | null => {
     } else {
       parsedObj = raw;
     }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const findPptData = (obj: any, depth: number = 0): PptData | null => {
       if (obj === null || obj === undefined || depth > 8) return null;
       if (obj.title && Array.isArray(obj.slides)) return obj as PptData;
@@ -755,7 +760,7 @@ const tryExtractPartialSlides = (accumulated: string): PptSlide[] | null => {
 
     // Scan for complete slide objects (each starts with { and has "slideIndex")
     const completeSlides: PptSlide[] = [];
-    let searchFrom = arrayStart + 1;
+    const searchFrom = arrayStart + 1;
     let depth = 0;
     let slideStart = -1;
 
@@ -811,8 +816,9 @@ const generatePptx = (data: PptData, theme: PptTheme) => {
       color: string,
       gradient?: { from: string; to: string },
     ) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       if (gradient) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         slide.addShape((pres as any).shapes.RECTANGLE, {
           x,
           y,
@@ -822,6 +828,7 @@ const generatePptx = (data: PptData, theme: PptTheme) => {
           line: { width: 0 },
         });
         // Overlay with semi-transparent gradient effect using second shape
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         slide.addShape((pres as any).shapes.RECTANGLE, {
           x,
           y,
@@ -831,6 +838,7 @@ const generatePptx = (data: PptData, theme: PptTheme) => {
           line: { width: 0 },
         });
       } else {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         slide.addShape((pres as any).shapes.RECTANGLE, {
           x,
           y,
@@ -1013,11 +1021,14 @@ const generatePptx = (data: PptData, theme: PptTheme) => {
             const tblX = Math.max(safe.x, el.x || 0);
             const tblY = Math.max(safe.y, el.y || 0);
             const safeRows = Array.isArray(el.rows)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
               ? el.rows.filter((r: any) => Array.isArray(r) && r.length > 0)
               : [];
             if (safeRows.length > 0 && (el.w || 0) > 0) {
               const colCount = safeRows[0].length || 1;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const tableRows = safeRows.map((row: any, rowIdx: number) =>
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 row.map((cell: any) => ({
                   text: String(cell ?? ""),
                   options: {
@@ -1744,7 +1755,7 @@ ${content}`;
 
       let accumulatedReasoning = "";
       let accumulatedContent = "";
-      let accumulatedSteps: MessageStep[] = [];
+      const accumulatedSteps: MessageStep[] = [];
 
       setStreamPhase("analyzing");
       setStreamProgress("姝ｅ湪鍒嗘瀽闇€姹?..");
@@ -2749,7 +2760,7 @@ ${content}`;
 
       if (el.kind === "text") {
         const fontSizeNum = el.fontSize || 18;
-        let fontSize = Math.max(8, fontSizeNum * 0.7);
+        const fontSize = Math.max(8, fontSizeNum * 0.7);
         // Position-aware color detection: check if element center is on a dark area
         const elCenterX = elX + (el.w || 4) / 2;
         const elCenterY = elY + (el.h || 1) / 2;
@@ -2941,6 +2952,7 @@ ${content}`;
 
       if (el.kind === "table" && Array.isArray(el.rows) && el.rows.length > 0) {
         const safeRows = el.rows.filter(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (r: any) => Array.isArray(r) && r.length > 0,
         );
         if (safeRows.length === 0) return null;
@@ -2962,6 +2974,7 @@ ${content}`;
               <tbody>
                 {safeRows.map((row, ri) => (
                   <tr key={ri}>
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {row.map((cell: any, ci: number) => (
                       <td
                         key={ci}

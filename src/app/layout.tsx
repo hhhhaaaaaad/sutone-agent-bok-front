@@ -23,7 +23,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeInitializationScript }} />
         <Script src="/env-config.js" strategy="beforeInteractive" />
       </head>
-      <body className="antialiased overflow-y-scroll">
+      <body className="antialiased">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>

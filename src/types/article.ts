@@ -24,6 +24,7 @@ export interface ArticlePageItem {
   viewCount: number;
   likeCount: number;
   favoriteCount: number;
+  commentCount: number;
   tags: string[];
 }
 
@@ -41,6 +42,7 @@ export interface ArticleDetailResponse {
   viewCount: number;
   likeCount: number;
   favoriteCount: number;
+  commentCount: number;
   tags: string[];
 }
 

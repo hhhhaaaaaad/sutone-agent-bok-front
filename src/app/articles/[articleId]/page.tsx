@@ -7,6 +7,9 @@ import { articlesApi } from '@/api/articles';
 import { socialApi } from '@/api/social';
 import { API_CONFIG } from '@/config/api-config';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import CommentSection from '@/components/CommentSection';
+import RecommendList from '@/components/RecommendList';
+import FollowButton from '@/components/FollowButton';
 import type { ArticleDetailResponse } from '@/types/article';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
 
@@ -25,9 +28,15 @@ export default function ArticleDetailPage() {
   const [favorited, setFavorited] = useState(false);
   const [favoriteCount, setFavoriteCount] = useState(0);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<number | undefined>();
   const fetchedRef = useRef(false);
 
-  useEffect(() => { queueMicrotask(() => setCurrentUser(getUserInfo()?.user || '')); }, []);
+  useEffect(() => {
+    const info = getUserInfo();
+    setCurrentUser(info?.user || '');
+    setCurrentUserId(info?.userId);
+  }, []);
   useEffect(() => {
     if (!articleId) return;
     if (fetchedRef.current) return;
@@ -75,14 +84,15 @@ export default function ArticleDetailPage() {
     setLikeLoading(true);
     const prevLiked = liked;
     const prevCount = likeCount;
+    const nextCount = liked ? likeCount - 1 : likeCount + 1;
     setLiked(!liked);
-    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
+    setLikeCount(nextCount);
     try {
       const resp = liked
         ? await socialApi.unlike(articleId)
         : await socialApi.like(articleId);
       setLiked(resp.data.liked);
-      setLikeCount(resp.data.likeCount);
+      setLikeCount(Math.max(resp.data.likeCount, nextCount));
     } catch {
       setLiked(prevLiked);
       setLikeCount(prevCount);
@@ -96,14 +106,15 @@ export default function ArticleDetailPage() {
     setFavoriteLoading(true);
     const prevFav = favorited;
     const prevCount = favoriteCount;
+    const nextCount = favorited ? favoriteCount - 1 : favoriteCount + 1;
     setFavorited(!favorited);
-    setFavoriteCount(favorited ? favoriteCount - 1 : favoriteCount + 1);
+    setFavoriteCount(nextCount);
     try {
       const resp = favorited
         ? await socialApi.unfavorite(articleId)
         : await socialApi.favorite(articleId);
       setFavorited(resp.data.favorited);
-      setFavoriteCount(resp.data.favoriteCount);
+      setFavoriteCount(Math.max(resp.data.favoriteCount, nextCount));
     } catch {
       setFavorited(prevFav);
       setFavoriteCount(prevCount);
@@ -161,9 +172,18 @@ export default function ArticleDetailPage() {
           )}
           <h1 className="workspace-editorial text-[42px] leading-[1.05] text-[#22252a] md:text-[56px]">{article.title}</h1>
 
-          <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-[#858c96]">
-            <span>发布于 {article.publishTime}</span>
-            <span>{article.viewCount} 阅读</span>
+          <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-[#e6e2db] flex items-center justify-center text-[11px] font-medium text-slate-600 shrink-0">
+                {(article.authorName || article.authorId || '?').toString()[0]}
+              </div>
+              <span className="text-[#22252a] font-medium">{article.authorName || `用户 #${article.authorId}`}</span>
+              {article.authorId && article.authorId !== currentUserId && (
+                <FollowButton key={article.authorId} targetUserId={article.authorId} />
+              )}
+            </div>
+            <span className="text-[#858c96]">发布于 {article.publishTime}</span>
+            <span className="text-[#858c96]">{article.viewCount} 阅读</span>
             {article.tags?.map(tag => (
               <span key={tag} className="workspace-status">{tag}</span>
             ))}
@@ -197,7 +217,13 @@ export default function ArticleDetailPage() {
             >
               {favoriteLoading ? '...' : favorited ? `已收藏 ${favoriteCount}` : `收藏 ${favoriteCount}`}
             </button>
+            {commentCount > 0 && (
+              <span className="text-sm text-slate-400 ml-2">{commentCount} 条评论</span>
+            )}
           </div>
+
+          <CommentSection articleId={articleId} currentUserId={currentUserId} />
+          <RecommendList />
         </main>
       </div>
     </div>

@@ -6,15 +6,19 @@ import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { draftsApi } from '@/api/drafts';
 import { articlesApi } from '@/api/articles';
 import { socialApi } from '@/api/social';
+import { followApi } from '@/api/follow';
+import { userApi } from '@/api/user';
 import type { DraftPageItem } from '@/types/draft';
 import type { ArticlePageItem } from '@/types/article';
+import type { UserInfo } from '@/types/user';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
 import Pagination from '@/components/Pagination';
+import FollowButton from '@/components/FollowButton';
 
 export default function MePage() {
   const router = useRouter();
   const [user, setUser] = useState('');
-  const [activeTab, setActiveTab] = useState<'drafts' | 'articles' | 'likes' | 'favorites'>('drafts');
+  const [activeTab, setActiveTab] = useState<'drafts' | 'articles' | 'likes' | 'favorites' | 'following' | 'followers'>('drafts');
   const [drafts, setDrafts] = useState<DraftPageItem[]>([]);
   const [articles, setArticles] = useState<ArticlePageItem[]>([]);
   const [likedArticles, setLikedArticles] = useState<ArticlePageItem[]>([]);
@@ -30,6 +34,11 @@ export default function MePage() {
   const [likePageSize, setLikePageSize] = useState(10);
   const [favPageNo, setFavPageNo] = useState(1);
   const [favPageSize, setFavPageSize] = useState(10);
+  const [followingIds, setFollowingIds] = useState<number[]>([]);
+  const [followerIds, setFollowerIds] = useState<number[]>([]);
+  const [followTotal, setFollowTotal] = useState(0);
+  const [followerTotal, setFollowerTotal] = useState(0);
+  const [userInfos, setUserInfos] = useState<Record<number, UserInfo>>({});
   const fetchedRef = useRef(false);
 
   useEffect(() => {
@@ -62,6 +71,35 @@ export default function MePage() {
       setFavoritedArticles(favResp.data ?? []);
       setDraftTotal(dResp.data.total ?? 0);
       setArticleTotal(aResp.data.total ?? 0);
+      try {
+        if (info?.userId) {
+          const [followingResp, followerResp] = await Promise.all([
+            followApi.getFollowing(info.userId),
+            followApi.getFollowers(info.userId),
+          ]);
+          const followingList = followingResp.data?.list ?? [];
+          const followerList = followerResp.data?.list ?? [];
+          setFollowingIds(followingList);
+          setFollowTotal(followingResp.data?.total ?? 0);
+          setFollowerIds(followerList);
+          setFollowerTotal(followerResp.data?.total ?? 0);
+
+          // Fetch user infos for all follow-related user IDs
+          const allIds = [...new Set([...followingList, ...followerList])];
+          if (allIds.length > 0) {
+            const results = await Promise.allSettled(
+              allIds.map((id) => userApi.getUserById(id)),
+            );
+            const infos: Record<number, UserInfo> = {};
+            results.forEach((r, i) => {
+              if (r.status === 'fulfilled' && r.value?.data) {
+                infos[allIds[i]] = r.value.data;
+              }
+            });
+            setUserInfos((prev) => ({ ...prev, ...infos }));
+          }
+        }
+      } catch { /* ignore */ }
     } catch { /* ignore */ }
     setLoading(false);
   };
@@ -83,7 +121,7 @@ export default function MePage() {
 
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto max-w-[1280px] overflow-hidden bg-[#fcfbf8]">
+      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1280px] flex-col overflow-hidden">
         <WorkspaceHeader activePath="/me" userName={user} onLogout={handleLogout} />
         <header className="flex items-center justify-between border-b border-[#e6e2db] px-5 py-4 md:px-7">
           <div>
@@ -109,12 +147,14 @@ export default function MePage() {
           </div>
 
           <div className="mt-8 flex gap-6">
-            <aside className="w-[180px] shrink-0 space-y-1">
+            <aside className="w-[220px] shrink-0 space-y-1">
               {([
                 { key: 'drafts' as const, label: '我的草稿', count: drafts.length },
                 { key: 'articles' as const, label: '我的文章', count: articles.length },
                 { key: 'likes' as const, label: '我的喜欢', count: likedArticles.length },
                 { key: 'favorites' as const, label: '我的收藏', count: favoritedArticles.length },
+                { key: 'following' as const, label: '我的关注', count: followTotal },
+                { key: 'followers' as const, label: '我的粉丝', count: followerTotal },
               ]).map((tab) => (
                 <button
                   key={tab.key}
@@ -228,6 +268,46 @@ export default function MePage() {
                       </div>
                       <Pagination pageNo={favPageNo} pageSize={favPageSize} total={favoritedArticles.length} onChange={(pn, ps) => { setFavPageNo(pn); setFavPageSize(ps); }} />
                     </>
+                  )}
+                </section>
+              )}
+
+              {activeTab === 'following' && (
+                <section>
+                  <h3 className="mb-4 text-xl font-semibold text-[#22252a]">我的关注 ({followTotal})</h3>
+                  {loading ? (
+                    <p className="text-sm text-[#858c96]">加载中...</p>
+                  ) : followingIds.length === 0 ? (
+                    <p className="text-sm text-[#858c96]">还没有关注任何人</p>
+                  ) : (
+                    <div className="grid gap-3">
+                      {followingIds.map((uid) => (
+                        <div key={uid} className="workspace-panel rounded-[14px] p-4 text-left flex items-center justify-between">
+                          <span className="text-sm font-medium text-[#22252a]">{userInfos[uid]?.username || `用户 #${uid}`}</span>
+                          <FollowButton targetUserId={uid} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              )}
+
+              {activeTab === 'followers' && (
+                <section>
+                  <h3 className="mb-4 text-xl font-semibold text-[#22252a]">我的粉丝 ({followerTotal})</h3>
+                  {loading ? (
+                    <p className="text-sm text-[#858c96]">加载中...</p>
+                  ) : followerIds.length === 0 ? (
+                    <p className="text-sm text-[#858c96]">还没有粉丝</p>
+                  ) : (
+                    <div className="grid gap-3">
+                      {followerIds.map((uid) => (
+                        <div key={uid} className="workspace-panel rounded-[14px] p-4 text-left flex items-center justify-between">
+                          <span className="text-sm font-medium text-[#22252a]">{userInfos[uid]?.username || `用户 #${uid}`}</span>
+                          <FollowButton targetUserId={uid} />
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </section>
               )}

@@ -172,13 +172,8 @@ export default function ArticlesPage() {
                 )}
 
                 <section className="mt-6">
-                  <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="mb-4">
                     <h3 className="text-xl font-semibold text-[#22252a]">精选文章</h3>
-                    <div className="flex gap-2">
-                      {['最新', '发布', '笔记'].map((item) => (
-                        <span key={item} className="workspace-toolbar-chip">{item}</span>
-                      ))}
-                    </div>
                   </div>
 
                   <div className="grid gap-4">

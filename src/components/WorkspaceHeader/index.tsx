@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/Theme/ThemeToggle";
+import NotificationBell from "@/components/NotificationBell";
 
-type IconName = "home" | "draft" | "article" | "flow" | "slides" | "user";
+type IconName = "home" | "draft" | "article" | "flow" | "slides" | "dashboard" | "user";
 
 const NAV_ITEMS: Array<{ label: string; path: string; icon: IconName }> = [
   { label: "首页", path: "/", icon: "home" },
@@ -11,6 +12,7 @@ const NAV_ITEMS: Array<{ label: string; path: string; icon: IconName }> = [
   { label: "文章", path: "/articles", icon: "article" },
   { label: "流程图", path: "/drawio", icon: "flow" },
   { label: "演示", path: "/ppt", icon: "slides" },
+  { label: "数据", path: "/dashboard", icon: "dashboard" },
   { label: "我的", path: "/me", icon: "user" },
 ];
 
@@ -29,6 +31,9 @@ function NavIcon({ name }: { name: IconName }) {
   }
   if (name === "slides") {
     return <><rect x="3" y="4" width="18" height="13" rx="2" /><path d="M8 21l4-4 4 4M8 8h8M8 12h5" /></>;
+  }
+  if (name === "dashboard") {
+    return <><rect x="3" y="12" width="18" height="9" rx="1" /><path d="M3 8l4-5 4 3 4-4 4 3v1H3V8Z" /></>;
   }
   return <><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></>;
 }
@@ -87,6 +92,7 @@ export default function WorkspaceHeader({
       </nav>
 
       <div className="workspace-top-actions">
+        <NotificationBell />
         {userName && <span className="workspace-top-user" suppressHydrationWarning>{userName}</span>}
         <ThemeToggle compact />
         {onLogout && (

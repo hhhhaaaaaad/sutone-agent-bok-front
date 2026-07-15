@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUserInfo } from "@/utils/cookie";
+import { getUserInfo, clearUserInfo } from "@/utils/cookie";
 import {
   agentApi,
   StatusChunk,
@@ -1638,6 +1638,11 @@ export default function PptPage() {
         createNewSession();
       }
     }
+  };
+
+  const handleLogout = () => {
+    clearUserInfo();
+    router.push("/login");
   };
 
   const handleAgentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -3440,7 +3445,7 @@ ${content}`;
   return (
     <div className="h-screen theme-bg-gradient p-5 overflow-hidden">
       <div className="workspace-dark-shell flex h-full max-w-[1280px] mx-auto w-full flex-col overflow-hidden">
-        <WorkspaceHeader activePath="/ppt" userName={currentUser} />
+        <WorkspaceHeader activePath="/ppt" userName={currentUser} onLogout={handleLogout} />
       {/* ===== Header Bar ===== */}
       <header className="tool-header workspace-dark-header flex h-16 items-center justify-between border-b px-4 md:px-6 shrink-0 z-40">
         <div className="flex items-center gap-3">
@@ -3530,7 +3535,7 @@ ${content}`;
       {/* ===== Main 3-Column Layout ===== */}
       <div className="flex flex-1 w-full overflow-hidden">
         {/* ===== Left: Slide Thumbnails / Template Library ===== */}
-        <aside className="w-[180px] bg-white border-r border-slate-100/60 flex flex-col shrink-0 z-30">
+        <aside className="w-[220px] workspace-sidebar-soft flex flex-col shrink-0 z-30">
           {/* Tab Switcher: Templates / Slides */}
           <div className="px-2 pt-2 pb-1 border-b border-slate-100 flex gap-1">
             <button

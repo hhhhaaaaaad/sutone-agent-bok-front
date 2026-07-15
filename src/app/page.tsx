@@ -123,7 +123,7 @@ export default function Lobby() {
     <div className="min-h-screen theme-bg-gradient p-5">
       <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1280px] flex-col overflow-hidden">
         <WorkspaceHeader activePath="/" userName={currentUser} onLogout={handleLogout} />
-        <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[224px_1fr]">
+        <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[220px_1fr]">
         <aside className="workspace-sidebar flex flex-col px-5 py-5">
           <div className="workspace-panel rounded-[12px] p-4">
             <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">

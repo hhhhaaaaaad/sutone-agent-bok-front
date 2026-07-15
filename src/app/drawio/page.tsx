@@ -3,7 +3,7 @@
 import { DrawIoEmbed, DrawIoEmbedRef } from "react-drawio";
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUserInfo } from "@/utils/cookie";
+import { getUserInfo, clearUserInfo } from "@/utils/cookie";
 import {
   agentApi,
   StreamEvent,
@@ -696,6 +696,11 @@ export default function Home() {
     };
     loadAgents();
   }, [router]);
+
+  const handleLogout = () => {
+    clearUserInfo();
+    router.push("/login");
+  };
 
   const handleAgentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newAgentId = e.target.value;
@@ -1621,7 +1626,7 @@ export default function Home() {
   return (
     <div className="h-screen theme-bg-gradient p-5 overflow-hidden">
       <div className="workspace-dark-shell flex h-full max-w-[1280px] mx-auto w-full flex-col overflow-hidden">
-        <WorkspaceHeader activePath="/drawio" userName={currentUser} />
+        <WorkspaceHeader activePath="/drawio" userName={currentUser} onLogout={handleLogout} />
       {/* Header - Minimal & Clean */}
       <div className="tool-header workspace-dark-header relative z-40 flex h-16 items-center justify-between border-b px-4 md:px-6">
         <div className="flex items-center gap-3">
@@ -1677,7 +1682,7 @@ export default function Home() {
       {/* Main Layout */}
       <div className="flex flex-1 w-full overflow-hidden relative">
         {/* Sessions Sidebar */}
-        <div className="hidden lg:flex w-64 flex-col border-r border-[#e6e2db] bg-[#f1ece6] text-slate-600 shrink-0 z-30">
+        <div className="hidden lg:flex w-[220px] flex-col border-r border-[#e6e2db] bg-[#f1ece6] text-slate-600 shrink-0 z-30">
           <div className="flex h-14 items-center justify-between border-b border-[#e6e2db] px-4 shrink-0">
             <span className="font-semibold text-slate-800 flex items-center gap-2">
               <Icons.MessageSquare className="w-4 h-4 text-indigo-600" />

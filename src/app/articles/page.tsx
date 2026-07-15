@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { articlesApi } from '@/api/articles';
+import { API_CONFIG } from '@/config/api-config';
 import type { ArticlePageItem, LeaderboardItem } from '@/types/article';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
 import Pagination from '@/components/Pagination';
@@ -190,8 +191,19 @@ export default function ArticlesPage() {
                           onClick={() => router.push(`/articles/${article.articleId}`)}
                           className="workspace-panel workspace-panel-hover grid w-full grid-cols-[80px_minmax(0,1fr)] gap-4 rounded-[16px] p-5 text-left"
                         >
-                          <div className="workspace-subpanel flex items-center justify-center rounded-[10px] text-xs text-[#b5aea4]">
-                            封面
+                          <div className="workspace-subpanel flex h-[80px] items-center justify-center rounded-[10px] overflow-hidden">
+                            {article.coverUrl ? (
+                              <img
+                                src={article.coverUrl.startsWith('http') ? article.coverUrl : API_CONFIG.UPLOAD_BASE + article.coverUrl}
+                                alt={article.title}
+                                className="h-full w-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                  (e.target as HTMLImageElement).parentElement!.querySelector('.cover-fallback')!.classList.remove('hidden');
+                                }}
+                              />
+                            ) : null}
+                            <span className={`text-xs text-[#b5aea4] cover-fallback ${article.coverUrl ? 'hidden' : ''}`}>封面</span>
                           </div>
                           <div>
                             <h4 className="text-[22px] font-medium tracking-tight text-[#22252a]">{article.title}</h4>

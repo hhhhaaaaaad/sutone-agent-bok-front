@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { articlesApi } from '@/api/articles';
 import { socialApi } from '@/api/social';
+import { API_CONFIG } from '@/config/api-config';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
 import type { ArticleDetailResponse } from '@/types/article';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
@@ -149,6 +150,15 @@ export default function ArticleDetailPage() {
         </header>
 
         <main className="px-5 py-8 md:px-10 md:py-10">
+          {article.coverUrl && (
+            <div className="mb-8 overflow-hidden rounded-[16px] border border-[#e6e2db]">
+              <img
+                src={article.coverUrl.startsWith('http') ? article.coverUrl : API_CONFIG.UPLOAD_BASE + article.coverUrl}
+                alt={article.title}
+                className="w-full object-cover max-h-[420px]"
+              />
+            </div>
+          )}
           <h1 className="workspace-editorial text-[42px] leading-[1.05] text-[#22252a] md:text-[56px]">{article.title}</h1>
 
           <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-[#858c96]">

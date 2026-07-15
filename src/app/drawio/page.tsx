@@ -3,7 +3,7 @@
 import { DrawIoEmbed, DrawIoEmbedRef } from "react-drawio";
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUserInfo, clearUserInfo } from "@/utils/cookie";
+import { getUserInfo } from "@/utils/cookie";
 import {
   agentApi,
   StreamEvent,
@@ -696,11 +696,6 @@ export default function Home() {
     };
     loadAgents();
   }, [router]);
-
-  const handleLogout = () => {
-    clearUserInfo();
-    router.push("/login");
-  };
 
   const handleAgentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newAgentId = e.target.value;
@@ -1625,33 +1620,16 @@ export default function Home() {
 
   return (
     <div className="h-screen theme-bg-gradient p-5 overflow-hidden">
-      <div className="workspace-dark-shell flex h-full max-w-[1280px] mx-auto w-full flex-col overflow-hidden font-sans">
-        <WorkspaceHeader activePath="/drawio" userName={currentUser} onLogout={handleLogout} />
+      <div className="workspace-dark-shell flex h-full max-w-[1280px] mx-auto w-full flex-col overflow-hidden">
+        <WorkspaceHeader activePath="/drawio" userName={currentUser} />
       {/* Header - Minimal & Clean */}
       <div className="tool-header workspace-dark-header relative z-40 flex h-16 items-center justify-between border-b px-4 md:px-6">
         <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-br from-cyan-400 via-indigo-500 to-emerald-500 p-1.5 rounded-xl shadow-[0_10px_24px_rgba(79,70,229,0.22)]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-          </div>
           <div>
-            <h1 className="text-lg font-bold text-slate-100 tracking-tight">
-              AI Bok 创作社区Sutmuch
+            <h1 className="text-lg font-bold text-[#22252a]">
+              Draw.io 绘图工作台
             </h1>
-            <p className="text-[11px] text-slate-400">Sutmuch flowchart workspace</p>
+            <p className="text-[11px] text-[#22252a]"> AI使绘图更简单！</p>
           </div>
         </div>
 
@@ -1673,42 +1651,8 @@ export default function Home() {
             >
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            返回工作台
+            返回首页
           </button>
-
-          <a
-            href="https://sukesutone.cn/md/project/ai-agent-scaffold/ai-agent-scaffold.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="workspace-secondary-btn flex items-center gap-1.5 px-3 py-2 text-xs font-medium"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-            </svg>
-            社区指南
-          </a>
-
-          <div className="h-6 w-px bg-slate-700 mx-1"></div>
-
-          <div className="workspace-subpanel flex items-center gap-2 rounded-full px-3 py-1.5">
-            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
-            <span className="text-xs font-semibold text-slate-300">
-              {currentUser || "访客"}
-            </span>
-          </div>
-
-          <div className="h-6 w-px bg-slate-700 mx-1"></div>
 
           <button
             onClick={exportDiagram}
@@ -1716,14 +1660,6 @@ export default function Home() {
           >
             <Icons.Download className="w-4 h-4" />
             导出图稿
-          </button>
-
-          <button
-            onClick={handleLogout}
-            className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-            title="退出登录"
-          >
-            <Icons.Logout />
           </button>
 
           {!isChatOpen && (

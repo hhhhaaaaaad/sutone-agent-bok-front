@@ -156,16 +156,6 @@ export default function Lobby() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <input
-                className="workspace-input w-[280px] max-w-full text-sm"
-                placeholder="搜索草稿、工具或资料库"
-              />
-              <button
-                onClick={handleNewDraft}
-                className="workspace-primary-btn h-[42px] px-5 text-sm font-medium"
-              >
-                新建草稿
-              </button>
             </div>
           </header>
 

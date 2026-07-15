@@ -575,6 +575,9 @@ html[data-theme="dark"] .theme-bg-yellow {
 
 .workspace-dark-shell {
   background: var(--bg0);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
 }
 
 .workspace-dark-header {

@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getUserInfo, clearUserInfo } from "@/utils/cookie";
+import { getUserInfo } from "@/utils/cookie";
 import {
   agentApi,
   StatusChunk,
@@ -53,7 +53,7 @@ interface PptSlideElement {
   radius?: number;
   shadow?: boolean;
   opacity?: number;
-  gradient?: string; // e.g. 'primary' 鈫?resolved to theme gradient
+    gradient?: string; // e.g. 'primary' → resolved to theme gradient
   // Line/divider options
   thickness?: number; // line thickness in inches (for divider)
   // Bullet number
@@ -442,7 +442,7 @@ const DEFAULT_THEME = THEMES[0];
 // Shape elements are now fully skipped (theme handles all decorations)
 
 // Generate PPTX from PptData with professional theme
-// Smart layout inference 鈥?ensure visual diversity even when AI doesn't specify layout
+// Smart layout inference — ensure visual diversity even when AI doesn't specify layout
 const inferLayout = (
   slideData: PptSlide,
   slideIdx: number,
@@ -1190,7 +1190,7 @@ export default function PptPage() {
       id: "1",
       role: "agent",
       content:
-        "浣犲ソ锛佹垜鏄綘鐨勬紨绀虹鏅鸿兘鍔╂墜銆傝鍛婅瘔鎴戜綘鎯冲埗浣滀粈涔堜富棰樼殑婕旂ず绋匡紵",
+        "你好！我是你的演示稿智能助手。请告诉我你想制作什么主题的演示稿？",
       timestamp: Date.now(),
     },
   ]);
@@ -1202,6 +1202,20 @@ export default function PptPage() {
   const [streamPhase, setStreamPhase] = useState<string>("");
   const [streamProgress, setStreamProgress] = useState<string>("");
   const streamAbortRef = useRef<AbortController | null>(null);
+  const streamPhaseRef = useRef("");
+  const streamProgressRef = useRef("");
+
+  const setStreamPhaseSafely = (nextPhase: string) => {
+    if (streamPhaseRef.current === nextPhase) return;
+    streamPhaseRef.current = nextPhase;
+    setStreamPhase(nextPhase);
+  };
+
+  const setStreamProgressSafely = (nextProgress: string) => {
+    if (streamProgressRef.current === nextProgress) return;
+    streamProgressRef.current = nextProgress;
+    setStreamProgress(nextProgress);
+  };
 
   // Agent State
   const [agents, setAgents] = useState<AiAgentConfigResponseDTO[]>([]);
@@ -1538,7 +1552,7 @@ export default function PptPage() {
           id: Date.now().toString(),
           role: "agent",
           content:
-            "浣犲ソ锛佹垜鏄綘鐨勬紨绀虹鏅鸿兘鍔╂墜銆傝鍛婅瘔鎴戜綘鎯冲埗浣滀粈涔堜富棰樼殑婕旂ず绋匡紵",
+            "你好！我是你的演示稿智能助手。请告诉我你想制作什么主题的演示稿？",
           timestamp: Date.now(),
         },
       ],
@@ -1626,11 +1640,6 @@ export default function PptPage() {
     }
   };
 
-  const handleLogout = () => {
-    clearUserInfo();
-    router.push("/login");
-  };
-
   const handleAgentChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newAgentId = e.target.value;
     setSelectedAgentId(newAgentId);
@@ -1644,8 +1653,8 @@ export default function PptPage() {
       streamAbortRef.current = null;
     }
     setIsSending(false);
-    setStreamPhase("");
-    setStreamProgress("");
+    setStreamPhaseSafely("");
+    setStreamProgressSafely("");
     setMessages((prev) => [
       ...prev,
       {
@@ -1678,17 +1687,17 @@ export default function PptPage() {
       TONE_OPTIONS.find((o) => o.id === selectedTone)?.label || selectedTone;
     const sceneLabel =
       SCENE_OPTIONS.find((o) => o.id === selectedScene)?.label || selectedScene;
-    styleHints.push(`椋庢牸=${styleLabel}`);
-    styleHints.push(`缁撴瀯=${structureLabel}`);
-    styleHints.push(`鑹茶皟=${toneLabel}`);
-    styleHints.push(`鍦烘櫙=${sceneLabel}`);
+    styleHints.push(`风格=${styleLabel}`);
+    styleHints.push(`结构=${structureLabel}`);
+    styleHints.push(`色调=${toneLabel}`);
+    styleHints.push(`场景=${sceneLabel}`);
     if (!selectedLayouts.includes("auto") && selectedLayouts.length > 0) {
       const layoutLabels = selectedLayouts
         .map((id) => LAYOUT_OPTIONS.find((o) => o.id === id)?.label || id)
         .join(" / ");
-      styleHints.push(`甯冨眬=${layoutLabels}`);
+      styleHints.push(`布局=${layoutLabels}`);
     }
-    const enrichedContent = `[璁捐鎸囦护: ${styleHints.join(", ")}]
+    const enrichedContent = `[设计指令: ${styleHints.join(", ")}]
 
 ${content}`;
 
@@ -1757,8 +1766,8 @@ ${content}`;
       let accumulatedContent = "";
       const accumulatedSteps: MessageStep[] = [];
 
-      setStreamPhase("analyzing");
-      setStreamProgress("姝ｅ湪鍒嗘瀽闇€姹?..");
+      setStreamPhaseSafely("analyzing");
+      setStreamProgressSafely("正在分析需求..");
 
       const updateStep = (
         phaseStr: string,
@@ -1810,15 +1819,15 @@ ${content}`;
 
           const phaseLabel: Record<string, string> = {
             analyzing: "Analyzing request",
-            drawing: "馃帹 鐢熸垚鍐呭",
-            generating: "馃帹 鐢熸垚鍐呭",
+            drawing: "生成内",
+            generating: "生成内",
             reviewing: "Reviewing output",
-            thinking: "馃 鎬濊€冧腑",
+            thinking: "思考中",
           };
           const currentPhaseLabel = phaseLabel[phase] || phaseLabel.thinking;
 
           if (phase !== "done" && phase !== "error") {
-            setStreamPhase(phase);
+            setStreamPhaseSafely(phase);
             streamPhaseStr = phase;
             updateStep(phase, currentPhaseLabel, "");
           }
@@ -1838,7 +1847,7 @@ ${content}`;
               setPptData({ title: pptTitle || "PPT", slides: newSlides });
               renderedSlideCount = newSlides.length;
             }
-            setStreamProgress(`宸叉覆鏌?${renderedSlideCount} 椤?..`);
+            setStreamProgressSafely(`已渲染 ${renderedSlideCount} 页`);
           } else if (chunk.type === "status") {
             const statusContent = (chunk as StatusChunk).content || "";
             accumulatedText += statusContent;
@@ -1858,7 +1867,7 @@ ${content}`;
                 accumulatedReasoning += statusContent + "\n";
               }
               updateStep(phase, currentPhaseLabel, statusContent);
-              setStreamProgress(text.substring(0, 50) + "...");
+              setStreamProgressSafely(text.substring(0, 50) + "...");
               setMessages((prev) =>
                 prev.map((m) =>
                   m.id === agentMsgId
@@ -1947,7 +1956,7 @@ ${content}`;
           } else if (chunk.type === "error") {
             accumulatedContent +=
               (accumulatedContent ? "\n\n" : "") +
-              `鉂?${(chunk as ErrorChunk).content || "鐢熸垚澶辫触"}`;
+              `${(chunk as ErrorChunk).content || "生成失败"}`;
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === agentMsgId
@@ -1960,7 +1969,7 @@ ${content}`;
               ),
             );
           } else if (chunk.type === "done" || chunk.type === "drawio_done") {
-            setStreamPhase("done");
+            setStreamPhaseSafely("done");
           }
         },
         (error: Error) => {
@@ -1972,7 +1981,7 @@ ${content}`;
           ) {
             accumulatedContent +=
               (accumulatedContent ? "\n\n" : "") +
-              `鉂?杩炴帴寮傚父: ${error.message}`;
+              `连接异常: ${error.message}`;
             setMessages((prev) =>
               prev.map((m) =>
                 m.id === agentMsgId
@@ -1997,13 +2006,13 @@ ${content}`;
             );
           }
           setIsSending(false);
-          setStreamPhase("");
-          setStreamProgress("");
+          setStreamPhaseSafely("");
+          setStreamProgressSafely("");
         },
         () => {
           setIsSending(false);
-          setStreamPhase("");
-          setStreamProgress("");
+          setStreamPhaseSafely("");
+          setStreamProgressSafely("");
           accumulatedSteps.forEach((s) => {
             s.status = "done";
           });
@@ -2153,8 +2162,8 @@ ${content}`;
         },
       ]);
       setIsSending(false);
-      setStreamPhase("");
-      setStreamProgress("");
+      setStreamPhaseSafely("");
+      setStreamProgressSafely("");
     }
   };
   const handleDownloadPptx = () => {
@@ -2188,7 +2197,7 @@ ${content}`;
         id: Date.now().toString(),
         role: "agent",
         content:
-          "浣犲ソ锛佹垜鏄綘鐨勬紨绀虹鏅鸿兘鍔╂墜銆傝鍛婅瘔鎴戜綘鎯冲埗浣滀粈涔堜富棰樼殑婕旂ず绋匡紵",
+          "你好！我是你的演示稿智能助手。请告诉我你想制作什么主题的演示稿？",
         timestamp: Date.now(),
       };
       setSessionId(newBackendId);
@@ -2673,7 +2682,7 @@ ${content}`;
         className="w-full h-full relative bg-white"
         style={{ fontSize: "2px" }}
       >
-        {/* Theme decorations (mini) 鈥?layout-specific */}
+                {/* Theme decorations (mini) — layout-specific */}
         {renderMiniDecor(layout, slideIdx, t)}
         {/* Actual text content in thumbnail */}
         {slideData.elements
@@ -3085,7 +3094,7 @@ ${content}`;
     );
   };
 
-  // Render theme decorations for preview 鈥?layout-specific skeletons (ENHANCED)
+    // Render theme decorations for preview — layout-specific skeletons (ENHANCED)
   const renderThemeDecor = (slideData: PptSlide, slideIdx: number) => {
     const layout = inferLayout(
       slideData,
@@ -3105,7 +3114,7 @@ ${content}`;
     const primaryVertGrad = `linear-gradient(180deg, #${t.primary}, #${t.primaryMid})`;
 
     if (layout === "title_classic" || layout === "end_slide") {
-      // Cover / End Classic 鈥?gradient cover + soft accent
+            // Cover / End Classic — gradient cover + soft accent
       elements.push(
         renderDecorDiv(0, 0, 13.33, t.coverNavyHeight, t.primary, "t-top", {
           gradient: primaryGrad,
@@ -3135,7 +3144,7 @@ ${content}`;
         }),
       );
     } else if (layout === "title_center") {
-      // Cover Center 鈥?gradient bars + soft center circle
+            // Cover Center — gradient bars + soft center circle
       elements.push(
         renderDecorDiv(0, 0, 13.33, 0.25, t.primary, "t-top", {
           gradient: primaryGrad,
@@ -3160,7 +3169,7 @@ ${content}`;
         }),
       );
     } else if (layout === "title_split") {
-      // Cover Split 鈥?gradient left + subtle divider
+            // Cover Split — gradient left + subtle divider
       elements.push(
         renderDecorDiv(0, 0, 6.66, 7.5, t.primary, "t-left", {
           gradient: primaryVertGrad,
@@ -3180,7 +3189,7 @@ ${content}`;
         }),
       );
     } else if (layout === "card_3col") {
-      // 3-Column Cards 鈥?shadow cards with rounded top accent
+            // 3-Column Cards — shadow cards with rounded top accent
       elements.push(
         renderDecorDiv(0, 0, 13.33, 0.9, t.primary, "t-header", {
           gradient: primaryGrad,
@@ -3354,7 +3363,7 @@ ${content}`;
         }),
       );
     } else if (layout === "card_2col") {
-      // 2-Column Cards 鈥?shadow + rounded
+            // 2-Column Cards — shadow + rounded
       elements.push(
         renderDecorDiv(0, 0, 13.33, 0.9, t.primary, "t-header", {
           gradient: primaryGrad,
@@ -3391,7 +3400,7 @@ ${content}`;
         }),
       );
     } else if (layout === "content_top") {
-      // Content Top Bar 鈥?gradient header
+            // Content Top Bar — gradient header
       elements.push(
         renderDecorDiv(0, 0, 13.33, 1.2, t.primary, "t-header", {
           gradient: primaryGrad,
@@ -3429,19 +3438,17 @@ ${content}`;
   };
 
   return (
-    <div className="workspace-dark-shell flex h-screen w-full flex-col overflow-hidden font-sans">
-      <WorkspaceHeader activePath="/ppt" />
+    <div className="h-screen theme-bg-gradient p-5 overflow-hidden">
+      <div className="workspace-dark-shell flex h-full max-w-[1280px] mx-auto w-full flex-col overflow-hidden">
+        <WorkspaceHeader activePath="/ppt" userName={currentUser} />
       {/* ===== Header Bar ===== */}
       <header className="tool-header workspace-dark-header flex h-16 items-center justify-between border-b px-4 md:px-6 shrink-0 z-40">
         <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-br from-cyan-400 via-indigo-500 to-emerald-500 p-1.5 rounded-xl shadow-[0_10px_24px_rgba(79,70,229,0.22)]">
-            <Icons.FilePresentation className="text-white w-5 h-5" />
-          </div>
           <div>
-            <h1 className="text-lg font-bold text-slate-100 tracking-tight">
-              AI Bok 鍒涗綔绀惧尯Sutmuch
+            <h1 className="text-lg font-bold text-[#22252a]">
+              PPT 工作台
             </h1>
-            <p className="text-[11px] text-slate-400">Sutmuch 婕旂ず绋垮伐浣滃彴</p>
+            <p className="text-[11px] text-[#22252a]">高效制作，节省你的时间！</p>
           </div>
         </div>
 
@@ -3463,54 +3470,16 @@ ${content}`;
             >
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            杩斿洖宸ヤ綔鍙?
+            返回首页
           </button>
-
-          <a
-            href="https://sukesutone.cn/md/project/ai-agent-scaffold/ai-agent-scaffold.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="workspace-secondary-btn flex items-center gap-1.5 px-3 py-2 text-xs font-medium"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-            </svg>
-            绀惧尯鎸囧崡
-          </a>
-
-          <div className="h-6 w-px bg-slate-700 mx-1"></div>
-
-          <div className="workspace-subpanel flex items-center gap-2 rounded-full px-3 py-1.5">
-            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
-            <span className="text-xs font-semibold text-slate-300">
-              {currentUser || "璁垮"}
-            </span>
-          </div>
-
-          <div className="h-6 w-px bg-slate-700 mx-1"></div>
 
           <button
             onClick={handleDownloadPptx}
             disabled={!pptData}
-            className={`flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm font-medium transition-all shadow-sm active:scale-95 ${
-              pptData
-                ? "text-slate-300 hover:bg-slate-700 hover:text-white hover:border-slate-600"
-                : "text-slate-500 cursor-not-allowed opacity-50"
-            }`}
+            className="workspace-primary-btn flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Icons.Download className="w-4 h-4" />
-            涓嬭浇婕旂ず绋?
+            下载演示稿
           </button>
 
           {pptData && (
@@ -3534,35 +3503,23 @@ ${content}`;
                 <path d="M3 16v3a2 2 0 0 0 2 2h3"></path>
                 <path d="M16 21h3a2 2 0 0 0 2-2v-3"></path>
               </svg>
-              鍏ㄥ睆婕旂ず
+              全屏演示
             </button>
           )}
 
           <button
             onClick={() => setIsStylePanelOpen((prev) => !prev)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all shadow-sm active:scale-95 border ${
-              isStylePanelOpen
-                ? "bg-indigo-500/20 border-indigo-500/50 text-indigo-300"
-                : "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700 hover:text-white hover:border-slate-600"
-            }`}
-            title="椋庢牸璁剧疆"
+            className="workspace-primary-btn flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium"
+            title="风格设置"
           >
-            馃帥锔?
-          </button>
-
-          <button
-            onClick={handleLogout}
-            className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-            title="退出登录"
-          >
-            <Icons.Logout className="w-4 h-4" />
+            风格选择
           </button>
 
           {!isChatOpen && (
             <button
               onClick={() => setIsChatOpen(true)}
               className="p-1.5 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-md transition-colors"
-              title="鎵撳紑鍔╂墜"
+              title="打开助手"
             >
               <Icons.Chat className="w-4 h-4" />
             </button>
@@ -3580,20 +3537,20 @@ ${content}`;
               onClick={() => setLeftTab("templates")}
               className={`flex-1 text-[10px] font-medium py-1 rounded transition ${leftTab === "templates" ? "bg-indigo-50 text-indigo-600" : "text-slate-400 hover:bg-slate-50"}`}
             >
-              馃搵 妯℃澘
+              模板
             </button>
             <button
               onClick={() => setLeftTab("slides")}
               className={`flex-1 text-[10px] font-medium py-1 rounded transition ${leftTab === "slides" ? "bg-indigo-50 text-indigo-600" : "text-slate-400 hover:bg-slate-50"}`}
             >
-              馃柤锔?椤甸潰
+              页面
             </button>
           </div>
 
           {/* Theme Selector (always visible) */}
           <div className="px-3 pt-2 pb-2 border-b border-slate-100">
             <div className="text-[10px] text-slate-400 font-medium mb-1.5">
-              馃帹 涓婚
+              主题
             </div>
             <div className="flex flex-wrap gap-1.5">
               {THEMES.map((t) => (
@@ -3705,7 +3662,7 @@ ${content}`;
                 <Icons.FilePresentation className="w-8 h-8 mx-auto text-slate-200 mb-2" />
                 <p className="text-[11px] text-slate-400">暂无幻灯片</p>
                 <p className="text-[9px] text-slate-300 mt-1">
-                  鍦ㄥ彸渚ц緭鍏ラ渶姹傛垨閫夋嫨妯℃澘
+                  在右侧输入需求或选择模板
                 </p>
               </div>
             )}
@@ -3715,12 +3672,12 @@ ${content}`;
           <div className="border-t border-slate-100">
             <div className="h-9 px-3 flex items-center justify-between">
               <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
-                鍘嗗彶
+                历史
               </span>
               <button
                 onClick={handleNewChat}
                 className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition"
-                title="鏂板缓"
+                title="新建"
               >
                 <Icons.Plus className="w-3.5 h-3.5" />
               </button>
@@ -3783,10 +3740,10 @@ ${content}`;
                   <Icons.FilePresentation className="w-12 h-12 text-slate-300" />
                 </div>
                 <p className="text-base text-slate-500 mb-2 font-medium">
-                  鐢熸垚瀹屾垚鍚庡皢鍦ㄨ繖閲岄瑙堟紨绀虹
+                  生成完成后将在这里预览演示稿
                 </p>
                 <p className="text-sm text-slate-400">
-                  鍦ㄥ彸渚у璇濆尯鎻忚堪浣犵殑闇€姹?
+                  在右侧对话区描述你的需求
                 </p>
               </div>
             ) : (
@@ -3871,7 +3828,7 @@ ${content}`;
                 </svg>
               </button>
               <div className="h-4 w-px bg-slate-200 mx-2"></div>
-              <span className="text-xs text-slate-400">鈫?鈫?缈婚〉</span>
+              <span className="text-xs text-slate-400">↑↓ 翻页</span>
             </div>
           )}
         </main>
@@ -3888,7 +3845,7 @@ ${content}`;
           >
             <div className="h-12 px-4 border-b border-slate-100 flex items-center justify-between shrink-0">
               <span className="text-sm font-bold text-slate-800">
-                馃帥锔?椋庢牸璁剧疆
+                               风格设置
               </span>
               <button
                 onClick={() => setIsStylePanelOpen(false)}
@@ -3901,7 +3858,7 @@ ${content}`;
               {/* Style */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  椋庢牸
+                  风格
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {STYLE_OPTIONS.map((opt) => (
@@ -3922,7 +3879,7 @@ ${content}`;
               {/* Structure */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  缁撴瀯
+                  结构
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {STRUCTURE_OPTIONS.map((opt) => (
@@ -3943,7 +3900,7 @@ ${content}`;
               {/* Tone */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  鑹茶皟
+                  色调
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {TONE_OPTIONS.map((opt) => (
@@ -3964,7 +3921,7 @@ ${content}`;
               {/* Scene */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  鍦烘櫙
+                  场景
                 </div>
                 <div className="grid grid-cols-2 gap-1.5">
                   {SCENE_OPTIONS.map((opt) => (
@@ -3985,7 +3942,7 @@ ${content}`;
               {/* Layout Preference */}
               <div>
                 <div className="text-xs text-slate-400 font-medium mb-2">
-                  甯冨眬鍋忓ソ
+                  布局偏好
                 </div>
                 <div className="space-y-1">
                   {LAYOUT_OPTIONS.map((opt) => (
@@ -4042,7 +3999,7 @@ ${content}`;
                     style={{ backgroundImage: "none" }}
                   >
                     {agents.length === 0 && (
-                      <option value="">姝ｅ湪鍔犺浇鏅鸿兘浣?..</option>
+                      <option value="">正在加载智能体..</option>
                     )}
                     {agents.map((agent) => (
                       <option key={agent.agentId} value={agent.agentId}>
@@ -4053,7 +4010,7 @@ ${content}`;
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                     <span className="text-[10px] text-slate-500 font-medium leading-tight">
-                      鏅鸿兘鍔╂墜鍦ㄧ嚎
+                      智能助手在线
                     </span>
                   </div>
                 </div>
@@ -4117,10 +4074,10 @@ ${content}`;
                                 <summary className="inline-flex items-center gap-2 cursor-pointer text-xs text-slate-500 hover:text-slate-700 font-medium select-none bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm transition-all hover:border-slate-300">
                                   <Icons.Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                                   <span className="group-open/details:hidden">
-                                    灞曞紑鎵ц姝ラ
+                                    展开执步骤
                                   </span>
                                   <span className="hidden group-open/details:inline">
-                                    鏀惰捣鎵ц姝ラ
+                                    收起执步骤
                                   </span>
                                 </summary>
                                 <div className="mt-2 flex flex-col gap-2 p-3 bg-slate-50/50 border border-slate-200 rounded-xl shadow-sm text-sm text-slate-600 max-w-none overflow-x-auto">
@@ -4135,7 +4092,7 @@ ${content}`;
                                             <Icons.Loader className="w-3.5 h-3.5 text-indigo-500" />
                                           ) : (
                                             <span className="text-green-500">
-                                              鉁?
+                                              
                                             </span>
                                           )}
                                           <span>{step.label}</span>
@@ -4282,8 +4239,8 @@ ${content}`;
                   onKeyDown={handleKeyDown}
                   placeholder={
                     isSending
-                      ? "鏅鸿兘鍔╂墜姝ｅ湪鐢熸垚涓?.."
-                      : "杈撳叆鎮ㄧ殑闂锛屾弿杩版偍鐨勯渶姹?.."
+                      ? "智能助手正在生成中.."
+                      : "输入您的问题，描述您的需求.."
                   }
                   disabled={isSending}
                   className="flex-1 px-4 py-3 bg-transparent border-none focus:ring-0 text-[15px] text-slate-800 placeholder:text-slate-400 resize-none max-h-[300px] min-h-[80px] scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent disabled:opacity-50 disabled:cursor-not-allowed outline-none leading-relaxed"
@@ -4295,7 +4252,7 @@ ${content}`;
                     <button
                       onClick={handleStopStream}
                       className="p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center bg-red-100 text-red-600 hover:bg-red-200 shadow-sm"
-                      title="鍋滄鐢熸垚"
+                      title="停止生成"
                     >
                       <Icons.Square className="w-4 h-4" />
                     </button>
@@ -4320,7 +4277,7 @@ ${content}`;
                     onClick={handleRestartSession}
                     disabled={isSending}
                     className="p-2.5 rounded-lg bg-white text-slate-400 hover:bg-slate-50 hover:text-indigo-600 transition-all duration-200 border border-slate-200 hover:border-indigo-100 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="閲嶅惎瀵硅瘽"
+                    title="重启对话"
                   >
                     <Icons.Plus className="w-4 h-4" />
                   </button>
@@ -4349,7 +4306,7 @@ ${content}`;
                     }}
                     className="appearance-none bg-transparent border-none text-[11px] font-medium text-slate-600 focus:ring-0 py-1 pl-1 pr-5 cursor-pointer outline-none"
                   >
-                    <option value="default">榛樿妯″瀷</option>
+                    <option value="default">默认模型</option>
                     {customModels
                       .filter((m) => m.enabled)
                       .map((m) => (
@@ -4357,8 +4314,8 @@ ${content}`;
                           {m.name || m.model}
                         </option>
                       ))}
-                    <option disabled>鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€</option>
-                    <option value="add_new">+ 绠＄悊妯″瀷</option>
+                    <option disabled>──────────</option>
+                    <option value="add_new">+ 管理模型</option>
                   </select>
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-slate-400">
                     <svg
@@ -4372,14 +4329,14 @@ ${content}`;
                 </div>
                 <span className="text-[10px] text-slate-400 ml-auto hidden sm:inline">
                   <kbd className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500">
-                    鍥炶溅
+                    回车
                   </kbd>{" "}
-                  鍙戦€?
+                  发送
                 </span>
               </div>
               <div className="text-center mt-1.5">
                 <p className="text-[10px] text-slate-400">
-                  {isSending ? streamProgress || "鐢熸垚涓?.." : ""}
+                  {isSending ? streamProgress || "生成中.." : ""}
                 </p>
               </div>
             </div>
@@ -4395,7 +4352,7 @@ ${content}`;
                   <Icons.Sparkles className="w-4 h-4 text-indigo-500" />
                 </div>
                 <h2 className="text-base font-bold text-slate-800">
-                  鑷畾涔夋ā鍨嬮厤缃?
+                                    自定义模型配置
                 </h2>
               </div>
               <button
@@ -4417,7 +4374,7 @@ ${content}`;
                     onClick={handleAddNewModel}
                     className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm text-sm font-medium"
                   >
-                    <Icons.Plus className="w-4 h-4" /> 娣诲姞妯″瀷
+                    <Icons.Plus className="w-4 h-4" /> 添加模型
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -4473,9 +4430,9 @@ ${content}`;
                   ))}
                   {customModels.length === 0 && (
                     <div className="text-center text-xs text-slate-400 py-6">
-                      鏆傛棤鑷畾涔夋ā鍨?
+                                            暂无自定义模型
                       <br />
-                      鐐瑰嚮涓婃柟鎸夐挳娣诲姞
+                      点击上方按钮添加
                     </div>
                   )}
                 </div>
@@ -4487,7 +4444,7 @@ ${content}`;
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        灞曠ず鍚嶇О
+                        显示名称
                       </label>
                       <input
                         type="text"
@@ -4504,7 +4461,7 @@ ${content}`;
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        妯″瀷鍚嶇О
+                        模型名称
                       </label>
                       <input
                         type="text"
@@ -4521,7 +4478,7 @@ ${content}`;
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        鎺ュ彛鍦板潃
+                        接口地址
                       </label>
                       <input
                         type="text"
@@ -4538,7 +4495,7 @@ ${content}`;
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        鎺ュ彛瀵嗛挜
+                        接口密钥
                       </label>
                       <input
                         type="password"
@@ -4554,8 +4511,8 @@ ${content}`;
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-700 mb-1">
-                        瀵硅瘽鎺ュ彛璺緞锛堝彲閫夛級
+                      <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                        对话接口路径（可选）
                       </label>
                       <input
                         type="text"
@@ -4567,7 +4524,7 @@ ${content}`;
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="榛樿涓?v1/chat/completions"
+                        placeholder="默认为 v1/chat/completions"
                       />
                     </div>
                     <div className="pt-2 flex justify-end">
@@ -4575,16 +4532,14 @@ ${content}`;
                         onClick={handleSaveEditingModel}
                         className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-sm transition-all text-sm"
                       >
-                        淇濆瓨閰嶇疆
+                        保存配置
                       </button>
                     </div>
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center text-slate-400">
                     <Icons.Sparkles className="w-12 h-12 mb-3 opacity-20" />
-                    <p className="text-sm">
-                      閫夋嫨宸︿晶妯″瀷鍚庡彲缂栬緫锛屼篃鍙互鏂板缓妯″瀷
-                    </p>
+                    <p className="text-sm">选择左侧模型后可编辑，也可以新建模型</p>
                   </div>
                 )}
               </div>
@@ -4643,13 +4598,14 @@ ${content}`;
             </div>
           </div>
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/20 text-xs pointer-events-none">
-            ESC 閫€鍑?路 鈫?鈫?缈婚〉
+            ESC 退出 · ↑↓ 翻页
           </div>
           <div className="absolute bottom-4 right-6 text-white/20 text-xs font-mono pointer-events-none">
             {currentSlideIndex + 1} / {pptData.slides.length}
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

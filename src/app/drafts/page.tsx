@@ -33,6 +33,7 @@ export default function DraftsPage() {
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const [searchText, setSearchText] = useState('');
 
   const handleLogout = () => { clearUserInfo(); router.push('/login'); };
 
@@ -89,6 +90,10 @@ export default function DraftsPage() {
     if (activeFilter === 'ready') return draft.status === 1;
     if (activeFilter === 'archived') return draft.status === 2;
     return true;
+  }).filter((draft) => {
+    if (!searchText.trim()) return true;
+    const kw = searchText.trim().toLowerCase();
+    return (draft.title || '').toLowerCase().includes(kw);
   });
 
   const featured = filteredDrafts[0] ?? drafts[0];
@@ -138,7 +143,12 @@ export default function DraftsPage() {
               <h2 className="mt-1 text-[34px] font-semibold tracking-tight text-[#22252a]">继续整理你的写作项目</h2>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <input className="workspace-search w-[180px]" placeholder="按标题或状态搜索" />
+              <input
+                className="workspace-search w-[180px]"
+                placeholder="搜索草稿标题..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
               <button onClick={() => loadDrafts(pageNo, pageSize)} className="workspace-secondary-btn px-4 py-2.5 text-sm font-medium">
                 刷新
               </button>

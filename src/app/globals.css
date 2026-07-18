@@ -76,6 +76,11 @@ html[data-theme="dark"] {
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -575,6 +580,9 @@ html[data-theme="dark"] .theme-bg-yellow {
 
 .workspace-dark-shell {
   background: var(--bg0);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
 }
 
 .workspace-dark-header {

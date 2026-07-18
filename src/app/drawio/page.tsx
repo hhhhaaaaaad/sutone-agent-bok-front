@@ -330,7 +330,7 @@ export default function Home() {
     {
       id: "1",
       role: "agent",
-      content: "Hello! I'm your diagram assistant. Choose an agent to start.",
+      content: "Hello! 我是你的流程图助手。选择一个 Agent 开始吧。",
       timestamp: Date.now(),
     },
   ]);
@@ -474,8 +474,8 @@ export default function Home() {
           }
 
           const nextTitle =
-            session.title === "鏂板缓缁樺浘浼氳瘽"
-              ? firstUserMessage?.content.slice(0, 20) || "鏂板缓缁樺浘浼氳瘽"
+            session.title === "新建绘图会话"
+              ? firstUserMessage?.content.slice(0, 20) || "新建绘图会话"
               : session.title;
           const nextBackendSessionId = sessionId || "";
           const currentBackendSessionId = session.backendSessionId || "";
@@ -506,12 +506,12 @@ export default function Home() {
     const newSession: Session = {
       id: Date.now().toString(),
       backendSessionId: backendId,
-      title: "鏂板缓缁樺浘浼氳瘽",
+      title: "新建绘图会话",
       messages: [
         {
           id: Date.now().toString(),
           role: "agent",
-          content: "Hello! I'm your diagram assistant. Choose an agent to start.",
+          content: "Hello! 我是你的流程图助手。选择一个 Agent 开始吧。",
           timestamp: Date.now(),
         },
       ],
@@ -740,7 +740,7 @@ export default function Home() {
       const initialMsg: Message = {
         id: Date.now().toString(),
         role: "agent",
-        content: "Hello! I'm your diagram assistant. Choose an agent to start.",
+        content: "Hello! 我是你的流程图助手。选择一个 Agent 开始吧。",
         timestamp: Date.now(),
       };
 
@@ -857,7 +857,7 @@ export default function Home() {
 
       // 2. Send Message via Stream
       setStreamPhaseSafely("connecting");
-      setStreamProgressSafely("姝ｅ湪杩炴帴...");
+      setStreamProgressSafely("正在连接...");
 
       // Track incremental merge state
       let nodeCount = 0;
@@ -1086,7 +1086,7 @@ export default function Home() {
 
               hasIncrementalContent = true;
               nodeCount++;
-              setStreamProgressSafely(`娣诲姞鑺傜偣 #${nodeCount}: ${chunk.label}`);
+              setStreamProgressSafely(`添加节点 #${nodeCount}: ${chunk.label}`);
 
               // Sometimes AI returns empty XML or malformed tags, skip adding to prevent crashing draw.io
               if (
@@ -1161,7 +1161,7 @@ export default function Home() {
               hasIncrementalContent = true;
               receivedDrawioDone = true;
               finalXml = chunk.content;
-              setStreamProgressSafely("馃帹 缁樺埗瀹屾垚锛屾鍦ㄥ姞杞芥渶缁堝浘琛?..");
+              setStreamProgressSafely("绘制完成，正在加载最终图表..");
 
               // Only render the diagram and end the process if this is the final Reviewer output (or if there is no reviewer)
               // We identify the final output if phase is 'drawing' or 'done' (since we removed reviewer)
@@ -1624,33 +1624,17 @@ export default function Home() {
   ];
 
   return (
-    <div className="workspace-dark-shell flex h-screen w-full flex-col overflow-hidden font-sans">
-      <WorkspaceHeader activePath="/drawio" />
+    <div className="h-screen theme-bg-gradient p-5 overflow-hidden">
+      <div className="workspace-dark-shell flex h-full max-w-[1280px] mx-auto w-full flex-col overflow-hidden">
+        <WorkspaceHeader activePath="/drawio" userName={currentUser} onLogout={handleLogout} />
       {/* Header - Minimal & Clean */}
       <div className="tool-header workspace-dark-header relative z-40 flex h-16 items-center justify-between border-b px-4 md:px-6">
         <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-br from-cyan-400 via-indigo-500 to-emerald-500 p-1.5 rounded-xl shadow-[0_10px_24px_rgba(79,70,229,0.22)]">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <circle cx="8.5" cy="8.5" r="1.5"></circle>
-              <polyline points="21 15 16 10 5 21"></polyline>
-            </svg>
-          </div>
           <div>
-            <h1 className="text-lg font-bold text-slate-100 tracking-tight">
-              AI Bok 鍒涗綔绀惧尯Sutmuch
+            <h1 className="text-lg font-bold text-[#22252a]">
+              Draw.io 绘图工作台
             </h1>
-            <p className="text-[11px] text-slate-400">Sutmuch flowchart workspace</p>
+            <p className="text-[11px] text-[#22252a]"> AI使绘图更简单！</p>
           </div>
         </div>
 
@@ -1672,64 +1656,22 @@ export default function Home() {
             >
               <polyline points="15 18 9 12 15 6"></polyline>
             </svg>
-            杩斿洖宸ヤ綔鍙?
+            返回首页
           </button>
-
-          <a
-            href="https://sukesutone.cn/md/project/ai-agent-scaffold/ai-agent-scaffold.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="workspace-secondary-btn flex items-center gap-1.5 px-3 py-2 text-xs font-medium"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-            </svg>
-            绀惧尯鎸囧崡
-          </a>
-
-          <div className="h-6 w-px bg-slate-700 mx-1"></div>
-
-          <div className="workspace-subpanel flex items-center gap-2 rounded-full px-3 py-1.5">
-            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></div>
-            <span className="text-xs font-semibold text-slate-300">
-              {currentUser || "璁垮"}
-            </span>
-          </div>
-
-          <div className="h-6 w-px bg-slate-700 mx-1"></div>
 
           <button
             onClick={exportDiagram}
             className="workspace-secondary-btn flex items-center gap-2 px-4 py-2 text-sm font-medium"
           >
             <Icons.Download className="w-4 h-4" />
-            瀵煎嚭鍥剧
-          </button>
-
-          <button
-            onClick={handleLogout}
-            className="p-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-            title="退出登录"
-          >
-            <Icons.Logout />
+            导出图稿
           </button>
 
           {!isChatOpen && (
             <button
               onClick={() => setIsChatOpen(true)}
               className="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-100"
-              title="鎵撳紑鍔╂墜"
+              title="打开助手"
             >
               <Icons.Chat />
             </button>
@@ -1740,16 +1682,16 @@ export default function Home() {
       {/* Main Layout */}
       <div className="flex flex-1 w-full overflow-hidden relative">
         {/* Sessions Sidebar */}
-        <div className="hidden lg:flex w-64 flex-col border-r border-[#e6e2db] bg-[#f1ece6] text-slate-600 shrink-0 z-30">
+        <div className="hidden lg:flex w-[220px] flex-col border-r border-[#e6e2db] bg-[#f1ece6] text-slate-600 shrink-0 z-30">
           <div className="flex h-14 items-center justify-between border-b border-[#e6e2db] px-4 shrink-0">
             <span className="font-semibold text-slate-800 flex items-center gap-2">
               <Icons.MessageSquare className="w-4 h-4 text-indigo-600" />
-              缁樺浘璁板綍
+              绘图记录
             </span>
             <button
               onClick={handleNewChat}
               className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-all"
-              title="鏂板缓缁樺浘浼氳瘽"
+              title="新建绘图会话"
             >
               <Icons.Plus className="w-5 h-5" />
             </button>
@@ -1800,7 +1742,7 @@ export default function Home() {
                           : "hover:bg-red-50 text-slate-400 hover:text-red-500"
                       }
                     `}
-                    title="鍒犻櫎浼氳瘽"
+                    title="删除会话"
                   >
                     <Icons.Trash className="w-4 h-4" />
                   </button>
@@ -1808,7 +1750,7 @@ export default function Home() {
               ))}
             {sessions.length === 0 && (
               <div className="text-center py-10 text-xs text-slate-400">
-                鏆傛棤浼氳瘽璁板綍
+                暂无会话记录
               </div>
             )}
           </div>
@@ -1882,7 +1824,7 @@ export default function Home() {
                   style={{ backgroundImage: "none" }}
                 >
                   {agents.length === 0 && (
-                    <option value="">姝ｅ湪鍔犺浇鏅鸿兘浣?..</option>
+                    <option value="">正在加载智能体..</option>
                   )}
                   {agents.map((agent) => (
                     <option key={agent.agentId} value={agent.agentId}>
@@ -1893,7 +1835,7 @@ export default function Home() {
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
                   <span className="text-[10px] text-slate-500 font-medium leading-tight">
-                    鏅鸿兘鍔╂墜鍦ㄧ嚎
+                    智能助手在线
                   </span>
                 </div>
               </div>
@@ -1955,10 +1897,10 @@ export default function Home() {
                               <summary className="inline-flex items-center gap-2 cursor-pointer text-xs text-slate-500 hover:text-slate-700 font-medium select-none bg-white border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm transition-all hover:border-slate-300">
                                 <Icons.Sparkles className="w-3.5 h-3.5 text-indigo-400" />
                                 <span className="group-open/details:hidden">
-                                  灞曞紑鎵ц姝ラ
+                                  展开执步骤
                                 </span>
                                 <span className="hidden group-open/details:inline">
-                                  鏀惰捣鎵ц姝ラ
+                                  收起执行步骤
                                 </span>
                               </summary>
                               <div className="mt-2 flex flex-col gap-2 p-3 bg-slate-50/50 border border-slate-200 rounded-xl shadow-sm text-sm text-slate-600 max-w-none overflow-x-auto">
@@ -2131,8 +2073,8 @@ export default function Home() {
                 onKeyDown={handleKeyDown}
                 placeholder={
                   isSending
-                    ? "AI 姝ｅ湪鐢熸垚涓?.."
-                    : "杈撳叆鎮ㄧ殑闂锛屾弿杩版偍鐨勯渶姹?.."
+                    ? "AI 正在生成中..."
+                    : "输入您的问题，描述您的需求..."
                 }
                 disabled={isSending}
                 className="flex-1 px-4 py-3 bg-transparent border-none focus:ring-0 text-[15px] text-slate-800 placeholder:text-slate-400 resize-none max-h-[300px] min-h-[80px] scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent disabled:opacity-50 disabled:cursor-not-allowed leading-relaxed"
@@ -2144,7 +2086,7 @@ export default function Home() {
                   <button
                     onClick={handleStopStream}
                     className="p-2.5 rounded-lg transition-all duration-200 flex items-center justify-center bg-red-100 text-red-600 hover:bg-red-200 shadow-sm"
-                    title="鍋滄鐢熸垚"
+                    title="停止生成"
                   >
                     <Icons.Square className="w-4 h-4" />
                   </button>
@@ -2169,7 +2111,7 @@ export default function Home() {
                   onClick={handleRestartSession}
                   disabled={isSending}
                   className="p-2.5 rounded-lg bg-white text-slate-400 hover:bg-slate-50 hover:text-indigo-600 transition-all duration-200 border border-slate-200 hover:border-indigo-100 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-                  title="閲嶅惎瀵硅瘽"
+                  title="重启对话"
                 >
                   <Icons.Plus className="w-4 h-4" />
                 </button>
@@ -2198,7 +2140,7 @@ export default function Home() {
                   }}
                   className="appearance-none bg-transparent border-none text-[11px] font-medium text-slate-600 focus:ring-0 py-1 pl-1 pr-5 cursor-pointer outline-none"
                 >
-                  <option value="default">榛樿妯″瀷</option>
+                  <option value="default">默认模型</option>
                   {customModels
                     .filter((m) => m.enabled)
                     .map((m) => (
@@ -2207,7 +2149,7 @@ export default function Home() {
                       </option>
                     ))}
                   <option disabled>鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€</option>
-                  <option value="add_new">+ 绠＄悊妯″瀷</option>
+                  <option value="add_new">+ 管理模型</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-slate-400">
                   <svg
@@ -2221,14 +2163,14 @@ export default function Home() {
               </div>
               <span className="text-[10px] text-slate-400 ml-auto hidden sm:inline">
                 <kbd className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-slate-500">
-                  鍥炶溅
+                  回车
                 </kbd>{" "}
-                鍙戦€?
+                发送
               </span>
             </div>
             <div className="text-center mt-1.5">
               <p className="text-[10px] text-slate-400">
-                {isSending ? streamProgress || "鐢熸垚涓?.." : ""}
+                {isSending ? streamProgress || "生成中.." : ""}
               </p>
             </div>
           </div>
@@ -2245,9 +2187,9 @@ export default function Home() {
                   <Icons.Download className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-slate-800">瀵煎嚭瀹屾垚</h2>
+                  <h2 className="text-lg font-bold text-slate-800">导出完成</h2>
                   <p className="text-xs text-slate-500">
-                    褰撳墠鍥剧宸茬粡鎴愬姛杞崲锛屽彲鐩存帴棰勮鎴栦笅杞姐€?
+                    当前图稿已经成功转换，可直接预览或下载。
                   </p>
                 </div>
               </div>
@@ -2274,15 +2216,15 @@ export default function Home() {
                 onClick={() => setImgData(null)}
                 className="px-5 py-2.5 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors text-sm"
               >
-                鍏抽棴棰勮
+                关闭预览
               </button>
               <a
                 href={imgData}
-                download="娴佺▼鍥剧.svg"
+                download="流程图稿.svg"
                 className="px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all text-sm flex items-center gap-2"
               >
                 <Icons.Download className="w-4 h-4" />
-                涓嬭浇鏂囦欢
+                下载文件
               </a>
             </div>
           </div>
@@ -2305,7 +2247,7 @@ export default function Home() {
 
             <div className="p-6">
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                浼氳瘽鍚嶇О
+                会话名称
               </label>
               <input
                 type="text"
@@ -2313,7 +2255,7 @@ export default function Home() {
                 onChange={(e) => setNewSessionTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleRenameSave()}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                placeholder="杈撳叆鏂扮殑浼氳瘽鍚嶇О"
+                placeholder="输入新的会话名称"
                 autoFocus
               />
             </div>
@@ -2323,13 +2265,13 @@ export default function Home() {
                 onClick={() => setIsRenameModalOpen(false)}
                 className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-100 rounded-lg transition-colors text-sm"
               >
-                鍙栨秷
+                取消
               </button>
               <button
                 onClick={handleRenameSave}
                 className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all text-sm"
               >
-                淇濆瓨淇敼
+                保存修改
               </button>
             </div>
           </div>
@@ -2367,7 +2309,7 @@ export default function Home() {
                     onClick={handleAddNewModel}
                     className="w-full flex items-center justify-center gap-2 py-2 bg-white border border-indigo-200 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors shadow-sm text-sm font-medium"
                   >
-                    <Icons.Plus className="w-4 h-4" /> 娣诲姞妯″瀷
+                    <Icons.Plus className="w-4 h-4" /> 添加模型
                   </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -2423,9 +2365,9 @@ export default function Home() {
                   ))}
                   {customModels.length === 0 && (
                     <div className="text-center text-xs text-slate-400 py-6">
-                      鏆傛棤鑷畾涔夋ā鍨?
+                      暂无自定义模型
                       <br />
-                      鐐瑰嚮涓婃柟鎸夐挳娣诲姞
+                      点击上方按钮添加
                     </div>
                   )}
                 </div>
@@ -2437,7 +2379,7 @@ export default function Home() {
                   <div className="space-y-4 animate-in fade-in duration-200">
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        灞曠ず鍚嶇О
+                        显示名称
                       </label>
                       <input
                         type="text"
@@ -2449,12 +2391,12 @@ export default function Home() {
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="渚嬪锛氭垜鐨凣PT-4o"
+                        placeholder="例如：我的GPT-4o"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        妯″瀷鍚嶇О
+                        模型名称
                       </label>
                       <input
                         type="text"
@@ -2466,12 +2408,12 @@ export default function Home() {
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="渚嬪锛歡pt-4o"
+                        placeholder="例如：gpt-4o"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        鎺ュ彛鍦板潃
+                        接口地址
                       </label>
                       <input
                         type="text"
@@ -2483,12 +2425,12 @@ export default function Home() {
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="渚嬪锛歨ttps://api.openai.com"
+                        placeholder="例如：https://api.openai.com"
                       />
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        鎺ュ彛瀵嗛挜
+                        接口密钥
                       </label>
                       <input
                         type="password"
@@ -2505,7 +2447,7 @@ export default function Home() {
                     </div>
                     <div>
                       <label className="block text-xs font-medium text-slate-700 mb-1">
-                        瀵硅瘽鎺ュ彛璺緞锛堝彲閫夛級
+                        对话接口路径（可选）
                       </label>
                       <input
                         type="text"
@@ -2517,7 +2459,7 @@ export default function Home() {
                           })
                         }
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
-                        placeholder="榛樿涓?v1/chat/completions"
+                        placeholder="默认为 v1/chat/completions"
                       />
                     </div>
                     <div className="pt-2 flex justify-end">
@@ -2525,14 +2467,14 @@ export default function Home() {
                         onClick={handleSaveEditingModel}
                         className="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-sm transition-all text-sm"
                       >
-                        淇濆瓨閰嶇疆
+                        保存配置
                       </button>
                     </div>
                   </div>
                 ) : (
                   <div className="h-full flex flex-col items-center justify-center text-slate-400">
                     <Icons.Sparkles className="w-12 h-12 mb-3 opacity-20" />
-                    <p className="text-sm">閫夋嫨宸︿晶妯″瀷杩涜缂栬緫锛屾垨鐐瑰嚮娣诲姞</p>
+                    <p className="text-sm">选择左侧模型进行编辑，或点击添加</p>
                   </div>
                 )}
               </div>
@@ -2540,6 +2482,7 @@ export default function Home() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ export interface SubmitAiTaskRequest {
   draftId: number;
   taskType: AiTaskType;
   promptParams?: Record<string, unknown>;
+  enableIllustration?: boolean;
 }
 
 export interface SubmitAiTaskResponse {
@@ -36,7 +37,7 @@ export interface StreamChunk {
 }
 
 export interface StreamEvent {
-  phase: 'analyzing' | 'generating' | 'reviewing' | 'thinking' | 'done' | 'error';
+  phase: 'analyzing' | 'generating' | 'illustrating' | 'reviewing' | 'thinking' | 'done' | 'error';
   chunk: StreamChunk;
 }
 

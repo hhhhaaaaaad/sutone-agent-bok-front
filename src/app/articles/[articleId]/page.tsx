@@ -2,8 +2,14 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { articlesApi } from '@/api/articles';
+import { socialApi } from '@/api/social';
+import { API_CONFIG } from '@/config/api-config';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import CommentSection from '@/components/CommentSection';
+import RecommendList from '@/components/RecommendList';
+import FollowButton from '@/components/FollowButton';
 import type { ArticleDetailResponse } from '@/types/article';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
 
@@ -14,9 +20,23 @@ export default function ArticleDetailPage() {
   const [article, setArticle] = useState<ArticleDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentUser, setCurrentUser] = useState('');
   const [reverting, setReverting] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [likeLoading, setLikeLoading] = useState(false);
+  const [favorited, setFavorited] = useState(false);
+  const [favoriteCount, setFavoriteCount] = useState(0);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<number | undefined>();
   const fetchedRef = useRef(false);
 
+  useEffect(() => {
+    const info = getUserInfo();
+    setCurrentUser(info?.user || '');
+    setCurrentUserId(info?.userId);
+  }, []);
   useEffect(() => {
     if (!articleId) return;
     if (fetchedRef.current) return;
@@ -25,6 +45,18 @@ export default function ArticleDetailPage() {
       try {
         const resp = await articlesApi.detail(articleId);
         setArticle(resp.data);
+        setLikeCount(resp.data.likeCount);
+        setFavoriteCount(resp.data.favoriteCount);
+        try {
+          const likeStatus = await socialApi.getLikeStatus(articleId);
+          setLiked(likeStatus.data.liked);
+          setLikeCount(likeStatus.data.likeCount);
+        } catch { /* use detail-provided count */ }
+        try {
+          const favStatus = await socialApi.getFavoriteStatus(articleId);
+          setFavorited(favStatus.data.favorited);
+          setFavoriteCount(favStatus.data.favoriteCount);
+        } catch { /* use detail-provided count */ }
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : '加载失败');
       } finally {
@@ -32,6 +64,8 @@ export default function ArticleDetailPage() {
       }
     })();
   }, [articleId]);
+
+  const handleLogout = () => { clearUserInfo(); router.push('/login'); };
 
   const handleRevertToDraft = async () => {
     if (!articleId || reverting) return;
@@ -42,6 +76,50 @@ export default function ArticleDetailPage() {
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : '回退失败');
       setReverting(false);
+    }
+  };
+
+  const handleLikeToggle = async () => {
+    if (likeLoading) return;
+    setLikeLoading(true);
+    const prevLiked = liked;
+    const prevCount = likeCount;
+    const nextCount = liked ? likeCount - 1 : likeCount + 1;
+    setLiked(!liked);
+    setLikeCount(nextCount);
+    try {
+      const resp = liked
+        ? await socialApi.unlike(articleId)
+        : await socialApi.like(articleId);
+      setLiked(resp.data.liked);
+      setLikeCount(Math.max(resp.data.likeCount, nextCount));
+    } catch {
+      setLiked(prevLiked);
+      setLikeCount(prevCount);
+    } finally {
+      setLikeLoading(false);
+    }
+  };
+
+  const handleFavoriteToggle = async () => {
+    if (favoriteLoading) return;
+    setFavoriteLoading(true);
+    const prevFav = favorited;
+    const prevCount = favoriteCount;
+    const nextCount = favorited ? favoriteCount - 1 : favoriteCount + 1;
+    setFavorited(!favorited);
+    setFavoriteCount(nextCount);
+    try {
+      const resp = favorited
+        ? await socialApi.unfavorite(articleId)
+        : await socialApi.favorite(articleId);
+      setFavorited(resp.data.favorited);
+      setFavoriteCount(Math.max(resp.data.favoriteCount, nextCount));
+    } catch {
+      setFavorited(prevFav);
+      setFavoriteCount(prevCount);
+    } finally {
+      setFavoriteLoading(false);
     }
   };
 
@@ -64,8 +142,8 @@ export default function ArticleDetailPage() {
 
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto max-w-[980px] overflow-hidden bg-[#fcfbf8]">
-        <WorkspaceHeader activePath="/articles" />
+      <div className="workspace-shell mx-auto max-w-[1280px] overflow-hidden bg-[#fcfbf8]">
+        <WorkspaceHeader activePath="/articles" userName={currentUser} onLogout={handleLogout} />
         <header className="border-b border-[#e6e2db] flex items-center justify-between px-5 py-4 md:px-7">
           <div className="flex items-center gap-3">
             <button onClick={() => router.push('/articles')} className="workspace-secondary-btn px-3 py-2 text-sm font-medium">
@@ -83,11 +161,29 @@ export default function ArticleDetailPage() {
         </header>
 
         <main className="px-5 py-8 md:px-10 md:py-10">
+          {article.coverUrl && (
+            <div className="mb-8 overflow-hidden rounded-[16px] border border-[#e6e2db]">
+              <img
+                src={article.coverUrl.startsWith('http') ? article.coverUrl : API_CONFIG.UPLOAD_BASE + article.coverUrl}
+                alt={article.title}
+                className="w-full object-cover max-h-[420px]"
+              />
+            </div>
+          )}
           <h1 className="workspace-editorial text-[42px] leading-[1.05] text-[#22252a] md:text-[56px]">{article.title}</h1>
 
-          <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-[#858c96]">
-            <span>发布于 {article.publishTime}</span>
-            <span>{article.viewCount} 阅读</span>
+          <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-[#e6e2db] flex items-center justify-center text-[11px] font-medium text-slate-600 shrink-0">
+                {(article.authorName || article.authorId || '?').toString()[0]}
+              </div>
+              <span className="text-[#22252a] font-medium">{article.authorName || `用户 #${article.authorId}`}</span>
+              {article.authorId && article.authorId !== currentUserId && (
+                <FollowButton key={article.authorId} targetUserId={article.authorId} />
+              )}
+            </div>
+            <span className="text-[#858c96]">发布于 {article.publishTime}</span>
+            <span className="text-[#858c96]">{article.viewCount} 阅读</span>
             {article.tags?.map(tag => (
               <span key={tag} className="workspace-status">{tag}</span>
             ))}
@@ -103,19 +199,31 @@ export default function ArticleDetailPage() {
             <MarkdownRenderer
               key={article.articleId}
               content={article.contentMd || ''}
-              stream
             />
           </article>
 
           <div className="mt-12 flex flex-wrap items-center gap-3 border-t border-[#e6e2db] pt-6">
-            <button disabled className="workspace-secondary-btn px-4 py-2 text-sm text-[#858c96] disabled:cursor-not-allowed">
-              点赞 {article.likeCount}
+            <button
+              onClick={handleLikeToggle}
+              disabled={likeLoading}
+              className={`px-4 py-2 text-sm font-medium ${liked ? 'workspace-primary-btn' : 'workspace-secondary-btn'} disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {likeLoading ? '...' : liked ? `已点赞 ${likeCount}` : `点赞 ${likeCount}`}
             </button>
-            <button disabled className="workspace-secondary-btn px-4 py-2 text-sm text-[#858c96] disabled:cursor-not-allowed">
-              收藏 {article.favoriteCount}
+            <button
+              onClick={handleFavoriteToggle}
+              disabled={favoriteLoading}
+              className={`px-4 py-2 text-sm font-medium ${favorited ? 'workspace-primary-btn' : 'workspace-secondary-btn'} disabled:opacity-50 disabled:cursor-not-allowed`}
+            >
+              {favoriteLoading ? '...' : favorited ? `已收藏 ${favoriteCount}` : `收藏 ${favoriteCount}`}
             </button>
-            <span className="ml-auto text-xs text-[#858c96]">互动功能将在后续阶段接入</span>
+            {commentCount > 0 && (
+              <span className="text-sm text-slate-400 ml-2">{commentCount} 条评论</span>
+            )}
           </div>
+
+          <CommentSection articleId={articleId} currentUserId={currentUserId} />
+          <RecommendList />
         </main>
       </div>
     </div>

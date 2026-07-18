@@ -43,6 +43,55 @@ function EditorContent({
         [CrepeFeature.Latex]: true,
         [CrepeFeature.TopBar]: true,
       },
+      featureConfigs: {
+        [CrepeFeature.CodeMirror]: {
+          renderPreview: (language: string, content: string, applyPreview: (v: null | string | HTMLElement) => void) => {
+            if (language !== "drawio" || !content.trim()) {
+              applyPreview(null);
+              return;
+            }
+
+            const container = document.createElement("div");
+            container.className = "drawio-preview";
+            container.style.minHeight = "300px";
+            container.style.overflow = "auto";
+
+            const div = document.createElement("div");
+            div.className = "mxgraph";
+            div.setAttribute("data-mxgraph", JSON.stringify({
+              highlight: "#0000ff",
+              nav: true,
+              resize: true,
+              toolbar: "zoom layers lightbox",
+              edit: "_blank",
+              xml: content.trim(),
+            }));
+            container.appendChild(div);
+            applyPreview(container);
+
+            const SRC = "https://viewer.diagrams.net/js/viewer-static.min.js";
+            const doRender = () => {
+              const gv = window.GraphViewer;
+              if (gv) {
+                if (typeof gv.processElements === "function") {
+                  gv.processElements(div);
+                } else if (typeof gv.createViewerForElement === "function") {
+                  gv.createViewerForElement(div);
+                }
+              }
+            };
+
+            if (document.querySelector(`script[src="${SRC}"]`)) {
+              setTimeout(doRender, 10);
+            } else {
+              const script = document.createElement("script");
+              script.src = SRC;
+              script.onload = doRender;
+              document.head.appendChild(script);
+            }
+          },
+        },
+      },
     });
 
     crepe.on((listener) => {

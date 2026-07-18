@@ -2,13 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { articlesApi } from '@/api/articles';
-import type { ArticlePageItem } from '@/types/article';
+import { API_CONFIG } from '@/config/api-config';
+import type { ArticlePageItem, LeaderboardItem } from '@/types/article';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
 import Pagination from '@/components/Pagination';
 
 export default function ArticlesPage() {
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState('');
   const [articles, setArticles] = useState<ArticlePageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,6 +19,8 @@ export default function ArticlesPage() {
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
   const [keyword, setKeyword] = useState('');
+  const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const fetchedRef = useRef(false);
 
@@ -34,8 +39,18 @@ export default function ArticlesPage() {
     if (fetchedRef.current) return;
     fetchedRef.current = true;
     queueMicrotask(() => fetchPage(1, pageSize, ''));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => { queueMicrotask(() => setCurrentUser(getUserInfo()?.user || '')); }, []);
+
+  useEffect(() => {
+    articlesApi.leaderboard('daily', 5)
+      .then((resp) => setLeaderboard(resp.data ?? []))
+      .catch(() => {})
+      .finally(() => setLeaderboardLoading(false));
+  }, []);
+
+  const handleLogout = () => { clearUserInfo(); router.push('/login'); };
 
   const handleSearch = (value: string) => {
     setKeyword(value);
@@ -68,7 +83,7 @@ export default function ArticlesPage() {
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
       <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1280px] flex-col overflow-hidden">
-        <WorkspaceHeader activePath="/articles" />
+        <WorkspaceHeader activePath="/articles" userName={currentUser} onLogout={handleLogout} />
         <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[220px_minmax(0,1fr)_280px]">
         <aside className="workspace-sidebar-soft flex flex-col gap-5 px-5 py-6">
           <div>
@@ -134,8 +149,11 @@ export default function ArticlesPage() {
                           {featured.summary || '这篇文章已经进入可公开阅读状态，适合作为专题内容、案例复盘或长期知识资产的代表页。'}
                         </p>
                         <div className="mt-5 flex flex-wrap items-center gap-3 text-xs text-[#858c96]">
+                          {featured.authorName && <span>{featured.authorName}</span>}
                           <span>{featured.publishTime || '刚刚发布'}</span>
                           <span>{featured.viewCount} 阅读</span>
+                          <span>{featured.likeCount} 赞</span>
+                          <span>{featured.favoriteCount} 收藏</span>
                         </div>
                         <div className="mt-5 flex flex-wrap gap-3">
                           <button
@@ -154,13 +172,8 @@ export default function ArticlesPage() {
                 )}
 
                 <section className="mt-6">
-                  <div className="mb-4 flex items-center justify-between gap-3">
+                  <div className="mb-4">
                     <h3 className="text-xl font-semibold text-[#22252a]">精选文章</h3>
-                    <div className="flex gap-2">
-                      {['最新', '发布', '笔记'].map((item) => (
-                        <span key={item} className="workspace-toolbar-chip">{item}</span>
-                      ))}
-                    </div>
                   </div>
 
                   <div className="grid gap-4">
@@ -173,8 +186,19 @@ export default function ArticlesPage() {
                           onClick={() => router.push(`/articles/${article.articleId}`)}
                           className="workspace-panel workspace-panel-hover grid w-full grid-cols-[80px_minmax(0,1fr)] gap-4 rounded-[16px] p-5 text-left"
                         >
-                          <div className="workspace-subpanel flex items-center justify-center rounded-[10px] text-xs text-[#b5aea4]">
-                            封面
+                          <div className="workspace-subpanel flex h-[80px] items-center justify-center rounded-[10px] overflow-hidden">
+                            {article.coverUrl ? (
+                              <img
+                                src={article.coverUrl.startsWith('http') ? article.coverUrl : API_CONFIG.UPLOAD_BASE + article.coverUrl}
+                                alt={article.title}
+                                className="h-full w-full object-cover"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                  (e.target as HTMLImageElement).parentElement!.querySelector('.cover-fallback')!.classList.remove('hidden');
+                                }}
+                              />
+                            ) : null}
+                            <span className={`text-xs text-[#b5aea4] cover-fallback ${article.coverUrl ? 'hidden' : ''}`}>封面</span>
                           </div>
                           <div>
                             <h4 className="text-[22px] font-medium tracking-tight text-[#22252a]">{article.title}</h4>
@@ -185,8 +209,11 @@ export default function ArticlesPage() {
                               {article.tags?.slice(0, 3).map((tag) => (
                                 <span key={tag} className="workspace-status">{tag}</span>
                               ))}
+                              {article.authorName && <span>{article.authorName}</span>}
                               <span>{article.publishTime || '刚刚发布'}</span>
                               <span>{article.viewCount} 阅读</span>
+                              <span>{article.likeCount} 赞</span>
+                              <span>{article.favoriteCount} 收藏</span>
                             </div>
                           </div>
                         </button>
@@ -223,6 +250,40 @@ export default function ArticlesPage() {
                 ))
               )}
             </div>
+          </div>
+
+          <div className="workspace-panel rounded-[12px] p-4">
+            <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">热门排行</p>
+            {leaderboardLoading ? (
+              <p className="mt-3 text-sm text-[#858c96]">加载中...</p>
+            ) : leaderboard.length === 0 ? (
+              <p className="mt-3 text-sm text-[#858c96]">暂无排行数据</p>
+            ) : (
+              <ol className="mt-3 space-y-2">
+                {leaderboard.map((item, index) => (
+                  <li key={item.articleId}>
+                    <button
+                      onClick={() => router.push(`/articles/${item.articleId}`)}
+                      className="workspace-ghost-btn flex w-full items-center gap-3 rounded-[10px] px-2 py-2 text-left"
+                    >
+                      <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${
+                        index === 0
+                          ? 'bg-[#f5d76e] text-[#5c4a1e]'
+                          : index === 1
+                            ? 'bg-[#d1d5db] text-[#374151]'
+                            : index === 2
+                              ? 'bg-[#e8c396] text-[#6b4c2a]'
+                              : 'text-[#858c96]'
+                      }`}>
+                        {index + 1}
+                      </span>
+                      <span className="flex-1 truncate text-sm text-[#5d636c]">{item.title}</span>
+                      <span className="workspace-mono text-[11px] text-[#858c96]">{item.heatScore} 热度</span>
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            )}
           </div>
         </aside>
         </div>

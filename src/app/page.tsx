@@ -121,9 +121,9 @@ export default function Lobby() {
 
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
-      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1180px] flex-col overflow-hidden">
+      <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1280px] flex-col overflow-hidden">
         <WorkspaceHeader activePath="/" userName={currentUser} onLogout={handleLogout} />
-        <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[224px_1fr]">
+        <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[220px_1fr]">
         <aside className="workspace-sidebar flex flex-col px-5 py-5">
           <div className="workspace-panel rounded-[12px] p-4">
             <p className="workspace-mono text-[11px] tracking-[0.14em] text-[#858c96]">
@@ -156,16 +156,6 @@ export default function Lobby() {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <input
-                className="workspace-input w-[280px] max-w-full text-sm"
-                placeholder="搜索草稿、工具或资料库"
-              />
-              <button
-                onClick={handleNewDraft}
-                className="workspace-primary-btn h-[42px] px-5 text-sm font-medium"
-              >
-                新建草稿
-              </button>
             </div>
           </header>
 

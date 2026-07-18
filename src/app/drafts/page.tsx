@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { getUserInfo } from '@/utils/cookie';
+import { getUserInfo, clearUserInfo } from '@/utils/cookie';
 import { draftsApi } from '@/api/drafts';
 import type { DraftPageItem } from '@/types/draft';
 import WorkspaceHeader from '@/components/WorkspaceHeader';
@@ -21,7 +21,11 @@ const FILTERS: Array<{ key: FilterKey; label: string }> = [
 
 export default function DraftsPage() {
   const router = useRouter();
-  const [currentUser] = useState(() => getUserInfo()?.user || '');
+  const [currentUser, setCurrentUser] = useState('');
+
+  useEffect(() => {
+    setCurrentUser(getUserInfo()?.user || '');
+  }, []);
   const [drafts, setDrafts] = useState<DraftPageItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -29,6 +33,9 @@ export default function DraftsPage() {
   const [pageNo, setPageNo] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [total, setTotal] = useState(0);
+  const [searchText, setSearchText] = useState('');
+
+  const handleLogout = () => { clearUserInfo(); router.push('/login'); };
 
   const loadDrafts = useCallback(async (pn: number, ps: number) => {
     setLoading(true);
@@ -83,6 +90,10 @@ export default function DraftsPage() {
     if (activeFilter === 'ready') return draft.status === 1;
     if (activeFilter === 'archived') return draft.status === 2;
     return true;
+  }).filter((draft) => {
+    if (!searchText.trim()) return true;
+    const kw = searchText.trim().toLowerCase();
+    return (draft.title || '').toLowerCase().includes(kw);
   });
 
   const featured = filteredDrafts[0] ?? drafts[0];
@@ -96,7 +107,7 @@ export default function DraftsPage() {
   return (
     <div className="min-h-screen theme-bg-gradient p-5">
       <div className="workspace-shell mx-auto flex min-h-[calc(100vh-40px)] max-w-[1280px] flex-col overflow-hidden">
-        <WorkspaceHeader activePath="/drafts" userName={currentUser} />
+        <WorkspaceHeader activePath="/drafts" userName={currentUser} onLogout={handleLogout} />
         <div className="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[220px_minmax(0,1fr)_280px]">
         <aside className="workspace-sidebar-soft flex flex-col gap-5 px-5 py-6">
           <div>
@@ -132,7 +143,12 @@ export default function DraftsPage() {
               <h2 className="mt-1 text-[34px] font-semibold tracking-tight text-[#22252a]">继续整理你的写作项目</h2>
             </div>
             <div className="flex flex-wrap items-center gap-3">
-              <input className="workspace-search w-[180px]" placeholder="按标题或状态搜索" />
+              <input
+                className="workspace-search w-[180px]"
+                placeholder="搜索草稿标题..."
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
               <button onClick={() => loadDrafts(pageNo, pageSize)} className="workspace-secondary-btn px-4 py-2.5 text-sm font-medium">
                 刷新
               </button>

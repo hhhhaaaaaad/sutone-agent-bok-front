@@ -349,6 +349,7 @@ export default function DraftEditorPage() {
               <AiWritingPanel
                 draftId={draftId}
                 content={content}
+                title={title}
                 getPromptParams={getPromptParams}
                 onApplyResult={handleApplyResult}
               />

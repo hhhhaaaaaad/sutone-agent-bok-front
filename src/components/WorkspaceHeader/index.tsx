@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import ThemeToggle from "@/components/Theme/ThemeToggle";
 import NotificationBell from "@/components/NotificationBell";
 
-type IconName = "home" | "draft" | "article" | "flow" | "slides" | "dashboard" | "user";
+type IconName = "home" | "draft" | "article" | "flow" | "slides" | "dashboard" | "memory" | "user";
 
 const NAV_ITEMS: Array<{ label: string; path: string; icon: IconName }> = [
   { label: "首页", path: "/", icon: "home" },
@@ -13,6 +13,7 @@ const NAV_ITEMS: Array<{ label: string; path: string; icon: IconName }> = [
   { label: "流程图", path: "/drawio", icon: "flow" },
   { label: "演示", path: "/ppt", icon: "slides" },
   { label: "数据", path: "/dashboard", icon: "dashboard" },
+  { label: "记忆", path: "/memory", icon: "memory" },
   { label: "我的", path: "/me", icon: "user" },
 ];
 
@@ -34,6 +35,9 @@ function NavIcon({ name }: { name: IconName }) {
   }
   if (name === "dashboard") {
     return <><rect x="3" y="12" width="18" height="9" rx="1" /><path d="M3 8l4-5 4 3 4-4 4 3v1H3V8Z" /></>;
+  }
+  if (name === "memory") {
+    return <><path d="M12 2a7 7 0 0 1 7 7c0 2.8-1.6 5.2-4 6.3V17H9v-1.7C6.6 14.2 5 11.8 5 9a7 7 0 0 1 7-7Z"/><rect x="9" y="18" width="6" height="3" rx="1"/></>;
   }
   return <><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></>;
 }

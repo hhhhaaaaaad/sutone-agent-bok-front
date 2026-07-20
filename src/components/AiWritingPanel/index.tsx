@@ -3,11 +3,14 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { aiWritingApi } from "@/api/ai-writing";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
+import WritingChatPanel from "@/components/WritingChatPanel";
+import { getUserInfo } from "@/utils/cookie";
 import type { AiTaskStatus, AiTaskType, AiTaskDetailResponse, StreamEvent } from "@/types/ai-writing";
 
 interface AiWritingPanelProps {
   draftId: number;
   content: string;
+  title: string;
   getPromptParams: () => Record<string, unknown>;
   onApplyResult: (action: "append" | "replace" | "fillSummary", resultContent: string) => void;
 }
@@ -70,7 +73,8 @@ function PhaseIndicator({ phase }: { phase: string }) {
   );
 }
 
-export default function AiWritingPanel({ draftId, getPromptParams, onApplyResult }: AiWritingPanelProps) {
+export default function AiWritingPanel({ draftId, content, title, getPromptParams, onApplyResult }: AiWritingPanelProps) {
+  const [mode, setMode] = useState<"quick" | "chat">("quick");
   const [customInstruction, setCustomInstruction] = useState("");
   const [enableIllustration, setEnableIllustration] = useState(false);
   const [showAux, setShowAux] = useState(false);
@@ -169,8 +173,26 @@ export default function AiWritingPanel({ draftId, getPromptParams, onApplyResult
       </button>
     ));
 
+  const userId = getUserInfo()?.userId ?? 0;
+
   return (
-    <div className="workspace-subpanel rounded-[12px] p-4">
+    <div className="workspace-subpanel rounded-[12px] p-4 h-[560px] flex flex-col">
+      {/* Tab 切换 */}
+      <div className="flex rounded-[10px] bg-[#f7f5f2] p-0.5 mb-3 shrink-0" role="tablist">
+        <button onClick={() => setMode("quick")} role="tab" aria-selected={mode === "quick"}
+          className={`flex-1 rounded-[8px] py-1.5 text-xs transition ${
+            mode === "quick" ? "bg-white shadow-sm text-[#22252a]" : "text-[#858c96]"}`}>
+          快捷操作
+        </button>
+        <button onClick={() => setMode("chat")} role="tab" aria-selected={mode === "chat"}
+          className={`flex-1 rounded-[8px] py-1.5 text-xs transition ${
+            mode === "chat" ? "bg-white shadow-sm text-[#22252a]" : "text-[#858c96]"}`}>
+          对话写作
+        </button>
+      </div>
+
+      {/* 快捷操作面板（CSS hidden 保持状态） */}
+      <div className={`flex-1 min-h-0 overflow-y-auto ${mode === 'quick' ? '' : 'hidden'}`}>
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-[#22252a]">AI 写作助手</p>
         {currentTaskId && <span className="text-[10px] text-[#858c96]">#{currentTaskId}</span>}
@@ -253,6 +275,18 @@ export default function AiWritingPanel({ draftId, getPromptParams, onApplyResult
           </div>
         </div>
       )}
+      </div>
+
+      {/* 对话写作面板（CSS hidden 保持状态） */}
+      <div className={`flex-1 min-h-0 overflow-hidden ${mode === 'chat' ? '' : 'hidden'}`}>
+        <WritingChatPanel
+          userId={userId}
+          draftId={draftId}
+          draftTitle={title}
+          draftContent={content}
+          onApplyResult={(action, text) => onApplyResult(action, text)}
+        />
+      </div>
     </div>
   );
 }

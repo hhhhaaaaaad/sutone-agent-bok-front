@@ -28,19 +28,36 @@ export default function WritingChatPanel({
   const requestId = useRef(0);
   const firstMessageSent = useRef(false);
 
-  // 创建会话
+  const SESSION_STORAGE_KEY = "writing_chat_session_id";
+
+  // 获取或创建会话 + 加载历史
   useEffect(() => {
     (async () => {
       try {
-        const sid = await writingChatApi.createSession(draftId);
+        let sid = localStorage.getItem(SESSION_STORAGE_KEY);
+
+        if (!sid) {
+          sid = await writingChatApi.createSession();
+          localStorage.setItem(SESSION_STORAGE_KEY, sid);
+        }
+
         setSessionId(sid);
         setSessionError("");
+
+        // 加载历史消息
+        try {
+          const history = await writingChatApi.getHistory(sid);
+          setMessages(history);
+        } catch {
+          // 历史加载失败不影响使用
+          console.warn("加载历史消息失败");
+        }
       } catch (e: unknown) {
         setSessionError(e instanceof Error ? e.message : "创建会话失败");
       }
     })();
     return () => { controllerRef.current?.abort(); };
-  }, [userId, draftId]);
+  }, [userId]);
 
   // 自动滚动
   useEffect(() => {
@@ -94,7 +111,8 @@ export default function WritingChatPanel({
           // Session 过期自动重连
           if (err.message.includes('Session not found') || err.message.includes('500')) {
             try {
-              const newSid = await writingChatApi.createSession(draftId);
+              const newSid = await writingChatApi.createSession();
+              localStorage.setItem(SESSION_STORAGE_KEY, newSid);
               setSessionId(newSid);
               setMessages(prev => [...prev, { role: "assistant", content: "[会话已过期，已自动重连，请重新发送消息]" }]);
             } catch {
@@ -122,10 +140,10 @@ export default function WritingChatPanel({
 
   const handleSave = async () => {
     if (!sessionId || messages.length === 0) return;
-    const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
-    const lastAssistant = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
+    // 取最近 20 条对话，以 {role, content} 数组传给后端
+    const recentMessages = messages.slice(-20).map(m => ({ role: m.role, content: m.content }));
     try {
-      await writingChatApi.save(sessionId, lastUser, lastAssistant);
+      await writingChatApi.save(sessionId, recentMessages);
       setSaved(true);
     } catch (e) {
       console.error("保存记忆失败", e);

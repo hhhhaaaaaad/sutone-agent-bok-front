@@ -888,8 +888,9 @@ export default function Home() {
         const patch = pendingAgentPatch;
         pendingAgentPatch = null;
 
-        setMessages((prev) =>
-          prev.map((message) => {
+        setMessages((prev) => {
+          let changed = false;
+          const nextMessages = prev.map((message) => {
             if (message.id !== agentMsgId) {
               return message;
             }
@@ -906,6 +907,7 @@ export default function Home() {
               return message;
             }
 
+            changed = true;
             return {
               ...message,
               ...(patch.content !== undefined ? { content: nextContent } : {}),
@@ -914,8 +916,10 @@ export default function Home() {
                 : {}),
               ...(patch.steps !== undefined ? { steps: nextSteps } : {}),
             };
-          }),
-        );
+          });
+
+          return changed ? nextMessages : prev;
+        });
       };
 
       const queueAgentPatch = (patch: Partial<Message>) => {

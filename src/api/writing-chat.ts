@@ -1,15 +1,24 @@
 import { API_CONFIG } from '@/config/api-config';
+import type { ChatMessage } from '@/types/writing-chat';
 const BASE = API_CONFIG.BASE_URL;
 
 export const writingChatApi = {
-  createSession: async (draftId?: number): Promise<string> => {
-    const params = draftId ? `?draftId=${draftId}` : '';
-    const res = await fetch(`${BASE}/writing/chat/create_session${params}`, {
+  createSession: async (): Promise<string> => {
+    const res = await fetch(`${BASE}/writing/chat/create_session`, {
       method: 'POST', credentials: 'include',
     });
     const json = await res.json();
     if (json.code !== '0000') throw new Error(json.info || '创建会话失败');
     return json.data;
+  },
+
+  getHistory: async (sessionId: string, limit = 50): Promise<ChatMessage[]> => {
+    const res = await fetch(`${BASE}/writing/chat/history?sessionId=${encodeURIComponent(sessionId)}&limit=${limit}`, {
+      method: 'GET', credentials: 'include',
+    });
+    const json = await res.json();
+    if (json.code !== '0000') throw new Error(json.info || '加载历史失败');
+    return json.data ?? [];
   },
 
   streamChat: async (
@@ -60,11 +69,11 @@ export const writingChatApi = {
     return controller;
   },
 
-  save: async (sessionId: string, message: string, response: string): Promise<void> => {
+  save: async (sessionId: string, messages: Pick<ChatMessage, "role" | "content">[]): Promise<void> => {
     await fetch(`${BASE}/writing/chat/save`, {
       method: 'POST', credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, message, response }),
+      body: JSON.stringify({ sessionId, messages }),
     });
   },
 };
